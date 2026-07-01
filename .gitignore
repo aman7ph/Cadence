@@ -26,9 +26,6 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 
-# Convex generated
-**/convex/_generated/
-
 # Rust / Cargo build artifacts
 **/target/
 

@@ -148,7 +148,7 @@ importers:
         version: link:../../packages/shared
       '@clerk/clerk-react':
         specifier: ^5.20.0
-        version: 5.61.3(react-dom@19.1.0(react@19.2.7))(react@19.2.7)
+        version: 5.61.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -157,19 +157,19 @@ importers:
         version: 2.1.1
       convex:
         specifier: ^1.30.0
-        version: 1.42.0(@clerk/clerk-react@5.61.3(react-dom@19.1.0(react@19.2.7))(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6)
+        version: 1.42.0(@clerk/clerk-react@5.61.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@6.0.6)
       lucide-react:
         specifier: ^0.469.0
-        version: 0.469.0(react@19.2.7)
+        version: 0.469.0(react@19.1.0)
       react:
-        specifier: ^19.0.0
-        version: 19.2.7
+        specifier: 19.1.0
+        version: 19.1.0
       react-dom:
         specifier: 19.1.0
-        version: 19.1.0(react@19.2.7)
+        version: 19.1.0(react@19.1.0)
       recharts:
         specifier: ^3.9.0
-        version: 3.9.0(@types/react@19.2.17)(react-dom@19.1.0(react@19.2.7))(react-is@19.2.7)(react@19.2.7)(redux@5.0.1)
+        version: 3.9.0(@types/react@19.2.17)(react-dom@19.1.0(react@19.1.0))(react-is@19.2.7)(react@19.1.0)(redux@5.0.1)
       tailwind-merge:
         specifier: ^2.6.0
         version: 2.6.1
@@ -6336,13 +6336,6 @@ snapshots:
       react-dom: 19.1.0(react@19.1.0)
       tslib: 2.8.1
 
-  '@clerk/clerk-react@5.61.3(react-dom@19.1.0(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@clerk/shared': 3.47.7(react-dom@19.1.0(react@19.2.7))(react@19.2.7)
-      react: 19.2.7
-      react-dom: 19.1.0(react@19.2.7)
-      tslib: 2.8.1
-
   '@clerk/clerk-react@5.61.3(react-dom@19.2.7(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@clerk/shared': 3.47.7(react-dom@19.2.7(react@19.1.0))(react@19.1.0)
@@ -6376,18 +6369,6 @@ snapshots:
     optionalDependencies:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
-
-  '@clerk/shared@3.47.7(react-dom@19.1.0(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      csstype: 3.1.3
-      dequal: 2.0.3
-      glob-to-regexp: 0.4.1
-      js-cookie: 3.0.7
-      std-env: 3.10.0
-      swr: 2.3.4(react@19.2.7)
-    optionalDependencies:
-      react: 19.2.7
-      react-dom: 19.1.0(react@19.2.7)
 
   '@clerk/shared@3.47.7(react-dom@19.2.7(react@19.1.0))(react@19.1.0)':
     dependencies:
@@ -7541,7 +7522,7 @@ snapshots:
     dependencies:
       nanoid: 3.3.15
 
-  '@reduxjs/toolkit@2.12.0(react-redux@9.3.0(@types/react@19.2.17)(react@19.2.7)(redux@5.0.1))(react@19.2.7)':
+  '@reduxjs/toolkit@2.12.0(react-redux@9.3.0(@types/react@19.2.17)(react@19.1.0)(redux@5.0.1))(react@19.1.0)':
     dependencies:
       '@standard-schema/spec': 1.1.0
       '@standard-schema/utils': 0.3.0
@@ -7550,8 +7531,8 @@ snapshots:
       redux-thunk: 3.1.0(redux@5.0.1)
       reselect: 5.2.0
     optionalDependencies:
-      react: 19.2.7
-      react-redux: 9.3.0(@types/react@19.2.17)(react@19.2.7)(redux@5.0.1)
+      react: 19.1.0
+      react-redux: 9.3.0(@types/react@19.2.17)(react@19.1.0)(redux@5.0.1)
 
   '@rolldown/pluginutils@1.0.0-beta.27': {}
 
@@ -9128,18 +9109,6 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  convex@1.42.0(@clerk/clerk-react@5.61.3(react-dom@19.1.0(react@19.2.7))(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6):
-    dependencies:
-      esbuild: 0.27.0
-      prettier: 3.9.1
-      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-    optionalDependencies:
-      '@clerk/clerk-react': 5.61.3(react-dom@19.1.0(react@19.2.7))(react@19.2.7)
-      react: 19.2.7
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-
   convex@1.42.0(@clerk/clerk-react@5.61.3(react-dom@19.2.7(react@19.1.0))(react@19.1.0))(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@6.0.6):
     dependencies:
       esbuild: 0.27.0
@@ -10098,9 +10067,9 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lucide-react@0.469.0(react@19.2.7):
+  lucide-react@0.469.0(react@19.1.0):
     dependencies:
-      react: 19.2.7
+      react: 19.1.0
 
   magic-string@0.30.21:
     dependencies:
@@ -10649,11 +10618,6 @@ snapshots:
       react: 19.1.0
       scheduler: 0.26.0
 
-  react-dom@19.1.0(react@19.2.7):
-    dependencies:
-      react: 19.2.7
-      scheduler: 0.26.0
-
   react-dom@19.2.7(react@19.1.0):
     dependencies:
       react: 19.1.0
@@ -10796,11 +10760,11 @@ snapshots:
       react: 19.1.0
       scheduler: 0.25.0
 
-  react-redux@9.3.0(@types/react@19.2.17)(react@19.2.7)(redux@5.0.1):
+  react-redux@9.3.0(@types/react@19.2.17)(react@19.1.0)(redux@5.0.1):
     dependencies:
       '@types/use-sync-external-store': 0.0.6
-      react: 19.2.7
-      use-sync-external-store: 1.6.0(react@19.2.7)
+      react: 19.1.0
+      use-sync-external-store: 1.6.0(react@19.1.0)
     optionalDependencies:
       '@types/react': 19.2.17
       redux: 5.0.1
@@ -10838,7 +10802,8 @@ snapshots:
 
   react@19.1.0: {}
 
-  react@19.2.7: {}
+  react@19.2.7:
+    optional: true
 
   read-cache@1.0.0:
     dependencies:
@@ -10848,21 +10813,21 @@ snapshots:
     dependencies:
       picomatch: 2.3.2
 
-  recharts@3.9.0(@types/react@19.2.17)(react-dom@19.1.0(react@19.2.7))(react-is@19.2.7)(react@19.2.7)(redux@5.0.1):
+  recharts@3.9.0(@types/react@19.2.17)(react-dom@19.1.0(react@19.1.0))(react-is@19.2.7)(react@19.1.0)(redux@5.0.1):
     dependencies:
-      '@reduxjs/toolkit': 2.12.0(react-redux@9.3.0(@types/react@19.2.17)(react@19.2.7)(redux@5.0.1))(react@19.2.7)
+      '@reduxjs/toolkit': 2.12.0(react-redux@9.3.0(@types/react@19.2.17)(react@19.1.0)(redux@5.0.1))(react@19.1.0)
       clsx: 2.1.1
       decimal.js-light: 2.5.1
       es-toolkit: 1.49.0
       eventemitter3: 5.0.4
       immer: 10.2.0
-      react: 19.2.7
-      react-dom: 19.1.0(react@19.2.7)
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
       react-is: 19.2.7
-      react-redux: 9.3.0(@types/react@19.2.17)(react@19.2.7)(redux@5.0.1)
+      react-redux: 9.3.0(@types/react@19.2.17)(react@19.1.0)(redux@5.0.1)
       reselect: 5.2.0
       tiny-invariant: 1.3.3
-      use-sync-external-store: 1.6.0(react@19.2.7)
+      use-sync-external-store: 1.6.0(react@19.1.0)
       victory-vendor: 37.3.6
     transitivePeerDependencies:
       - '@types/react'
@@ -11185,6 +11150,7 @@ snapshots:
       dequal: 2.0.3
       react: 19.2.7
       use-sync-external-store: 1.6.0(react@19.2.7)
+    optional: true
 
   tabbable@6.5.0: {}
 
@@ -11357,6 +11323,7 @@ snapshots:
   use-sync-external-store@1.6.0(react@19.2.7):
     dependencies:
       react: 19.2.7
+    optional: true
 
   utf-8-validate@6.0.6:
     dependencies:

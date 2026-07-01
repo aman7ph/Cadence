@@ -35,3 +35,4 @@ Thumbs.db
 # AI assistant tooling (auto-scaffolded, kept locally, not shipped)
 **/.claude/
 **/.agents/
+.expo

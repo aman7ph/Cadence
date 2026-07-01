@@ -1,0 +1,181 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- Cadence base palette (mirrors Cadence Design System/tokens/colors.css) ---- */
+:root {
+  --slate-950: #0e0f14;
+  --slate-900: #15161b;
+  --slate-800: #1f212a;
+  --slate-700: #2c2f3a;
+  --slate-600: #4a4e5c;
+  --slate-500: #6b7080;
+  --slate-400: #9094a3;
+  --slate-300: #c2c6d0;
+  --slate-200: #e1e4ea;
+  --slate-100: #eff1f5;
+  --slate-50: #f7f8fa;
+  --white: #ffffff;
+
+  --indigo-700: #3a33b8;
+  --indigo-600: #4a40db;
+  --indigo-500: #5b52e8;
+  --indigo-400: #8079f0;
+  --indigo-100: #e6e4fb;
+  --indigo-50: #f2f1fd;
+
+  --green-700: #15803d;
+  --green-600: #1b8a36;
+  --green-500: #2ba84a;
+  --green-100: #dcf3e1;
+  --green-50: #ecfaef;
+
+  --amber-600: #c2820b;
+  --amber-500: #e0a100;
+  --amber-100: #fbefcb;
+  --amber-50: #fdf8ec;
+
+  --red-600: #dc2626;
+  --red-100: #fbe1e1;
+  --red-50: #fdeded;
+
+  /* heatmap ramp */
+  --heat-0: #ebedf0;
+  --heat-1: #c6e8cb;
+  --heat-2: #86cf92;
+  --heat-3: #43ae59;
+  --heat-4: #1b8a36;
+
+  /* chart palette */
+  --chart-1: #5b52e8;
+  --chart-2: #2ba84a;
+  --chart-3: #e0a100;
+  --chart-4: #e06060;
+  --chart-5: #38bdf8;
+  --chart-6: #a78bfa;
+}
+
+/* ---- LIGHT theme (default) — semantic aliases ---- */
+:root,
+[data-theme="light"] {
+  --bg-app: var(--slate-50);
+  --bg-elevated: var(--white);
+  --bg-sunken: var(--slate-100);
+  --bg-inverse: var(--slate-900);
+
+  --surface-card: var(--white);
+  --surface-hover: var(--slate-50);
+  --surface-active: var(--slate-100);
+  --surface-accent: var(--indigo-50);
+
+  --text-primary: var(--slate-900);
+  --text-secondary: var(--slate-500);
+  --text-tertiary: var(--slate-400);
+  --text-inverse: var(--white);
+  --text-accent: var(--indigo-600);
+  --text-on-accent: var(--white);
+
+  --border-subtle: var(--slate-200);
+  --border-default: var(--slate-300);
+  --border-strong: var(--slate-400);
+  --border-accent: var(--indigo-500);
+
+  --action-primary: var(--indigo-600);
+  --action-primary-hover: var(--indigo-700);
+
+  --status-complete: var(--green-600);
+  --status-streak: var(--green-600);
+  --status-carryover: var(--amber-500);
+  --status-danger: var(--red-600);
+  --status-pending: var(--slate-400);
+
+  --focus-ring: var(--indigo-400);
+
+  --shadow-xs: 0 1px 1px rgba(15, 17, 28, 0.04);
+  --shadow-sm: 0 1px 2px rgba(15, 17, 28, 0.05), 0 1px 1px rgba(15, 17, 28, 0.04);
+  --shadow-md: 0 4px 12px rgba(15, 17, 28, 0.07), 0 1px 3px rgba(15, 17, 28, 0.05);
+  --shadow-accent: 0 4px 14px rgba(74, 64, 219, 0.25);
+}
+
+/* ---- DARK theme — calm, quiet inversion ---- */
+[data-theme="dark"] {
+  --bg-app: var(--slate-950);
+  --bg-elevated: #181a22;
+  --bg-sunken: #0b0c10;
+  --bg-inverse: var(--slate-100);
+
+  --surface-card: #181a22;
+  --surface-hover: #20232d;
+  --surface-active: #262936;
+  --surface-accent: rgba(91, 82, 232, 0.16);
+
+  --text-primary: var(--slate-100);
+  --text-secondary: var(--slate-400);
+  --text-tertiary: var(--slate-500);
+  --text-inverse: var(--slate-900);
+  --text-accent: var(--indigo-400);
+  --text-on-accent: var(--white);
+
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.10);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --border-accent: var(--indigo-400);
+
+  --action-primary: var(--indigo-500);
+  --action-primary-hover: var(--indigo-400);
+
+  --status-complete: var(--green-500);
+  --status-streak: var(--green-500);
+  --status-carryover: var(--amber-500);
+  --status-danger: #ef4444;
+  --status-pending: var(--slate-500);
+
+  --focus-ring: var(--indigo-400);
+
+  /* chart palette — slightly brighter for dark bg */
+  --chart-1: #7c74f2;
+  --chart-2: #4ade80;
+  --chart-3: #fbbf24;
+  --chart-4: #f87171;
+  --chart-5: #7dd3fc;
+  --chart-6: #c4b5fd;
+
+  /* heatmap rebalanced for dark */
+  --heat-0: #20232d;
+  --heat-1: #1f3a26;
+  --heat-2: #2b6c3a;
+  --heat-3: #3aa052;
+  --heat-4: #6fd581;
+
+  --shadow-xs: 0 1px 1px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.40), 0 1px 1px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.50), 0 2px 4px rgba(0, 0, 0, 0.35);
+  --shadow-accent: 0 4px 14px rgba(91, 82, 232, 0.40);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "ss01", "cv11";
+    color-scheme: light dark;
+  }
+  ::selection {
+    background: var(--surface-accent);
+    color: var(--text-primary);
+  }
+  *:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}

@@ -1,0 +1,478 @@
+:root {
+  --bg: rgba(13, 17, 23, 0.93);
+  --bg-hover: rgba(255, 255, 255, 0.04);
+  --border: rgba(255, 255, 255, 0.06);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --tab-active: #4a9eff;
+  --tab-inactive: rgba(255, 255, 255, 0.40);
+  --text: rgba(255, 255, 255, 0.90);
+  --text-muted: rgba(255, 255, 255, 0.38);
+  --text-dim: rgba(255, 255, 255, 0.22);
+  --blue: #4a9eff;
+  --green: #3dd68c;
+  --amber: #f5a623;
+  --red: rgba(255, 80, 80, 0.85);
+  --brand: #e8edf5;
+  --scrollbar: rgba(255, 255, 255, 0.08);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Tauri default: transparent window, #root fills the 280×460 shell exactly.
+   html must be rgba(0,0,0,0) — not "transparent" keyword — for WebView2 compositing. */
+html {
+  background: rgba(0, 0, 0, 0);
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  background: transparent;
+  width: 100%;
+  height: 100%;
+}
+
+#dev-shell {
+  width: 100%;
+  height: 100%;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Browser dev preview: simulated desktop + overlay at true size */
+body.browser-preview {
+  background: #111827;
+  background-image:
+    radial-gradient(ellipse at 70% 20%, rgba(74, 158, 255, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 30% 80%, rgba(61, 214, 140, 0.04) 0%, transparent 50%);
+}
+
+body.browser-preview #dev-shell {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 32px;
+}
+
+body.browser-preview #root {
+  width: 280px;
+  height: 460px;
+  flex-shrink: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* ── overlay shell ─────────────────────────────────────────────── */
+
+.overlay {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  user-select: none;
+  opacity: var(--overlay-opacity, 1);
+}
+
+/* ── header ────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: 10px 10px 10px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.header-drag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  cursor: grab;
+}
+
+.header-drag:active {
+  cursor: grabbing;
+}
+
+.opacity-controls {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  flex-shrink: 0;
+}
+
+.opacity-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-dim);
+  font-size: 15px;
+  line-height: 1;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 0;
+  transition: color 80ms ease, background 80ms ease;
+}
+
+.opacity-btn:hover:not(:disabled) {
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.opacity-btn:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.brand {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--brand);
+}
+
+/* ── tab bar ───────────────────────────────────────────────────── */
+
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 9px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--tab-inactive);
+  letter-spacing: 0.01em;
+  transition: color 120ms ease;
+  position: relative;
+}
+
+.tab-btn::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--tab-active);
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.tab-btn.active {
+  color: var(--tab-active);
+}
+
+.tab-btn.active::after {
+  opacity: 1;
+}
+
+.tab-btn:hover:not(.active) {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* ── tab content ───────────────────────────────────────────────── */
+
+.tab-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+
+.tab-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.tab-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tab-content::-webkit-scrollbar-thumb {
+  background: var(--scrollbar);
+  border-radius: 2px;
+}
+
+/* ── empty state ───────────────────────────────────────────────── */
+
+.tab-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 120px;
+  gap: 6px;
+  padding: 24px;
+}
+
+.tab-empty-icon {
+  font-size: 24px;
+  opacity: 0.3;
+  line-height: 1;
+}
+
+.tab-empty-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ── task rows ─────────────────────────────────────────────────── */
+
+.task-list {
+  padding: 6px 0;
+}
+
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 14px;
+  cursor: default;
+  transition: background 80ms ease;
+  position: relative;
+}
+
+.task-row:hover {
+  background: var(--bg-hover);
+}
+
+.task-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: opacity 150ms ease;
+}
+
+.task-dot.blue   { background: var(--blue); }
+.task-dot.green  { background: var(--green); }
+.task-dot.amber  { background: var(--amber); }
+.task-dot.dim    { background: var(--text-dim); }
+
+.task-title {
+  flex: 1;
+  font-size: 12.5px;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-title.done {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.task-title.dismissed {
+  color: var(--text-dim);
+}
+
+/* actions revealed on hover */
+.task-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 100ms ease;
+  flex-shrink: 0;
+}
+
+.task-row:hover .task-actions {
+  opacity: 1;
+}
+
+.task-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  transition: color 80ms ease, background 80ms ease;
+  line-height: 1;
+}
+
+.task-action-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.task-action-btn.danger:hover {
+  color: var(--red);
+}
+
+/* ── sign-in screen ────────────────────────────────────────────── */
+
+.sign-in-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 10px;
+  padding: 32px 24px;
+}
+
+.sign-in-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--brand);
+  margin-top: 4px;
+}
+
+.sign-in-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+.sign-in-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 100ms ease, border-color 100ms ease;
+  justify-content: center;
+}
+
+.sign-in-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.sign-in-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sign-in-waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.sign-in-btn-text {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 80ms ease;
+}
+
+.sign-in-btn-text:hover {
+  color: var(--text);
+}
+
+.sign-in-error {
+  font-size: 11px;
+  color: var(--red);
+  text-align: center;
+  margin-top: 4px;
+}
+
+.sign-in-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--text);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+/* ── auth loading ───────────────────────────────────────────────── */
+
+.loading-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.loading-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+.sso-callback-shell {
+  display: grid;
+  place-items: center;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 80%, 100% { opacity: 0.2; }
+  40%            { opacity: 1; }
+}
+
+/* ── section label ─────────────────────────────────────────────── */
+
+.section-label {
+  padding: 8px 14px 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.section-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 4px 14px;
+}

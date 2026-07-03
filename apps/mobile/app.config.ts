@@ -8,6 +8,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: "portrait",
   scheme: "cadence",
   userInterfaceStyle: "dark",
+  icon: "./assets/images/icon.png",
   android: {
     package: "com.cadence.app",
     backgroundColor: "#0e0f14",
@@ -17,7 +18,20 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: "com.cadence.app",
     supportsTablet: false,
   },
-  plugins: ["expo-router", "expo-secure-store", "expo-web-browser"],
+  plugins: [
+    "expo-router",
+    "expo-secure-store",
+    "expo-web-browser",
+    [
+      "expo-build-properties",
+      {
+        android: {
+          useLegacyPackaging: true,
+          buildArchs: ["arm64-v8a"],
+        },
+      },
+    ],
+  ],
   experiments: {
     typedRoutes: true,
   },

@@ -12,18 +12,10 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
-      },
-      "env": {
-        "EXPO_PUBLIC_CONVEX_URL": "https://robust-spaniel-162.eu-west-1.convex.cloud",
-        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_c2V0dGxpbmctYnV6emFyZC04Ni5jbGVyay5hY2NvdW50cy5kZXYk"
       }
     },
     "production": {
-      "autoIncrement": true,
-      "env": {
-        "EXPO_PUBLIC_CONVEX_URL": "https://robust-spaniel-162.eu-west-1.convex.cloud",
-        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_c2V0dGxpbmctYnV6emFyZC04Ni5jbGVyay5hY2NvdW50cy5kZXYk"
-      }
+      "autoIncrement": true
     }
   },
   "submit": {

@@ -17,8 +17,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: "com.cadence.app",
     supportsTablet: false,
   },
-  plugins: ["expo-router", "expo-secure-store"],
+  plugins: ["expo-router", "expo-secure-store", "expo-web-browser"],
   experiments: {
     typedRoutes: true,
+  },
+  extra: {
+    eas: {
+      projectId: "9aecf529-c02a-41fa-b8e5-9981aba64ad3",
+    },
   },
 });

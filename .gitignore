@@ -33,3 +33,5 @@ Thumbs.db
 **/.claude/
 **/.agents/
 .expo
+.vercel
+.env*

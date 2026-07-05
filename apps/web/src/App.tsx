@@ -11,6 +11,11 @@ import { api } from "@cadence/backend/convex/_generated/api";
 import { todayLocal } from "@cadence/shared";
 
 import { SignInCard } from "@/components/sign-in-card";
+import {
+  DesktopSignIn,
+  DesktopSignInCallback,
+  DesktopSignInComplete,
+} from "@/components/desktop-sign-in";
 import { Sidebar } from "@/components/sidebar";
 import { TodayView } from "@/components/today-view";
 import { RoutinesPage } from "@/components/routines-page";
@@ -105,6 +110,15 @@ function SignedInLayout() {
 export default function App() {
   if (window.location.pathname === "/sso-callback") {
     return <AuthenticateWithRedirectCallback />;
+  }
+  if (window.location.pathname === "/desktop-sign-in") {
+    return <DesktopSignIn />;
+  }
+  if (window.location.pathname === "/desktop-sign-in-callback") {
+    return <DesktopSignInCallback />;
+  }
+  if (window.location.pathname === "/desktop-sign-in-complete") {
+    return <DesktopSignInComplete />;
   }
 
   return (

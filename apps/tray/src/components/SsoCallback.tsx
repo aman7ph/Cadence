@@ -4,10 +4,11 @@ import { LoadingShell } from "./Shell";
 
 const isTauri = "__TAURI_INTERNALS__" in window;
 
-// Uses signIn.reload() + setActive() instead of handleRedirectCallback.
-// Clerk's backend completes the Google exchange before redirecting to our loopback
-// port, so reload() immediately returns status "complete". We activate the session
-// and navigate ourselves — Clerk never controls the WebView URL.
+// The whole Google OAuth exchange happens on the web app's desktop-sign-in bridge
+// pages (see apps/web/src/components/desktop-sign-in.tsx) — this window never talks
+// to Clerk's OAuth callback directly. Our loopback server instead receives a
+// one-time sign-in ticket, which we exchange here for a session in this window's
+// own Clerk client via the "ticket" strategy.
 export function SsoCallbackHandler() {
   const { signIn, isLoaded, setActive } = useSignIn();
 
@@ -15,9 +16,11 @@ export function SsoCallbackHandler() {
     if (!isLoaded || !signIn || !setActive) return;
     void (async () => {
       try {
-        const updated = await signIn.reload();
-        if (updated.status === "complete" && updated.createdSessionId) {
-          await setActive({ session: updated.createdSessionId });
+        const ticket = new URLSearchParams(window.location.search).get("ticket");
+        if (!ticket) throw new Error("Missing ticket");
+        const result = await signIn.create({ strategy: "ticket", ticket });
+        if (result.status === "complete" && result.createdSessionId) {
+          await setActive({ session: result.createdSessionId });
         }
         window.location.href = "/";
       } catch {

@@ -60,7 +60,12 @@ pub fn run(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         crate::tray::position_overlay(&w);
         #[cfg(debug_assertions)]
         let url = Url::parse("http://localhost:5174/").unwrap();
-        #[cfg(not(debug_assertions))]
+        // Tauri v2 serves the bundled frontend at http://tauri.localhost on Windows
+        // (https only applies if app.windows.useHttpsScheme is enabled, which it isn't here);
+        // macOS/iOS use the tauri://localhost custom scheme instead.
+        #[cfg(all(not(debug_assertions), target_os = "windows"))]
+        let url = Url::parse("http://tauri.localhost/").unwrap();
+        #[cfg(all(not(debug_assertions), not(target_os = "windows")))]
         let url = Url::parse("tauri://localhost/").unwrap();
         let _ = w.navigate(url);
         let _ = w.show();

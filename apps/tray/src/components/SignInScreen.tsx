@@ -51,26 +51,30 @@ export function SignInScreen() {
 
     try {
       if (isTauri) {
-        // Desktop flow (RFC 8252 loopback):
+        // Desktop flow (RFC 8252 loopback), routed through a real web page instead
+        // of signIn.create() here: Clerk's production instance ties the OAuth
+        // callback to a session cookie scoped to whichever browser started the
+        // flow. Doing the whole flow in the system browser against our own web
+        // domain keeps that cookie context consistent end to end (unlike either
+        // starting it here and finishing in the system browser, or embedding it
+        // in this window's own webview, which would lose the user's existing
+        // logged-in Google session). See apps/web's desktop-sign-in* pages.
         // 1. Start a one-shot HTTP server on a random loopback port
-        // 2. Get OAuth URL from Clerk using that port as the redirect
-        // 3. Open OAuth URL in system browser
-        // 4. Browser redirects to http://localhost:{port}/sso-callback?...
-        // 5. Our server catches it and emits "oauth-callback" to the WebView
+        // 2. Open the web app's bridge page in the system browser, passing the
+        //    loopback URL as where it should hand back a one-time sign-in ticket
+        // 3. That page signs in with Google, mints the ticket, and redirects to
+        //    http://localhost:{port}/sso-callback?ticket=...
+        // 4. Our server catches it and emits "oauth-callback" to this window
+        const webAppUrl = import.meta.env.VITE_WEB_APP_URL;
+        if (!webAppUrl) throw new Error("Missing VITE_WEB_APP_URL");
+
         const { invoke } = await import("@tauri-apps/api/core");
         const port = await invoke<number>("start_oauth_callback");
         const redirectUrl = `http://localhost:${port}/sso-callback`;
-
-        const result = await signIn.create({
-          strategy: "oauth_google",
-          redirectUrl,
-        });
-
-        const oauthUrl = result.firstFactorVerification.externalVerificationRedirectURL;
-        if (!oauthUrl) throw new Error("No OAuth URL returned from Clerk");
+        const bridgeUrl = `${webAppUrl}/desktop-sign-in?redirect_url=${encodeURIComponent(redirectUrl)}`;
 
         const { open } = await import("@tauri-apps/plugin-shell");
-        await open(oauthUrl.toString());
+        await open(bridgeUrl);
         setStatus("waiting");
       } else {
         // Browser dev preview: standard in-window redirect

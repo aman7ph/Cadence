@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSignIn } from "@clerk/clerk-react";
 import { LoadingShell } from "./Shell";
 
@@ -9,17 +9,19 @@ const isTauri = "__TAURI_INTERNALS__" in window;
 // to Clerk's OAuth callback directly. Our loopback server instead receives a
 // one-time sign-in ticket, which we exchange here for a session in this window's
 // own Clerk client via the "ticket" strategy.
-//
-// On failure we deliberately show the error instead of silently redirecting to "/":
-// window.location.href is a full page reload, which would wipe any console.error
-// before it could be read, and a previous bare `catch {}` here silently swallowed
-// exactly this kind of failure until it was undiagnosable.
 export function SsoCallbackHandler() {
   const { signIn, isLoaded, setActive } = useSignIn();
   const [error, setError] = useState<string | null>(null);
+  // useSignIn() returns a new `signIn` object identity whenever its internal state
+  // changes — which happens the moment signIn.create() below runs. Without this
+  // guard, that identity change re-triggers this effect via its own dependency
+  // array, retrying signIn.create() with the same (now-consumed) single-use ticket
+  // in a tight loop until Clerk 429s — confirmed via 6 rapid duplicate requests.
+  const hasRun = useRef(false);
 
   useEffect(() => {
-    if (!isLoaded || !signIn || !setActive) return;
+    if (!isLoaded || !signIn || !setActive || hasRun.current) return;
+    hasRun.current = true;
     void (async () => {
       try {
         const ticket = new URLSearchParams(window.location.search).get("ticket");

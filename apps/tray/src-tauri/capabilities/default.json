@@ -7,6 +7,13 @@
     "core:default",
     "core:window:allow-start-dragging",
     "shell:allow-open",
-    "deep-link:default"
+    "deep-link:default",
+    {
+      "identifier": "http:default",
+      "allow": [
+        { "url": "https://clerk.cadence.aman7ph.com/*" },
+        { "url": "https://*.clerk.accounts.dev/*" }
+      ]
+    }
   ]
 }

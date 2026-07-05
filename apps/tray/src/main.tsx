@@ -4,10 +4,12 @@ import { ClerkProvider, useAuth } from "@clerk/clerk-react";
 import { ConvexReactClient } from "convex/react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import App from "./App";
+import { installClerkNativeFetch } from "./lib/clerk-native-fetch";
 import "./index.css";
 
 // Tauri injects __TAURI_INTERNALS__ into the window; absent in a plain browser.
-if (!("__TAURI_INTERNALS__" in window)) {
+const isTauri = "__TAURI_INTERNALS__" in window;
+if (!isTauri) {
   document.body.classList.add("browser-preview");
 }
 
@@ -16,6 +18,11 @@ const convexUrl = import.meta.env.VITE_CONVEX_URL as string;
 
 if (!clerkKey) throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY in .env.local");
 if (!convexUrl) throw new Error("Missing VITE_CONVEX_URL in .env.local");
+
+// Must run before ClerkProvider mounts so clerk-js only ever sees the patched fetch.
+if (isTauri) {
+  installClerkNativeFetch(clerkKey);
+}
 
 const convex = new ConvexReactClient(convexUrl);
 

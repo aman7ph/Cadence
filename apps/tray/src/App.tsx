@@ -8,6 +8,7 @@ import { SignInScreen } from "./components/SignInScreen";
 import { EnsureProvisioned } from "./components/EnsureProvisioned";
 import { Logo, LoadingShell } from "./components/Shell";
 import { SsoCallbackHandler, useDeepLinkCallback } from "./components/SsoCallback";
+import { clearClerkClientJwt } from "./lib/clerk-native-fetch";
 
 type Tab = "routines" | "tasks";
 
@@ -53,6 +54,7 @@ export default function App() {
     import("@tauri-apps/api/event").then(({ listen }) => {
       listen("sign-out", () => {
         signOut().then(() => {
+          clearClerkClientJwt();
           window.history.replaceState({}, "", "/");
         });
       }).then((fn) => { unlisten = fn; });

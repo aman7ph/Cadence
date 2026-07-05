@@ -16,13 +16,25 @@ function getRedirectUrl(): string {
 }
 
 export function DesktopSignIn() {
-  const { signIn, isLoaded } = useSignIn();
+  const { signIn, isLoaded: signInLoaded } = useSignIn();
+  const { isSignedIn, isLoaded: authLoaded } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const redirectUrl = getRedirectUrl();
 
+  // Clerk refuses to start a new sign-in attempt while this browser already has an
+  // active session (e.g. the user already uses the main Cadence site here) — it
+  // errors with "session_exists" rather than just reusing it. If we're already
+  // signed in, skip Google entirely and go straight to minting a ticket for the
+  // current session.
+  useEffect(() => {
+    if (authLoaded && isSignedIn && redirectUrl) {
+      window.location.href = `/desktop-sign-in-complete?redirect_url=${encodeURIComponent(redirectUrl)}`;
+    }
+  }, [authLoaded, isSignedIn, redirectUrl]);
+
   const handleGoogle = async () => {
-    if (!signIn || !isLoaded) return;
+    if (!signIn || !signInLoaded) return;
     setLoading(true);
     setError("");
     try {
@@ -37,6 +49,14 @@ export function DesktopSignIn() {
       setLoading(false);
     }
   };
+
+  if (!authLoaded || (isSignedIn && redirectUrl)) {
+    return (
+      <div className="min-h-screen w-full grid place-items-center px-4">
+        <p className="text-sm text-muted-foreground">Finishing sign-in…</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full grid place-items-center px-4">
@@ -53,7 +73,7 @@ export function DesktopSignIn() {
             variant="outline"
             className="w-full gap-2"
             onClick={handleGoogle}
-            disabled={!isLoaded || loading || !redirectUrl}
+            disabled={!signInLoaded || loading || !redirectUrl}
           >
             {loading ? "Opening Google…" : "Continue with Google"}
           </Button>

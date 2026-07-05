@@ -63,7 +63,9 @@ export function SsoCallbackHandler() {
   return <LoadingShell />;
 }
 
-export function useDeepLinkCallback() {
+// Navigates this window to /sso-callback when the Rust loopback server
+// receives the browser's redirect and emits "oauth-callback".
+export function useOauthCallbackListener() {
   useEffect(() => {
     if (!isTauri) return;
     let unlisten: (() => void) | undefined;

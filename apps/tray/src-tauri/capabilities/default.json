@@ -7,7 +7,6 @@
     "core:default",
     "core:window:allow-start-dragging",
     "shell:allow-open",
-    "deep-link:default",
     {
       "identifier": "http:default",
       "allow": [

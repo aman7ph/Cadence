@@ -22,19 +22,11 @@
         "skipTaskbar": true,
         "visible": false,
         "resizable": false,
-        "devtools": true,
         "shadow": false,
         "backgroundColor": "#00000000"
       }
     ],
     "security": { "csp": null }
-  },
-  "plugins": {
-    "deep-link": {
-      "desktop": {
-        "schemes": ["cadence"]
-      }
-    }
   },
   "bundle": {
     "active": true,

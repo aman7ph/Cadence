@@ -18,6 +18,18 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: "com.cadence.app",
     supportsTablet: false,
   },
+  // EAS Update (OTA): installed builds poll this URL for new JS bundles.
+  // appVersion policy: runtime version == `version` above. BUMP `version`
+  // WHENEVER THE NATIVE LAYER CHANGES (new native module, SDK upgrade),
+  // or old installs would receive JS their binary can't run.
+  // (fingerprint policy is not usable here: pnpm monorepo hoisting makes the
+  // cloud-computed fingerprint differ from the local one and the build fails.)
+  updates: {
+    url: "https://u.expo.dev/9aecf529-c02a-41fa-b8e5-9981aba64ad3",
+  },
+  runtimeVersion: {
+    policy: "appVersion",
+  },
   plugins: [
     "expo-router",
     "expo-secure-store",

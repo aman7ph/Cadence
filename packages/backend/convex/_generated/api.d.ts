@@ -15,8 +15,10 @@ import type * as dailyTasks from "../dailyTasks.js";
 import type * as days from "../days.js";
 import type * as goalLinks from "../goalLinks.js";
 import type * as goals from "../goals.js";
+import type * as http from "../http.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as lib_dayStats from "../lib/dayStats.js";
+import type * as lib_promoteStagedTask from "../lib/promoteStagedTask.js";
 import type * as lib_resolveUser from "../lib/resolveUser.js";
 import type * as lib_routineSetStatus from "../lib/routineSetStatus.js";
 import type * as lib_schedule from "../lib/schedule.js";
@@ -24,6 +26,8 @@ import type * as lib_streak from "../lib/streak.js";
 import type * as reflections from "../reflections.js";
 import type * as routineManagement from "../routineManagement.js";
 import type * as routines from "../routines.js";
+import type * as stagedTaskScheduling from "../stagedTaskScheduling.js";
+import type * as stagedTasks from "../stagedTasks.js";
 import type * as users from "../users.js";
 
 import type {
@@ -40,8 +44,10 @@ declare const fullApi: ApiFromModules<{
   days: typeof days;
   goalLinks: typeof goalLinks;
   goals: typeof goals;
+  http: typeof http;
   "lib/auth": typeof lib_auth;
   "lib/dayStats": typeof lib_dayStats;
+  "lib/promoteStagedTask": typeof lib_promoteStagedTask;
   "lib/resolveUser": typeof lib_resolveUser;
   "lib/routineSetStatus": typeof lib_routineSetStatus;
   "lib/schedule": typeof lib_schedule;
@@ -49,6 +55,8 @@ declare const fullApi: ApiFromModules<{
   reflections: typeof reflections;
   routineManagement: typeof routineManagement;
   routines: typeof routines;
+  stagedTaskScheduling: typeof stagedTaskScheduling;
+  stagedTasks: typeof stagedTasks;
   users: typeof users;
 }>;
 

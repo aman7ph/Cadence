@@ -3,6 +3,7 @@ import {
   BarChart3,
   CalendarDays,
   CheckSquare,
+  Inbox,
   ListChecks,
   LogOut,
   Moon,
@@ -54,6 +55,12 @@ export function Sidebar({ view, onNavigate }: SidebarProps) {
           label="Routines"
           active={view === "routines"}
           onClick={() => onNavigate("routines")}
+        />
+        <NavItem
+          icon={<Inbox className="size-[17px]" strokeWidth={2} />}
+          label="Staging"
+          active={view === "staging"}
+          onClick={() => onNavigate("staging")}
         />
         <NavItem
           icon={<CalendarDays className="size-[17px]" strokeWidth={2} />}

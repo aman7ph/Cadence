@@ -23,9 +23,10 @@ import { InsightsPage } from "@/components/insights-page";
 import { HistoryPage } from "@/components/history-page";
 import { SettingsPage } from "@/components/settings-page";
 import { GoalsPage } from "@/components/goals-page";
+import { StagingPage } from "@/components/staging-page";
 import { Logo } from "@/components/ui/logo";
 
-export type AppView = "today" | "routines" | "history" | "insights" | "settings" | "goals";
+export type AppView = "today" | "routines" | "staging" | "history" | "insights" | "settings" | "goals";
 
 function EnsureProvisioned() {
   const me = useQuery(api.users.getMe);
@@ -41,6 +42,7 @@ function EnsureProvisioned() {
 function RolloverOnForeground() {
   const me = useQuery(api.users.getMe);
   const rolloverOpenTasks = useMutation(api.dailyTasks.rolloverOpenTasks);
+  const promoteDueStagedTasks = useMutation(api.stagedTaskScheduling.promoteDue);
   const lastRolloverDate = useRef<string | null>(null);
 
   useEffect(() => {
@@ -50,6 +52,9 @@ function RolloverOnForeground() {
       const today = todayLocal();
       if (lastRolloverDate.current === today) return;
       lastRolloverDate.current = today;
+      // Promote before rollover: promoted tasks land with currentDate = today,
+      // so they are never subject to same-day carryover.
+      void promoteDueStagedTasks({ today });
       void rolloverOpenTasks({ today });
     };
 
@@ -62,7 +67,7 @@ function RolloverOnForeground() {
     return () => {
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [me, rolloverOpenTasks]);
+  }, [me, rolloverOpenTasks, promoteDueStagedTasks]);
 
   return null;
 }
@@ -97,6 +102,7 @@ function SignedInLayout() {
           <RolloverOnForeground />
           {view === "today" && <TodayView onNavigate={setView} />}
           {view === "routines" && <RoutinesPage />}
+          {view === "staging" && <StagingPage />}
           {view === "history" && <HistoryPage />}
           {view === "insights" && <InsightsPage />}
           {view === "settings" && <SettingsPage />}

@@ -70,6 +70,27 @@ export default defineSchema({
     .index("by_user_status", ["userId", "status"])
     .index("by_goal", ["goalId"]),
 
+  // Staging area: tasks captured before being assigned to a destination.
+  // Unscheduled ⇔ scheduledDate/targetType absent. Once scheduledDate arrives,
+  // promoteDue materializes the row into dailyTasks or routines and deletes it.
+  stagedTasks: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    createdAt: v.number(),
+    scheduledDate: v.optional(v.string()), // YYYY-MM-DD; set ⇔ targetType set
+    targetType: v.optional(
+      v.union(v.literal("task"), v.literal("routine")),
+    ),
+    // Required iff targetType === "routine":
+    routineScheduleType: v.optional(
+      v.union(v.literal("daily"), v.literal("weekdays"), v.literal("custom")),
+    ),
+    routineCustomDays: v.optional(v.array(v.number())),
+    goalId: v.optional(v.id("goals")),
+    goalContribution: v.optional(v.number()),
+  }).index("by_user", ["userId"]),
+
   dayStats: defineTable({
     userId: v.id("users"),
     date: v.string(),

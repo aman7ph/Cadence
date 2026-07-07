@@ -19,6 +19,7 @@ export default function DrawerLayout() {
       >
         <Drawer.Screen name="index"    options={{ title: "Today" }} />
         <Drawer.Screen name="routines" options={{ title: "Routines" }} />
+        <Drawer.Screen name="staging"  options={{ title: "Staging" }} />
         <Drawer.Screen name="goals"    options={{ title: "Goals" }} />
         <Drawer.Screen name="history"  options={{ title: "History" }} />
         <Drawer.Screen name="insights" options={{ title: "Insights" }} />

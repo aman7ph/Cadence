@@ -7,6 +7,7 @@ import { useColors } from "../lib/theme";
 const NAV = [
   { name: "index",    label: "Today",    route: "/(drawer)/"        },
   { name: "routines", label: "Routines", route: "/(drawer)/routines" },
+  { name: "staging",  label: "Staging",  route: "/(drawer)/staging"  },
   { name: "goals",    label: "Goals",    route: "/(drawer)/goals"    },
   { name: "history",  label: "History",  route: "/(drawer)/history"  },
   { name: "insights", label: "Insights", route: "/(drawer)/insights" },

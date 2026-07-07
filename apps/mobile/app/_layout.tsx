@@ -34,6 +34,7 @@ function EnsureProvisioned() {
 function RolloverOnForeground() {
   const me = useQuery(api.users.getMe);
   const rollover = useMutation(api.dailyTasks.rolloverOpenTasks);
+  const promoteDueStagedTasks = useMutation(api.stagedTaskScheduling.promoteDue);
   const lastDate = useRef<string | null>(null);
   useEffect(() => {
     if (!me) return;
@@ -41,12 +42,15 @@ function RolloverOnForeground() {
       const today = todayStr();
       if (lastDate.current === today) return;
       lastDate.current = today;
+      // Promote before rollover: promoted tasks land with currentDate = today,
+      // so they are never subject to same-day carryover.
+      void promoteDueStagedTasks({ today });
       void rollover({ today });
     };
     run();
     const sub = AppState.addEventListener("change", (s) => { if (s === "active") run(); });
     return () => sub.remove();
-  }, [me, rollover]);
+  }, [me, rollover, promoteDueStagedTasks]);
   return null;
 }
 

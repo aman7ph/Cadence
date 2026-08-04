@@ -2,6 +2,8 @@ import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { requireUser } from "./lib/auth";
 import { upsertDayStats } from "./lib/dayStats";
+import { applyGoalContribution } from "./lib/goalContribution";
+import { assertPlainTask, deleteTaskCompletions, validateRepeatArgs } from "./lib/taskRepeat";
 
 export const create = mutation({
   args: {
@@ -11,11 +13,14 @@ export const create = mutation({
     today: v.string(),
     goalId: v.optional(v.id("goals")),
     goalContribution: v.optional(v.number()),
+    repeatTarget: v.optional(v.number()),
+    repeatIntervalMinutes: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const user = await requireUser(ctx);
     const trimmed = args.title.trim();
     if (!trimmed) throw new Error("Task title is required");
+    validateRepeatArgs(args.repeatTarget, args.repeatIntervalMinutes);
     return await ctx.db.insert("dailyTasks", {
       userId: user._id,
       title: trimmed,
@@ -28,6 +33,8 @@ export const create = mutation({
       createdAt: Date.now(),
       goalId: args.goalId,
       goalContribution: args.goalContribution,
+      repeatTarget: args.repeatTarget,
+      repeatIntervalMinutes: args.repeatIntervalMinutes,
     });
   },
 });
@@ -40,20 +47,14 @@ export const complete = mutation({
     if (!task || task.userId !== user._id) {
       throw new Error("Task not found");
     }
+    assertPlainTask(task);
     if (task.status === "completed") return;
     await ctx.db.patch(taskId, {
       status: "completed",
       completedAt: Date.now(),
       completedDate: today,
     });
-    if (task.goalId && task.goalContribution) {
-      const goal = await ctx.db.get(task.goalId);
-      if (goal) {
-        await ctx.db.patch(task.goalId, {
-          currentValue: Math.max(0, (goal.currentValue ?? 0) + task.goalContribution),
-        });
-      }
-    }
+    await applyGoalContribution(ctx, task.goalId, task.goalContribution, 1);
     await upsertDayStats(ctx, user._id, today);
   },
 });
@@ -66,6 +67,9 @@ export const uncomplete = mutation({
     if (!task || task.userId !== user._id) {
       throw new Error("Task not found");
     }
+    // Restoring a *dismissed* repeat task is fine here; only reversing a
+    // completion must go through undoRep, which repairs the rep log too.
+    if (task.status === "completed") assertPlainTask(task);
     if (task.status === "open") return;
     const affectedDate = task.completedDate ?? task.currentDate;
     const wasCompleted = task.status === "completed";
@@ -74,13 +78,8 @@ export const uncomplete = mutation({
       completedAt: undefined,
       completedDate: undefined,
     });
-    if (wasCompleted && task.goalId && task.goalContribution) {
-      const goal = await ctx.db.get(task.goalId);
-      if (goal) {
-        await ctx.db.patch(task.goalId, {
-          currentValue: Math.max(0, (goal.currentValue ?? 0) - task.goalContribution),
-        });
-      }
+    if (wasCompleted) {
+      await applyGoalContribution(ctx, task.goalId, task.goalContribution, -1);
     }
     await upsertDayStats(ctx, user._id, affectedDate);
   },
@@ -118,6 +117,7 @@ export const remove = mutation({
       );
     }
     const affectedDate = task.status === "completed" ? (task.completedDate ?? task.currentDate) : task.status === "dismissed" ? task.currentDate : null;
+    await deleteTaskCompletions(ctx, taskId);
     await ctx.db.delete(taskId);
     if (affectedDate) {
       await upsertDayStats(ctx, user._id, affectedDate);

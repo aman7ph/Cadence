@@ -1,5 +1,6 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { dailyTasks, taskCompletions } from "./tables/tasks";
 
 export default defineSchema({
   users: defineTable({
@@ -46,29 +47,9 @@ export default defineSchema({
     .index("by_user_date", ["userId", "date"])
     .index("by_user_routine_date", ["userId", "routineId", "date"]),
 
-  dailyTasks: defineTable({
-    userId: v.id("users"),
-    title: v.string(),
-    description: v.optional(v.string()),
-    category: v.optional(v.string()),
-    originalDate: v.string(),
-    currentDate: v.string(),
-    status: v.union(
-      v.literal("open"),
-      v.literal("completed"),
-      v.literal("dismissed"),
-    ),
-    carryoverCount: v.number(),
-    completedAt: v.optional(v.number()),
-    completedDate: v.optional(v.string()),
-    createdAt: v.number(),
-    goalId: v.optional(v.id("goals")),
-    goalContribution: v.optional(v.number()),
-  })
-    .index("by_user_current", ["userId", "currentDate", "status"])
-    .index("by_user_original", ["userId", "originalDate"])
-    .index("by_user_status", ["userId", "status"])
-    .index("by_goal", ["goalId"]),
+  // Defined in ./tables/tasks.ts — see the note there.
+  dailyTasks,
+  taskCompletions,
 
   // Staging area: tasks captured before being assigned to a destination.
   // Unscheduled ⇔ scheduledDate/targetType absent. Once scheduledDate arrives,

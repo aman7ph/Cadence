@@ -79,7 +79,8 @@ export function DayDetailPanel({ date, today, onClose }: DayDetailPanelProps) {
                   : visibleTasks.map((t) => (
                       <TaskRow key={t.taskId} taskId={t.taskId} title={t.title}
                         description={t.description} status={t.status} isCarriedOver={t.isCarriedOver}
-                        originalDate={t.originalDate} carryoverCount={t.carryoverCount} viewedDate={date} readOnly />
+                        originalDate={t.originalDate} carryoverCount={t.carryoverCount} viewedDate={date}
+                        repeatTarget={t.repeatTarget} repeatDoneToday={t.repeatDoneToday} readOnly />
                     ))}
               </section>
             </div>

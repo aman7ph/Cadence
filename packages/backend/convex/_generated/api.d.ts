@@ -18,6 +18,7 @@ import type * as goalLinks from "../goalLinks.js";
 import type * as goals from "../goals.js";
 import type * as http from "../http.js";
 import type * as lib_auth from "../lib/auth.js";
+import type * as lib_dayReflection from "../lib/dayReflection.js";
 import type * as lib_dayStats from "../lib/dayStats.js";
 import type * as lib_goalContribution from "../lib/goalContribution.js";
 import type * as lib_promoteStagedTask from "../lib/promoteStagedTask.js";
@@ -51,6 +52,7 @@ declare const fullApi: ApiFromModules<{
   goals: typeof goals;
   http: typeof http;
   "lib/auth": typeof lib_auth;
+  "lib/dayReflection": typeof lib_dayReflection;
   "lib/dayStats": typeof lib_dayStats;
   "lib/goalContribution": typeof lib_goalContribution;
   "lib/promoteStagedTask": typeof lib_promoteStagedTask;

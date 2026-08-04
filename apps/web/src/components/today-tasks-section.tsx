@@ -12,6 +12,9 @@ interface Task {
   originalDate: string;
   carryoverCount: number;
   goalTitle?: string;
+  repeatTarget?: number;
+  repeatDoneToday?: number;
+  nextRepAllowedAt?: number;
 }
 
 interface TodayTasksSectionProps {
@@ -63,6 +66,9 @@ export function TodayTasksSection({
               carryoverCount={t.carryoverCount}
               viewedDate={viewedDate}
               goalTitle={t.goalTitle}
+              repeatTarget={t.repeatTarget}
+              repeatDoneToday={t.repeatDoneToday}
+              nextRepAllowedAt={t.nextRepAllowedAt}
             />
           ))}
         </div>

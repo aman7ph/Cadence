@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
-import { MoreHorizontal, Target } from "lucide-react";
+import { Target } from "lucide-react";
 import { api } from "@cadence/backend/convex/_generated/api";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 
 import { Badge } from "@/components/ui/badge";
 import { CompletionToggle } from "@/components/ui/completion-toggle";
+import { TaskRepeatControl } from "@/components/task-repeat-control";
+import { TaskRowMenu } from "@/components/task-row-menu";
+import { useCountdown } from "@/lib/use-countdown";
 import { cn } from "@/lib/utils";
 
 interface TaskRowProps {
@@ -19,6 +22,9 @@ interface TaskRowProps {
   viewedDate: string;
   goalTitle?: string;
   readOnly?: boolean;
+  repeatTarget?: number;
+  repeatDoneToday?: number;
+  nextRepAllowedAt?: number;
 }
 
 function prettyOriginalDate(date: string): string {
@@ -36,16 +42,37 @@ export function TaskRow({
   carryoverCount,
   viewedDate,
   goalTitle, readOnly,
+  repeatTarget,
+  repeatDoneToday = 0,
+  nextRepAllowedAt,
 }: TaskRowProps) {
   const complete = useMutation(api.dailyTasks.complete);
   const uncomplete = useMutation(api.dailyTasks.uncomplete);
   const dismiss = useMutation(api.dailyTasks.dismiss);
   const remove = useMutation(api.dailyTasks.remove);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const logRep = useMutation(api.dailyTaskRepeats.logRep);
+  const undoRep = useMutation(api.dailyTaskRepeats.undoRep);
+  const [error, setError] = useState<string | null>(null);
+
+  const isRepeat = repeatTarget !== undefined;
+  const remaining = useCountdown(nextRepAllowedAt);
+  const gated = remaining > 0;
+
+  // The server re-checks the gate regardless; disabling only stops the obvious
+  // case. Its rejection is surfaced, not swallowed — clock skew is when it fires.
+  const fail = (e: unknown) =>
+    setError(e instanceof Error ? e.message.split("\n")[0]! : "Something went wrong");
 
   const toggle = () => {
-    if (status === "completed") void uncomplete({ taskId });
-    else void complete({ taskId, today: viewedDate });
+    setError(null);
+    if (isRepeat) {
+      if (status !== "open" || gated) return;
+      void logRep({ taskId, today: viewedDate }).catch(fail);
+    } else if (status === "completed") {
+      void uncomplete({ taskId });
+    } else {
+      void complete({ taskId, today: viewedDate });
+    }
   };
 
   const meta = description?.trim()
@@ -64,7 +91,13 @@ export function TaskRow({
       <CompletionToggle
         state={status === "completed" ? "completed" : "pending"}
         onToggle={readOnly ? () => {} : toggle}
-        ariaLabel={`Mark ${title} ${status === "completed" ? "incomplete" : "complete"}`}
+        disabled={readOnly || (isRepeat && gated)}
+        className={cn(isRepeat && gated && "opacity-40")}
+        ariaLabel={
+          isRepeat
+            ? `Log a check-in for ${title} (${repeatDoneToday} of ${repeatTarget} done)`
+            : `Mark ${title} ${status === "completed" ? "incomplete" : "complete"}`
+        }
       />
       <div className="flex-1 min-w-0">
         <div
@@ -77,6 +110,7 @@ export function TaskRow({
           {title}
         </div>
         <div className="mt-[3px] text-[12px] text-[var(--text-tertiary)] truncate">{meta}</div>
+        {error && <div className="mt-[3px] text-[12px] text-[var(--red-600)]">{error}</div>}
         {goalTitle && (
           <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[var(--indigo-50)] px-2 py-0.5 text-[10px] font-semibold text-[var(--indigo-600)]">
             <Target className="size-2.5" />{goalTitle}
@@ -84,59 +118,32 @@ export function TaskRow({
         )}
       </div>
       <div className="flex items-center gap-2 shrink-0">
+        {isRepeat && (
+          <TaskRepeatControl
+            doneToday={repeatDoneToday}
+            target={repeatTarget}
+            remaining={remaining}
+            onUndo={() => {
+              setError(null);
+              void undoRep({ taskId, today: viewedDate }).catch(fail);
+            }}
+            readOnly={readOnly}
+          />
+        )}
         {isCarriedOver && status === "open" && (
           <Badge tone="carryover">
             ×<span className="font-mono">{carryoverCount}</span> carried
           </Badge>
         )}
         {status === "dismissed" && <Badge tone="neutral">Dismissed</Badge>}
-        {!readOnly && <div className="relative">
-          <button
-            type="button"
-            onClick={() => setMenuOpen((o) => !o)}
-            className="flex h-8 w-8 items-center justify-center rounded-[8px] text-muted-foreground opacity-0 group-hover:opacity-100 focus-visible:opacity-100 hover:bg-[var(--surface-hover)] hover:text-foreground transition-all duration-150"
-            aria-label="More options"
-          >
-            <MoreHorizontal className="size-4" />
-          </button>
-          {menuOpen && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-              <div className="absolute right-0 bottom-full mb-1 z-20 min-w-[140px] overflow-hidden rounded-[12px] border border-[var(--border-subtle)] bg-card shadow-[var(--shadow-md)]">
-                {status === "dismissed" ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => { void uncomplete({ taskId }); setMenuOpen(false); }}
-                      className="w-full px-3.5 py-2.5 text-left text-[13px] font-medium text-foreground hover:bg-[var(--surface-hover)] transition-colors"
-                    >
-                      Restore
-                    </button>
-                    <div className="mx-3 h-px bg-[var(--border-subtle)]" />
-                  </>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => { void dismiss({ taskId }); setMenuOpen(false); }}
-                      className="w-full px-3.5 py-2.5 text-left text-[13px] font-medium text-foreground hover:bg-[var(--surface-hover)] transition-colors"
-                    >
-                      Dismiss
-                    </button>
-                    <div className="mx-3 h-px bg-[var(--border-subtle)]" />
-                  </>
-                )}
-                <button
-                  type="button"
-                  onClick={() => { void remove({ taskId }); setMenuOpen(false); }}
-                  className="w-full px-3.5 py-2.5 text-left text-[13px] font-medium text-[var(--red-600)] hover:bg-[var(--red-50)] dark:hover:bg-[rgba(220,38,38,0.10)] transition-colors"
-                >
-                  Delete
-                </button>
-              </div>
-            </>
-          )}
-        </div>}
+        {!readOnly && (
+          <TaskRowMenu
+            isDismissed={status === "dismissed"}
+            onRestore={() => void uncomplete({ taskId })}
+            onDismiss={() => void dismiss({ taskId })}
+            onDelete={() => void remove({ taskId })}
+          />
+        )}
       </div>
     </div>
   );

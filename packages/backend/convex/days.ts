@@ -1,7 +1,13 @@
+import { nextAllowedAt } from "@cadence/shared";
 import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { isScheduledOn } from "./lib/schedule";
+import { loadDayReflection } from "./lib/dayReflection";
+import { countRepsByTask } from "./lib/taskRepeat";
+import type { DayReflection } from "./lib/dayReflection";
 import type { Doc, Id } from "./_generated/dataModel";
+
+export type { DayReflection };
 
 export type DayRoutine = {
   routineId: Id<"routines">;
@@ -27,13 +33,15 @@ export type DayTask = {
   carryoverCount: number;
   completedDate?: string;
   goalTitle?: string;
-};
-
-export type DayReflection = {
-  text: string;
-  taggedRoutineIds: Id<"routines">[];
-  taggedTaskIds: Id<"dailyTasks">[];
-  updatedAt: number;
+  // Repeat state — all absent on an ordinary task. `repeatDoneToday` is the
+  // count for *this* view's date, which is why a carried-over task reads 0
+  // the day after. `nextRepAllowedAt` is a fixed deadline rather than a
+  // remaining duration, so the query result stays stable and the client owns
+  // the ticking countdown.
+  repeatTarget?: number;
+  repeatIntervalMinutes?: number;
+  repeatDoneToday?: number;
+  nextRepAllowedAt?: number;
 };
 
 export type DayView = {
@@ -105,6 +113,12 @@ export const getDay = query({
     const tkGoalIds = [...new Set(tasksToday.map(t => t.goalId).filter((id): id is Id<"goals"> => !!id))].filter(id => !goalTitleMap.has(id));
     (await Promise.all(tkGoalIds.map(id => ctx.db.get(id)))).forEach(g => g && goalTitleMap.set(g._id, g.title));
 
+    // Read the rep log only when a repeat task is actually on the day, so
+    // other days' subscriptions take no dependency on taskCompletions.
+    const repCountByTask = tasksToday.some((t) => t.repeatTarget)
+      ? await countRepsByTask(ctx, user._id, date)
+      : new Map<Id<"dailyTasks">, number>();
+
     const randomTasks: DayTask[] = tasksToday.map((t) => ({
       taskId: t._id,
       title: t.title,
@@ -116,34 +130,15 @@ export const getDay = query({
       carryoverCount: t.carryoverCount,
       completedDate: t.completedDate,
       goalTitle: t.goalId ? goalTitleMap.get(t.goalId) : undefined,
+      repeatTarget: t.repeatTarget,
+      repeatIntervalMinutes: t.repeatIntervalMinutes,
+      repeatDoneToday: t.repeatTarget ? (repCountByTask.get(t._id) ?? 0) : undefined,
+      nextRepAllowedAt: t.repeatTarget
+        ? nextAllowedAt(t.lastRepAt, t.repeatIntervalMinutes)
+        : undefined,
     }));
 
-    const reflectionDoc = await ctx.db
-      .query("dailyReflections")
-      .withIndex("by_user_date", (q) =>
-        q.eq("userId", user._id).eq("date", date),
-      )
-      .unique();
-
-    let reflection: DayReflection | null = null;
-    if (reflectionDoc) {
-      const tags = await ctx.db
-        .query("reflectionTags")
-        .withIndex("by_reflection", (q) =>
-          q.eq("reflectionId", reflectionDoc._id),
-        )
-        .collect();
-      reflection = {
-        text: reflectionDoc.text,
-        taggedRoutineIds: tags
-          .map((t) => t.routineId)
-          .filter((id): id is Id<"routines"> => id !== undefined),
-        taggedTaskIds: tags
-          .map((t) => t.taskId)
-          .filter((id): id is Id<"dailyTasks"> => id !== undefined),
-        updatedAt: reflectionDoc.updatedAt,
-      };
-    }
+    const reflection = await loadDayReflection(ctx, user._id, date);
 
     return { date, routines, randomTasks, reflection };
   },

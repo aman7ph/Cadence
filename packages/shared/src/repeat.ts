@@ -65,6 +65,17 @@ export function formatCountdown(ms: number): string {
   return hours > 0 ? `${hours}:${mm}:${ss}` : `${mm}:${ss}`;
 }
 
+// Humanizes a raw minute count for the creation forms — "90" reads back as
+// "1h 30m", so a free-text minutes input can't be misread as hours.
+export function formatIntervalMinutes(minutes: number): string {
+  if (!Number.isFinite(minutes) || minutes <= 0) return "no wait";
+  const hours = Math.floor(minutes / 60);
+  const mins = Math.round(minutes % 60);
+  if (hours === 0) return `${mins}m`;
+  if (mins === 0) return `${hours}h`;
+  return `${hours}h ${mins}m`;
+}
+
 // Validation shared by the backend mutations and the creation forms, so both
 // reject the same values. A target of 1 is just a normal task.
 export function isValidRepeatTarget(target: number): boolean {

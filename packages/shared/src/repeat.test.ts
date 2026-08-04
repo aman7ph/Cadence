@@ -4,6 +4,7 @@ import {
   MAX_REPEAT_TARGET,
   MIN_REPEAT_TARGET,
   formatCountdown,
+  formatIntervalMinutes,
   isRepAllowed,
   isValidRepeatIntervalMinutes,
   isValidRepeatTarget,
@@ -117,6 +118,21 @@ describe("formatCountdown", () => {
 
   it("clamps negatives", () => {
     expect(formatCountdown(-5000)).toBe("00:00");
+  });
+});
+
+describe("formatIntervalMinutes", () => {
+  it("reads back minutes so a free-text input can't be misread as hours", () => {
+    expect(formatIntervalMinutes(45)).toBe("45m");
+    expect(formatIntervalMinutes(90)).toBe("1h 30m");
+    expect(formatIntervalMinutes(120)).toBe("2h");
+    expect(formatIntervalMinutes(1440)).toBe("24h");
+  });
+
+  it("calls 0 and nonsense 'no wait'", () => {
+    expect(formatIntervalMinutes(0)).toBe("no wait");
+    expect(formatIntervalMinutes(-5)).toBe("no wait");
+    expect(formatIntervalMinutes(NaN)).toBe("no wait");
   });
 });
 

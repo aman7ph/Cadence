@@ -4,8 +4,12 @@ import { api } from "@cadence/backend/convex/_generated/api";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { GoalLinkField } from "./goal-link-field";
+import { RepeatField } from "./repeat-field";
+import { RepeatToggle } from "./repeat-toggle";
 import { ScheduleForm } from "./routines-schedule-form";
 import type { ScheduleType } from "./routines-schedule-form";
+import { useRepeatFields } from "@/lib/use-repeat-fields";
 
 interface EditRoutineFormProps {
   routineId: Id<"routines">;
@@ -15,6 +19,8 @@ interface EditRoutineFormProps {
   initialCustomDays?: number[];
   initialGoalId?: Id<"goals">;
   initialGoalContribution?: number;
+  initialRepeatTarget?: number;
+  initialRepeatIntervalMinutes?: number;
   onDone: () => void;
 }
 
@@ -26,6 +32,8 @@ export function EditRoutineForm({
   initialCustomDays,
   initialGoalId,
   initialGoalContribution,
+  initialRepeatTarget,
+  initialRepeatIntervalMinutes,
   onDone,
 }: EditRoutineFormProps) {
   const update = useMutation(api.routineManagement.update);
@@ -37,8 +45,7 @@ export function EditRoutineForm({
   const [goalId, setGoalId] = useState<Id<"goals"> | "">(initialGoalId ?? "");
   const [contribution, setContribution] = useState(initialGoalContribution?.toString() ?? "");
   const [pending, setPending] = useState(false);
-
-  const selectedGoal = activeGoals?.find((g) => g._id === goalId);
+  const repeat = useRepeatFields(initialRepeatTarget, initialRepeatIntervalMinutes);
 
   const toggleDay = (d: number) =>
     setCustomDays((prev) =>
@@ -49,6 +56,8 @@ export function EditRoutineForm({
     e.preventDefault();
     if (!name.trim() || (scheduleType === "custom" && customDays.length === 0))
       return;
+    const repeatArgs = repeat.collect();
+    if (!repeatArgs) return;
     setPending(true);
     try {
       await update({
@@ -60,6 +69,7 @@ export function EditRoutineForm({
         goalId: goalId || undefined,
         goalContribution:
           goalId && contribution ? parseFloat(contribution) : undefined,
+        ...repeatArgs,
       });
       onDone();
     } finally {
@@ -92,36 +102,26 @@ export function EditRoutineForm({
         onChange={setScheduleType}
         onDayToggle={toggleDay}
       />
-      {(activeGoals?.length ?? 0) > 0 && (
-        <div className="flex items-center gap-2">
-          <select
-            value={goalId}
-            onChange={(e) => {
-              setGoalId(e.target.value as Id<"goals"> | "");
-              setContribution("");
-            }}
-            disabled={pending}
-            className="flex-1 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-sunken)] px-3 py-1.5 text-[13px] text-foreground focus:border-[var(--action-primary)] focus:outline-none transition-colors disabled:opacity-50"
-          >
-            <option value="">Link to goal (optional)</option>
-            {(activeGoals ?? []).map((g) => (
-              <option key={g._id} value={g._id}>
-                {g.title}
-              </option>
-            ))}
-          </select>
-          {selectedGoal?.targetValue && (
-            <input
-              type="number"
-              value={contribution}
-              onChange={(e) => setContribution(e.target.value)}
-              placeholder={selectedGoal.unit ?? "amount"}
-              disabled={pending}
-              className="w-24 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-sunken)] px-2 py-1.5 text-[13px] text-foreground placeholder:text-[var(--text-tertiary)] focus:border-[var(--action-primary)] focus:outline-none transition-colors disabled:opacity-50"
-            />
-          )}
-        </div>
+      <GoalLinkField
+        goals={activeGoals}
+        goalId={goalId}
+        contribution={contribution}
+        disabled={pending}
+        onGoalChange={setGoalId}
+        onContributionChange={setContribution}
+      />
+      <RepeatToggle enabled={repeat.enabled} onToggle={repeat.toggle} />
+      {repeat.enabled && (
+        <RepeatField
+          target={repeat.target}
+          interval={repeat.interval}
+          onTargetChange={repeat.setTarget}
+          onIntervalChange={repeat.setInterval}
+          cadenceLabel="each day"
+          disabled={pending}
+        />
       )}
+      {repeat.error && <p className="text-[12px] text-[var(--red-600)]">{repeat.error}</p>}
       <div className="flex gap-2">
         <Button
           type="submit"
@@ -134,13 +134,7 @@ export function EditRoutineForm({
         >
           Save changes
         </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
-          onClick={onDone}
-          disabled={pending}
-        >
+        <Button type="button" size="sm" variant="ghost" onClick={onDone} disabled={pending}>
           Cancel
         </Button>
       </div>

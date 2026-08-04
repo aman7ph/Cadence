@@ -3,7 +3,7 @@ import { formatCountdown } from "@cadence/shared";
 
 import { Badge } from "@/components/ui/badge";
 
-interface TaskRepeatControlProps {
+interface RepeatControlProps {
   doneToday: number;
   target: number;
   remaining: number;
@@ -14,13 +14,13 @@ interface TaskRepeatControlProps {
 // The right-hand cluster for a repeat task: how many of today's reps are done,
 // the live countdown while the interval gate is closed, and an undo for the
 // last rep. The rep action itself is the row's main toggle — this is status.
-export function TaskRepeatControl({
+export function RepeatControl({
   doneToday,
   target,
   remaining,
   onUndo,
   readOnly,
-}: TaskRepeatControlProps) {
+}: RepeatControlProps) {
   const complete = doneToday >= target;
 
   return (

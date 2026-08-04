@@ -12,6 +12,9 @@ interface Routine {
   currentStreak: number;
   longestStreak?: number;
   goalTitle?: string;
+  repeatTarget?: number;
+  repeatDoneToday?: number;
+  nextRepAllowedAt?: number;
 }
 
 interface TodayRoutinesSectionProps {
@@ -59,6 +62,9 @@ export function TodayRoutinesSection({
               currentStreak={r.currentStreak}
               viewedDate={viewedDate}
               goalTitle={r.goalTitle}
+              repeatTarget={r.repeatTarget}
+              repeatDoneToday={r.repeatDoneToday}
+              nextRepAllowedAt={r.nextRepAllowedAt}
             />
           ))}
         </div>

@@ -11,7 +11,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { TaskRepeatField } from "@/components/task-repeat-field";
+import { RepeatField } from "@/components/repeat-field";
 
 const toggleClass = (active: boolean) =>
   `shrink-0 rounded-[8px] p-1.5 transition-colors ${active ? "bg-[var(--action-primary)] text-white" : "text-[var(--text-tertiary)] hover:text-foreground hover:bg-[var(--surface-hover)]"}`;
@@ -100,7 +100,7 @@ export function AddTaskForm() {
         </Button>
       </div>
       {showRepeat && (
-        <TaskRepeatField
+        <RepeatField
           target={repeatTarget}
           interval={repeatInterval}
           onTargetChange={(v) => { setRepeatTarget(v); setError(null); }}

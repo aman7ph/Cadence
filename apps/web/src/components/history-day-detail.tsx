@@ -65,7 +65,8 @@ export function DayDetailPanel({ date, today, onClose }: DayDetailPanelProps) {
                       <RoutineRow key={r.routineId} routineId={r.routineId} name={r.name}
                         description={r.description} scheduleType={r.scheduleType}
                         customDays={r.customDays} status={r.status} currentStreak={r.currentStreak}
-                        viewedDate={date} readOnly />
+                        viewedDate={date} repeatTarget={r.repeatTarget}
+                        repeatDoneToday={r.repeatDoneToday} readOnly />
                     ))}
               </section>
 

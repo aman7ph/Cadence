@@ -6,7 +6,7 @@ import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 
 import { Badge } from "@/components/ui/badge";
 import { CompletionToggle } from "@/components/ui/completion-toggle";
-import { TaskRepeatControl } from "@/components/task-repeat-control";
+import { RepeatControl } from "@/components/repeat-control";
 import { TaskRowMenu } from "@/components/task-row-menu";
 import { useCountdown } from "@/lib/use-countdown";
 import { cn } from "@/lib/utils";
@@ -119,7 +119,7 @@ export function TaskRow({
       </div>
       <div className="flex items-center gap-2 shrink-0">
         {isRepeat && (
-          <TaskRepeatControl
+          <RepeatControl
             doneToday={repeatDoneToday}
             target={repeatTarget}
             remaining={remaining}

@@ -19,6 +19,8 @@ interface ActiveRoutineRowProps {
     goalId?: Id<"goals">;
     goalContribution?: number;
     goalTitle?: string;
+    repeatTarget?: number;
+    repeatIntervalMinutes?: number;
   };
   today: string;
 }
@@ -38,6 +40,8 @@ export function ActiveRoutineRow({ routine, today }: ActiveRoutineRowProps) {
         initialCustomDays={routine.customDays}
         initialGoalId={routine.goalId}
         initialGoalContribution={routine.goalContribution}
+        initialRepeatTarget={routine.repeatTarget}
+        initialRepeatIntervalMinutes={routine.repeatIntervalMinutes}
         onDone={() => setEditing(false)}
       />
     );

@@ -3,6 +3,7 @@ import type { Id } from "../_generated/dataModel";
 import { requireUser } from "./auth";
 import { recomputeStreak } from "./streak";
 import { upsertDayStats } from "./dayStats";
+import { applyGoalContribution } from "./goalContribution";
 
 export async function setStatus(
   ctx: MutationCtx,
@@ -40,16 +41,42 @@ export async function setStatus(
     });
   }
 
-  if (routine.goalId && routine.goalContribution && wasCompleted !== willBeCompleted) {
-    const goal = await ctx.db.get(routine.goalId);
-    if (goal) {
-      const delta = willBeCompleted ? routine.goalContribution : -routine.goalContribution;
-      await ctx.db.patch(routine.goalId, {
-        currentValue: Math.max(0, (goal.currentValue ?? 0) + delta),
-      });
-    }
+  if (wasCompleted !== willBeCompleted) {
+    await applyGoalContribution(
+      ctx,
+      routine.goalId,
+      routine.goalContribution,
+      willBeCompleted ? 1 : -1,
+    );
   }
 
+  await recomputeStreak(ctx, args.routineId, args.today);
+  await upsertDayStats(ctx, user._id, args.date);
+}
+
+// Reverses whatever status a day holds: drops the completion/skip row, gives
+// back any goal credit, and recomputes streak + day stats. Shared by
+// routines.uncomplete and the repeat undo, which must not diverge.
+export async function clearStatus(
+  ctx: MutationCtx,
+  args: { routineId: Id<"routines">; date: string; today: string },
+): Promise<void> {
+  const user = await requireUser(ctx);
+  const routine = await ctx.db.get(args.routineId);
+  if (!routine || routine.userId !== user._id) throw new Error("Routine not found");
+  const existing = await ctx.db
+    .query("routineCompletions")
+    .withIndex("by_routine_date", (q) =>
+      q.eq("routineId", args.routineId).eq("date", args.date),
+    )
+    .unique();
+  if (!existing) return;
+
+  const wasCompleted = existing.status === "completed";
+  await ctx.db.delete(existing._id);
+  if (wasCompleted) {
+    await applyGoalContribution(ctx, routine.goalId, routine.goalContribution, -1);
+  }
   await recomputeStreak(ctx, args.routineId, args.today);
   await upsertDayStats(ctx, user._id, args.date);
 }

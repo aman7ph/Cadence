@@ -1,9 +1,10 @@
+import { validateRepeatArgs } from "@cadence/shared";
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { requireUser } from "./lib/auth";
 import { upsertDayStats } from "./lib/dayStats";
 import { applyGoalContribution } from "./lib/goalContribution";
-import { assertPlainTask, deleteTaskCompletions, validateRepeatArgs } from "./lib/taskRepeat";
+import { assertPlainTask, deleteTaskCompletions } from "./lib/taskRepeat";
 
 export const create = mutation({
   args: {

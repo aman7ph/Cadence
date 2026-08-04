@@ -10,6 +10,7 @@ import {
   isValidRepeatTarget,
   nextAllowedAt,
   remainingMs,
+  validateRepeatArgs,
 } from "./repeat";
 
 // Local wall-clock helper so the scenarios read like the spec.
@@ -169,5 +170,33 @@ describe("validation", () => {
     expect(isValidRepeatIntervalMinutes(MAX_REPEAT_INTERVAL_MINUTES + 1)).toBe(false);
     expect(isValidRepeatIntervalMinutes(1.5)).toBe(false);
     expect(isValidRepeatIntervalMinutes(NaN)).toBe(false);
+  });
+});
+
+describe("validateRepeatArgs", () => {
+  it("accepts a plain non-repeating entity", () => {
+    expect(() => validateRepeatArgs(undefined, undefined)).not.toThrow();
+  });
+
+  it("accepts a valid pair, including a zero interval", () => {
+    expect(() => validateRepeatArgs(20, 60)).not.toThrow();
+    expect(() => validateRepeatArgs(3, 0)).not.toThrow();
+    expect(() => validateRepeatArgs(3, undefined)).not.toThrow();
+  });
+
+  it("rejects an interval with no count", () => {
+    expect(() => validateRepeatArgs(undefined, 60)).toThrow(
+      /interval needs a repeat count/,
+    );
+  });
+
+  it("rejects an out-of-range count", () => {
+    expect(() => validateRepeatArgs(1, 60)).toThrow(/whole number from 2 to 100/);
+    expect(() => validateRepeatArgs(101, 60)).toThrow(/whole number from 2 to 100/);
+  });
+
+  it("rejects an out-of-range interval", () => {
+    expect(() => validateRepeatArgs(5, 1441)).toThrow(/from 0 to 1440/);
+    expect(() => validateRepeatArgs(5, -1)).toThrow(/from 0 to 1440/);
   });
 });

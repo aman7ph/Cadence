@@ -94,3 +94,31 @@ export function isValidRepeatIntervalMinutes(minutes: number): boolean {
     minutes <= MAX_REPEAT_INTERVAL_MINUTES
   );
 }
+
+// Throwing form used by every mutation that accepts repeat settings — tasks
+// and routines both — so one definition decides what is acceptable. Absent
+// target means "not a repeat", in which case an interval is meaningless.
+export function validateRepeatArgs(
+  repeatTarget: number | undefined,
+  repeatIntervalMinutes: number | undefined,
+): void {
+  if (repeatTarget === undefined) {
+    if (repeatIntervalMinutes) {
+      throw new Error("A repeat interval needs a repeat count");
+    }
+    return;
+  }
+  if (!isValidRepeatTarget(repeatTarget)) {
+    throw new Error(
+      `Repeat count must be a whole number from ${MIN_REPEAT_TARGET} to ${MAX_REPEAT_TARGET}`,
+    );
+  }
+  if (
+    repeatIntervalMinutes !== undefined &&
+    !isValidRepeatIntervalMinutes(repeatIntervalMinutes)
+  ) {
+    throw new Error(
+      `Repeat interval must be a whole number of minutes from 0 to ${MAX_REPEAT_INTERVAL_MINUTES}`,
+    );
+  }
+}

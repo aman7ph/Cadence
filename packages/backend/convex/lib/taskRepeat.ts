@@ -1,39 +1,8 @@
-import {
-  MAX_REPEAT_INTERVAL_MINUTES,
-  MAX_REPEAT_TARGET,
-  MIN_REPEAT_TARGET,
-  isValidRepeatIntervalMinutes,
-  isValidRepeatTarget,
-} from "@cadence/shared";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 import type { Doc, Id } from "../_generated/dataModel";
 
-// Rejects repeat settings that the shared validators consider malformed, so
-// the mutations and the creation forms agree on what is acceptable.
-export function validateRepeatArgs(
-  repeatTarget: number | undefined,
-  repeatIntervalMinutes: number | undefined,
-): void {
-  if (repeatTarget === undefined) {
-    if (repeatIntervalMinutes) {
-      throw new Error("A repeat interval needs a repeat count");
-    }
-    return;
-  }
-  if (!isValidRepeatTarget(repeatTarget)) {
-    throw new Error(
-      `Repeat count must be a whole number from ${MIN_REPEAT_TARGET} to ${MAX_REPEAT_TARGET}`,
-    );
-  }
-  if (
-    repeatIntervalMinutes !== undefined &&
-    !isValidRepeatIntervalMinutes(repeatIntervalMinutes)
-  ) {
-    throw new Error(
-      `Repeat interval must be a whole number of minutes from 0 to ${MAX_REPEAT_INTERVAL_MINUTES}`,
-    );
-  }
-}
+// `validateRepeatArgs` used to live here; it moved to packages/shared once
+// routines needed it too (RD3), since it is pure and entity-agnostic.
 
 // Guards the plain complete/uncomplete mutations. A repeat task must go
 // through logRep/undoRep, which is where the interval gate lives — otherwise

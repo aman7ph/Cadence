@@ -31,10 +31,28 @@ export default defineSchema({
     lastCompletedDate: v.optional(v.string()),
     goalId: v.optional(v.id("goals")),
     goalContribution: v.optional(v.number()),
+    // Repeatable routines — absent ⇒ an ordinary once-a-day routine.
+    repeatTarget: v.optional(v.number()),          // reps needed per scheduled day
+    repeatIntervalMinutes: v.optional(v.number()), // min gap between reps; 0 ⇒ none
+    lastRepAt: v.optional(v.number()),             // epoch ms of the newest rep, any day
   })
     .index("by_user", ["userId"])
     .index("by_user_active", ["userId", "isActive"])
     .index("by_goal", ["goalId"]),
+
+  // Reps for a repeat routine. Deliberately NOT folded into routineCompletions,
+  // which stays exactly one row per (routine, date) because streaks, dayStats,
+  // and getDay all read it that way. The completion row is still written once,
+  // by setStatus, at the moment the day's rep count reaches the target.
+  routineReps: defineTable({
+    userId: v.id("users"),
+    routineId: v.id("routines"),
+    date: v.string(),
+    completedAt: v.number(),
+  })
+    .index("by_routine_date", ["routineId", "date"])
+    .index("by_routine", ["routineId"])
+    .index("by_user_date", ["userId", "date"]),
 
   routineCompletions: defineTable({
     userId: v.id("users"),

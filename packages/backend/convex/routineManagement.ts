@@ -1,6 +1,8 @@
+import { validateRepeatArgs } from "@cadence/shared";
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { requireUser } from "./lib/auth";
+import { deleteRoutineReps } from "./lib/routineRepeat";
 
 const scheduleType = v.union(
   v.literal("daily"),
@@ -17,13 +19,16 @@ export const update = mutation({
     customDays: v.optional(v.array(v.number())),
     goalId: v.optional(v.id("goals")),
     goalContribution: v.optional(v.number()),
+    repeatTarget: v.optional(v.number()),
+    repeatIntervalMinutes: v.optional(v.number()),
   },
-  handler: async (ctx, { routineId, name, description, scheduleType: sType, customDays, goalId, goalContribution }) => {
+  handler: async (ctx, { routineId, name, description, scheduleType: sType, customDays, goalId, goalContribution, repeatTarget, repeatIntervalMinutes }) => {
     const user = await requireUser(ctx);
     const routine = await ctx.db.get(routineId);
     if (!routine || routine.userId !== user._id) throw new Error("Routine not found");
     const trimmed = name.trim();
     if (!trimmed) throw new Error("Routine name is required");
+    validateRepeatArgs(repeatTarget, repeatIntervalMinutes);
     if (sType === "custom") {
       if (!customDays || customDays.length === 0) throw new Error("Custom schedule needs at least one day");
       for (const d of customDays) {
@@ -37,6 +42,10 @@ export const update = mutation({
       customDays: sType === "custom" ? customDays : undefined,
       goalId: goalId,
       goalContribution: goalContribution,
+      repeatTarget,
+      repeatIntervalMinutes,
+      // Turning repeat off must not strand a stale gate on the routine.
+      lastRepAt: repeatTarget === undefined ? undefined : routine.lastRepAt,
     });
   },
 });
@@ -72,6 +81,7 @@ export const permanentDelete = mutation({
       .withIndex("by_routine_date", (q) => q.eq("routineId", routineId))
       .collect();
     await Promise.all(completions.map((c) => ctx.db.delete(c._id)));
+    await deleteRoutineReps(ctx, routineId);
     await ctx.db.delete(routineId);
   },
 });

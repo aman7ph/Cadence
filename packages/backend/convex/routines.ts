@@ -1,9 +1,9 @@
+import { validateRepeatArgs } from "@cadence/shared";
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { requireUser } from "./lib/auth";
-import { recomputeStreak } from "./lib/streak";
-import { upsertDayStats } from "./lib/dayStats";
-import { setStatus } from "./lib/routineSetStatus";
+import { clearStatus, setStatus } from "./lib/routineSetStatus";
+import { assertPlainRoutine } from "./lib/routineRepeat";
 
 const scheduleType = v.union(
   v.literal("daily"),
@@ -48,11 +48,14 @@ export const create = mutation({
     today: v.string(),
     goalId: v.optional(v.id("goals")),
     goalContribution: v.optional(v.number()),
+    repeatTarget: v.optional(v.number()),
+    repeatIntervalMinutes: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const user = await requireUser(ctx);
     const trimmed = args.name.trim();
     if (!trimmed) throw new Error("Routine name is required");
+    validateRepeatArgs(args.repeatTarget, args.repeatIntervalMinutes);
     if (args.scheduleType === "custom") {
       if (!args.customDays || args.customDays.length === 0) {
         throw new Error("Custom schedule needs at least one day");
@@ -75,6 +78,8 @@ export const create = mutation({
       longestStreak: 0,
       goalId: args.goalId,
       goalContribution: args.goalContribution,
+      repeatTarget: args.repeatTarget,
+      repeatIntervalMinutes: args.repeatIntervalMinutes,
     });
   },
 });
@@ -82,6 +87,8 @@ export const create = mutation({
 export const complete = mutation({
   args: { routineId: v.id("routines"), date: v.string(), today: v.string() },
   handler: async (ctx, args) => {
+    const routine = await ctx.db.get(args.routineId);
+    if (routine) assertPlainRoutine(routine);
     await setStatus(ctx, { ...args, status: "completed" });
   },
 });
@@ -99,25 +106,15 @@ export const uncomplete = mutation({
     const user = await requireUser(ctx);
     const routine = await ctx.db.get(routineId);
     if (!routine || routine.userId !== user._id) throw new Error("Routine not found");
+    // Un-skipping a repeat routine is fine; only reversing a completion has to
+    // go through undoRep, which repairs the rep log alongside the status.
     const existing = await ctx.db
       .query("routineCompletions")
       .withIndex("by_routine_date", (q) =>
         q.eq("routineId", routineId).eq("date", date),
       )
       .unique();
-    if (existing) {
-      const wasCompleted = existing.status === "completed";
-      await ctx.db.delete(existing._id);
-      if (wasCompleted && routine.goalId && routine.goalContribution) {
-        const goal = await ctx.db.get(routine.goalId);
-        if (goal) {
-          await ctx.db.patch(routine.goalId, {
-            currentValue: Math.max(0, (goal.currentValue ?? 0) - routine.goalContribution),
-          });
-        }
-      }
-      await recomputeStreak(ctx, routineId, today);
-      await upsertDayStats(ctx, user._id, date);
-    }
+    if (existing?.status === "completed") assertPlainRoutine(routine);
+    await clearStatus(ctx, { routineId, date, today });
   },
 });

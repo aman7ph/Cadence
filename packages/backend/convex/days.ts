@@ -4,45 +4,12 @@ import { query } from "./_generated/server";
 import { isScheduledOn } from "./lib/schedule";
 import { loadDayReflection } from "./lib/dayReflection";
 import { countRepsByTask } from "./lib/taskRepeat";
+import { countRepsByRoutine } from "./lib/routineRepeat";
 import type { DayReflection } from "./lib/dayReflection";
+import type { DayRoutine, DayTask } from "./lib/dayTypes";
 import type { Doc, Id } from "./_generated/dataModel";
 
-export type { DayReflection };
-
-export type DayRoutine = {
-  routineId: Id<"routines">;
-  name: string;
-  description?: string;
-  scheduleType: Doc<"routines">["scheduleType"];
-  customDays?: number[];
-  status: "completed" | "skipped" | "pending";
-  currentStreak: number;
-  longestStreak: number;
-  goalId?: Id<"goals">;
-  goalTitle?: string;
-};
-
-export type DayTask = {
-  taskId: Id<"dailyTasks">;
-  title: string;
-  description?: string;
-  category?: string;
-  status: Doc<"dailyTasks">["status"];
-  isCarriedOver: boolean;
-  originalDate: string;
-  carryoverCount: number;
-  completedDate?: string;
-  goalTitle?: string;
-  // Repeat state — all absent on an ordinary task. `repeatDoneToday` is the
-  // count for *this* view's date, which is why a carried-over task reads 0
-  // the day after. `nextRepAllowedAt` is a fixed deadline rather than a
-  // remaining duration, so the query result stays stable and the client owns
-  // the ticking countdown.
-  repeatTarget?: number;
-  repeatIntervalMinutes?: number;
-  repeatDoneToday?: number;
-  nextRepAllowedAt?: number;
-};
+export type { DayReflection, DayRoutine, DayTask };
 
 export type DayView = {
   date: string;
@@ -87,6 +54,12 @@ export const getDay = query({
     const goalIds = [...new Set(scheduledRoutines.map((r) => r.goalId).filter((id): id is Id<"goals"> => !!id))];
     const goalTitleMap = new Map<Id<"goals">, string>((await Promise.all(goalIds.map((id) => ctx.db.get(id)))).filter(Boolean).map((g) => [g!._id, g!.title]));
 
+    // Same guard as tasks: only read the rep log when the day actually has a
+    // repeat routine on it.
+    const repsByRoutine = scheduledRoutines.some((r) => r.repeatTarget)
+      ? await countRepsByRoutine(ctx, user._id, date)
+      : new Map<Id<"routines">, number>();
+
     const routines: DayRoutine[] = [];
     for (const r of scheduledRoutines) {
       const c = completionByRoutine.get(r._id);
@@ -101,6 +74,12 @@ export const getDay = query({
         longestStreak: r.longestStreak,
         goalId: r.goalId,
         goalTitle: r.goalId ? goalTitleMap.get(r.goalId) : undefined,
+        repeatTarget: r.repeatTarget,
+        repeatIntervalMinutes: r.repeatIntervalMinutes,
+        repeatDoneToday: r.repeatTarget ? (repsByRoutine.get(r._id) ?? 0) : undefined,
+        nextRepAllowedAt: r.repeatTarget
+          ? nextAllowedAt(r.lastRepAt, r.repeatIntervalMinutes)
+          : undefined,
       });
     }
 

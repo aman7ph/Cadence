@@ -6,7 +6,9 @@ import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import * as Haptics from "expo-haptics";
 import { useColors } from "../lib/theme";
 import { fmtShort } from "../lib/dateUtils";
+import { useRepeatRow } from "../lib/useRepeatRow";
 import { ActionSheet } from "./ActionSheet";
+import { RepeatControl } from "./RepeatControl";
 
 export interface Task {
   taskId: Id<"dailyTasks">;
@@ -17,6 +19,9 @@ export interface Task {
   originalDate: string;
   carryoverCount: number;
   goalTitle?: string;
+  repeatTarget?: number;
+  repeatDoneToday?: number;
+  nextRepAllowedAt?: number;
 }
 
 interface Props { task: Task; viewedDate: string; readOnly?: boolean }
@@ -27,15 +32,32 @@ export function TaskItem({ task, viewedDate, readOnly }: Props) {
   const uncomplete = useMutation(api.dailyTasks.uncomplete);
   const dismiss    = useMutation(api.dailyTasks.dismiss);
   const remove     = useMutation(api.dailyTasks.remove);
+  const logRep     = useMutation(api.dailyTaskRepeats.logRep);
+  const undoRep    = useMutation(api.dailyTaskRepeats.undoRep);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isRepeat, remaining, gated, error, clearError, fail } =
+    useRepeatRow(task.repeatTarget, task.nextRepAllowedAt);
 
   const done      = task.status === "completed";
   const dismissed = task.status === "dismissed";
+  const doneToday = task.repeatDoneToday ?? 0;
   const meta      = task.description?.trim()
     || (task.isCarriedOver ? `Original ${fmtShort(task.originalDate)}` : "Today");
 
   const toggle = () => {
     if (readOnly) return;
+    clearError();
+    if (isRepeat) {
+      // A rejected tap gets a warning buzz rather than the "done" tick, so the
+      // gate is felt even when the countdown badge is off-screen.
+      if (task.status !== "open" || gated) {
+        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        return;
+      }
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      void logRep({ taskId: task.taskId, today: viewedDate }).catch(fail);
+      return;
+    }
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     done
       ? uncomplete({ taskId: task.taskId })
@@ -63,6 +85,7 @@ export function TaskItem({ task, viewedDate, readOnly }: Props) {
     title:           { fontSize: 14, fontWeight: "600", color: c.t1 },
     strike:          { textDecorationLine: "line-through", color: c.t3 },
     meta:            { fontSize: 12, color: c.t3 },
+    err:             { fontSize: 12, color: "#f87171" },
     goalPill:        { alignSelf: "flex-start", backgroundColor: c.accBg,
                        borderRadius: 999, paddingHorizontal: 7, paddingVertical: 2, marginTop: 2 },
     goalTxt:         { fontSize: 10, fontWeight: "600", color: c.tacc },
@@ -78,18 +101,32 @@ export function TaskItem({ task, viewedDate, readOnly }: Props) {
   return (
     <View style={[s.card, (done || dismissed) && s.dim]}>
       <TouchableOpacity onPress={toggle} hitSlop={6} style={s.toggle} disabled={!!readOnly}>
-        <View style={[s.circle, done && s.circleDone]}>
+        <View style={[s.circle, done && s.circleDone, isRepeat && gated && { opacity: 0.4 }]}>
           {done && <Text style={s.checkTxt}>✓</Text>}
         </View>
       </TouchableOpacity>
       <View style={s.body}>
         <Text style={[s.title, done && s.strike]} numberOfLines={2}>{task.title}</Text>
         <Text style={s.meta} numberOfLines={1}>{meta}</Text>
+        {error && <Text style={s.err} numberOfLines={2}>{error}</Text>}
         {task.goalTitle && (
           <View style={s.goalPill}><Text style={s.goalTxt} numberOfLines={1}>{task.goalTitle}</Text></View>
         )}
       </View>
       <View style={s.right}>
+        {isRepeat && (
+          <RepeatControl
+            doneToday={doneToday}
+            target={task.repeatTarget!}
+            remaining={remaining}
+            readOnly={readOnly}
+            onUndo={() => {
+              clearError();
+              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              void undoRep({ taskId: task.taskId, today: viewedDate }).catch(fail);
+            }}
+          />
+        )}
         {task.isCarriedOver && !done && !dismissed && (
           <View style={s.carryBadge}><Text style={s.carryTxt}>×{task.carryoverCount} carried</Text></View>
         )}

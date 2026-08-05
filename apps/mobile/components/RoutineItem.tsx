@@ -6,7 +6,10 @@ import { todayLocal } from "@cadence/shared";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import * as Haptics from "expo-haptics";
 import { useColors } from "../lib/theme";
+import { useRepeatRow } from "../lib/useRepeatRow";
 import { ActionSheet } from "./ActionSheet";
+import { RepeatControl } from "./RepeatControl";
+import { StreakPill } from "./StreakPill";
 import { scheduleLabel, type ScheduleType } from "./SchedulePicker";
 
 export interface Routine {
@@ -19,6 +22,9 @@ export interface Routine {
   currentStreak: number;
   longestStreak: number;
   goalTitle?: string;
+  repeatTarget?: number;
+  repeatDoneToday?: number;
+  nextRepAllowedAt?: number;
 }
 
 interface Props { routine: Routine; date: string; readOnly?: boolean }
@@ -29,15 +35,30 @@ export function RoutineItem({ routine, date, readOnly }: Props) {
   const uncomplete = useMutation(api.routines.uncomplete);
   const skip       = useMutation(api.routines.skip);
   const archive    = useMutation(api.routineManagement.archive);
+  const logRep     = useMutation(api.routineRepeats.logRep);
+  const undoRep    = useMutation(api.routineRepeats.undoRep);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isRepeat, remaining, gated, error, clearError, fail } =
+    useRepeatRow(routine.repeatTarget, routine.nextRepAllowedAt);
 
-  const done    = routine.status === "completed";
-  const skipped = routine.status === "skipped";
-  const meta    = routine.description?.trim() || scheduleLabel(routine.scheduleType as ScheduleType, routine.customDays);
+  const done      = routine.status === "completed";
+  const skipped   = routine.status === "skipped";
+  const doneToday = routine.repeatDoneToday ?? 0;
+  const meta      = routine.description?.trim() || scheduleLabel(routine.scheduleType as ScheduleType, routine.customDays);
 
   const toggle = () => {
     if (readOnly) return;
+    clearError();
     const today = todayLocal();
+    if (isRepeat) {
+      if (done || gated) {
+        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        return;
+      }
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      void logRep({ routineId: routine.routineId, date, today }).catch(fail);
+      return;
+    }
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     done
       ? uncomplete({ routineId: routine.routineId, date, today })
@@ -45,24 +66,16 @@ export function RoutineItem({ routine, date, readOnly }: Props) {
   };
 
   const menuActions = [
-    {
-      label: skipped ? "Un-skip" : "Skip today",
-      onPress: () => {
-        const today = todayLocal();
-        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-        skipped
-          ? uncomplete({ routineId: routine.routineId, date, today })
-          : skip({ routineId: routine.routineId, date, today });
-      },
-    },
-    {
-      label: "Archive",
-      style: "destructive" as const,
-      onPress: () => {
-        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-        archive({ routineId: routine.routineId, today: todayLocal() });
-      },
-    },
+    { label: skipped ? "Un-skip" : "Skip today", onPress: () => {
+      const today = todayLocal();
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      skipped ? uncomplete({ routineId: routine.routineId, date, today })
+              : skip({ routineId: routine.routineId, date, today });
+    } },
+    { label: "Archive", style: "destructive" as const, onPress: () => {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      archive({ routineId: routine.routineId, today: todayLocal() });
+    } },
   ];
 
   const s = StyleSheet.create({
@@ -81,17 +94,11 @@ export function RoutineItem({ routine, date, readOnly }: Props) {
     name:          { fontSize: 14, fontWeight: "600", color: c.t1 },
     strike:        { textDecorationLine: "line-through", color: c.t3 },
     meta:          { fontSize: 12, color: c.t3 },
+    err:           { fontSize: 12, color: "#f87171" },
     goalPill:      { alignSelf: "flex-start", backgroundColor: c.accBg,
                      borderRadius: 999, paddingHorizontal: 7, paddingVertical: 2, marginTop: 2 },
     goalTxt:       { fontSize: 10, fontWeight: "600", color: c.tacc },
     right:         { flexDirection: "row", alignItems: "center", gap: 6 },
-    streak:        { flexDirection: "row", alignItems: "baseline", gap: 1,
-                     backgroundColor: "rgba(43,168,74,0.18)", borderRadius: 999,
-                     paddingHorizontal: 8, paddingVertical: 3 },
-    streakNum:     { fontSize: 12, fontWeight: "700", color: c.cplt },
-    streakUnit:    { fontSize: 10, fontWeight: "600", color: c.cplt },
-    streakCold:    { backgroundColor: c.active },
-    streakNumCold: { color: c.t3 },
     skipBadge:     { backgroundColor: c.active, borderRadius: 999, paddingHorizontal: 6, paddingVertical: 2 },
     skipBadgeTxt:  { fontSize: 10, color: c.t3 },
     more:          { fontSize: 16, color: c.t3, letterSpacing: 1 },
@@ -100,7 +107,8 @@ export function RoutineItem({ routine, date, readOnly }: Props) {
   return (
     <View style={[s.card, (done || skipped) && s.dim]}>
       <TouchableOpacity onPress={toggle} hitSlop={6} style={s.toggle} disabled={!!readOnly}>
-        <View style={[s.circle, done && s.circleDone, skipped && s.circleSkip]}>
+        <View style={[s.circle, done && s.circleDone, skipped && s.circleSkip,
+                      isRepeat && gated && { opacity: 0.4 }]}>
           {done    && <Text style={s.checkTxt}>✓</Text>}
           {skipped && <View style={s.skipBar} />}
         </View>
@@ -108,15 +116,26 @@ export function RoutineItem({ routine, date, readOnly }: Props) {
       <View style={s.body}>
         <Text style={[s.name, done && s.strike]} numberOfLines={1}>{routine.name}</Text>
         <Text style={s.meta} numberOfLines={1}>{meta}</Text>
+        {error && <Text style={s.err} numberOfLines={2}>{error}</Text>}
         {routine.goalTitle && (
           <View style={s.goalPill}><Text style={s.goalTxt} numberOfLines={1}>{routine.goalTitle}</Text></View>
         )}
       </View>
       <View style={s.right}>
-        <View style={[s.streak, routine.currentStreak === 0 && s.streakCold]}>
-          <Text style={[s.streakNum, routine.currentStreak === 0 && s.streakNumCold]}>{routine.currentStreak}</Text>
-          <Text style={[s.streakUnit, routine.currentStreak === 0 && s.streakNumCold]}>d</Text>
-        </View>
+        {isRepeat && (
+          <RepeatControl
+            doneToday={doneToday}
+            target={routine.repeatTarget!}
+            remaining={remaining}
+            readOnly={readOnly}
+            onUndo={() => {
+              clearError();
+              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              void undoRep({ routineId: routine.routineId, date, today: todayLocal() }).catch(fail);
+            }}
+          />
+        )}
+        <StreakPill count={routine.currentStreak} />
         {skipped && <View style={s.skipBadge}><Text style={s.skipBadgeTxt}>Skipped</Text></View>}
         {!readOnly && (
           <TouchableOpacity onPress={() => setMenuOpen(true)} hitSlop={8}>

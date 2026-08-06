@@ -59,6 +59,10 @@ export function RoutinesPage() {
                 goalId: r.goalId as Id<"goals"> | undefined,
                 goalContribution: r.goalContribution,
                 goalTitle: r.goalId ? (goalTitleById.get(r.goalId as Id<"goals">) ?? undefined) : undefined,
+                // Must be carried through: the edit form submits every field,
+                // so omitting these would silently strip the repeat settings.
+                repeatTarget: r.repeatTarget,
+                repeatIntervalMinutes: r.repeatIntervalMinutes,
               }}
               today={today}
             />

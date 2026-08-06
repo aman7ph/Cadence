@@ -7,14 +7,17 @@ import {
   ActivityIndicator, KeyboardAvoidingView, Modal, Platform,
   ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from "react-native";
+import { RepeatFields } from "./RepeatFields";
 import { SchedulePicker } from "./SchedulePicker";
 import type { ScheduleType } from "./SchedulePicker";
 import { useColors } from "../lib/theme";
+import { useRepeatFields } from "../lib/useRepeatFields";
 
 export interface RoutineForForm {
   _id: Id<"routines">; name: string; description?: string;
   scheduleType: ScheduleType; customDays?: number[];
   goalId?: Id<"goals">; goalContribution?: number;
+  repeatTarget?: number; repeatIntervalMinutes?: number;
 }
 interface Props { visible: boolean; routine: RoutineForForm | null; onDone: () => void }
 
@@ -31,6 +34,7 @@ export function RoutineFormModal({ visible, routine, onDone }: Props) {
   const [goalId, setGoalId] = useState<Id<"goals"> | "">(routine?.goalId ?? "");
   const [contrib, setCtb] = useState(routine?.goalContribution?.toString() ?? "");
   const [pending, setPend] = useState(false);
+  const repeat = useRepeatFields(routine?.repeatTarget, routine?.repeatIntervalMinutes);
 
   const selGoal = goals?.find((g) => g._id === goalId);
   const invalid = !name.trim() || (sched === "custom" && days.length === 0);
@@ -39,6 +43,8 @@ export function RoutineFormModal({ visible, routine, onDone }: Props) {
 
   const submit = async () => {
     if (invalid || pending) return;
+    const repeatArgs = repeat.collect();
+    if (!repeatArgs) return;
     setPend(true);
     try {
       const base = {
@@ -46,6 +52,7 @@ export function RoutineFormModal({ visible, routine, onDone }: Props) {
         scheduleType: sched, customDays: sched === "custom" ? days : undefined,
         goalId: goalId || undefined,
         goalContribution: goalId && contrib ? parseFloat(contrib) : undefined,
+        ...repeatArgs,
       };
       routine ? await update({ routineId: routine._id, ...base })
               : await create({ ...base, today: todayLocal() });
@@ -118,6 +125,11 @@ export function RoutineFormModal({ visible, routine, onDone }: Props) {
                 placeholder={selGoal.unit ?? "Contribution amount"}
                 placeholderTextColor={c.t3} keyboardType="numeric" editable={!pending} />
             )}
+            <RepeatFields
+              enabled={repeat.enabled} target={repeat.target} interval={repeat.interval}
+              error={repeat.error} disabled={pending} cadenceLabel="each day"
+              onToggle={repeat.toggle} onTargetChange={repeat.setTarget}
+              onIntervalChange={repeat.setInterval} />
           </ScrollView>
           <View style={s.footer}>
             <TouchableOpacity onPress={onDone} disabled={pending} style={s.cancelBtn}>

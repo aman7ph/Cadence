@@ -7,6 +7,8 @@ import {
   TextInput, TouchableOpacity, View,
 } from "react-native";
 import { useColors } from "../lib/theme";
+import { useRepeatFields } from "../lib/useRepeatFields";
+import { RepeatFields } from "./RepeatFields";
 
 interface Props { today: string }
 
@@ -20,6 +22,7 @@ export function AddTaskBar({ today }: Props) {
   const [showGoal, setShowGoal]    = useState(false);
   const [goalId, setGoalId]        = useState<Id<"goals"> | null>(null);
   const [contribution, setContrib] = useState("");
+  const repeat = useRepeatFields();
 
   const hasGoals = (activeGoals?.length ?? 0) > 0;
   const selectedGoal = activeGoals?.find((g) => g._id === goalId);
@@ -27,14 +30,17 @@ export function AddTaskBar({ today }: Props) {
   const submit = async () => {
     const trimmed = title.trim();
     if (!trimmed || pending) return;
+    const repeatArgs = repeat.collect();
+    if (!repeatArgs) return;
     setPending(true);
     try {
       await create({
         title: trimmed, today,
         goalId: goalId ?? undefined,
         goalContribution: goalId && contribution ? parseFloat(contribution) : undefined,
+        ...repeatArgs,
       });
-      setTitle(""); setGoalId(null); setContrib(""); setShowGoal(false);
+      setTitle(""); setGoalId(null); setContrib(""); setShowGoal(false); repeat.reset();
     } finally { setPending(false); }
   };
 
@@ -107,6 +113,11 @@ export function AddTaskBar({ today }: Props) {
           )}
         </View>
       )}
+      <RepeatFields
+        enabled={repeat.enabled} target={repeat.target} interval={repeat.interval}
+        error={repeat.error} disabled={pending}
+        onToggle={repeat.toggle} onTargetChange={repeat.setTarget}
+        onIntervalChange={repeat.setInterval} />
     </View>
   );
 }

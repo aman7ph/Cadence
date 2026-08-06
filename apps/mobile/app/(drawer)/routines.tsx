@@ -41,6 +41,9 @@ export default function RoutinesScreen() {
       _id: r._id, name: r.name, description: r.description,
       scheduleType: r.scheduleType as ScheduleType, customDays: r.customDays,
       goalId: r.goalId as Id<"goals"> | undefined, goalContribution: r.goalContribution,
+      // Must be carried through: the form submits every field, so omitting
+      // these would silently strip the repeat settings on any edit.
+      repeatTarget: r.repeatTarget, repeatIntervalMinutes: r.repeatIntervalMinutes,
     });
     setFormVisible(true);
   };

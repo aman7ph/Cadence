@@ -8,6 +8,7 @@ import {
   ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from "react-native";
 import { RepeatFields } from "./RepeatFields";
+import { RepeatPill } from "./RepeatPill";
 import { SchedulePicker } from "./SchedulePicker";
 import type { ScheduleType } from "./SchedulePicker";
 import { useColors } from "../lib/theme";
@@ -125,11 +126,13 @@ export function RoutineFormModal({ visible, routine, onDone }: Props) {
                 placeholder={selGoal.unit ?? "Contribution amount"}
                 placeholderTextColor={c.t3} keyboardType="numeric" editable={!pending} />
             )}
-            <RepeatFields
-              enabled={repeat.enabled} target={repeat.target} interval={repeat.interval}
-              error={repeat.error} disabled={pending} cadenceLabel="each day"
-              onToggle={repeat.toggle} onTargetChange={repeat.setTarget}
-              onIntervalChange={repeat.setInterval} />
+            <RepeatPill enabled={repeat.enabled} onToggle={repeat.toggle} disabled={pending} />
+            {repeat.enabled && (
+              <RepeatFields
+                target={repeat.target} interval={repeat.interval}
+                error={repeat.error} disabled={pending} cadenceLabel="each day"
+                onTargetChange={repeat.setTarget} onIntervalChange={repeat.setInterval} />
+            )}
           </ScrollView>
           <View style={s.footer}>
             <TouchableOpacity onPress={onDone} disabled={pending} style={s.cancelBtn}>

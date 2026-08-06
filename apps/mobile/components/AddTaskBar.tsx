@@ -80,6 +80,11 @@ export function AddTaskBar({ today }: Props) {
         <TextInput style={s.input} placeholder="Add a task for today"
           placeholderTextColor={c.t3} value={title} onChangeText={setTitle}
           onSubmitEditing={submit} returnKeyType="done" submitBehavior="submit" editable={!pending} />
+        <TouchableOpacity onPress={repeat.toggle}
+          style={[s.iconBtn, repeat.enabled && s.iconBtnActive]} hitSlop={8}
+          accessibilityLabel="Repeat this task several times today">
+          <Text style={[s.iconTxt, repeat.enabled && s.iconTxtActive]}>↻</Text>
+        </TouchableOpacity>
         {hasGoals && (
           <TouchableOpacity onPress={() => setShowGoal((v) => !v)}
             style={[s.iconBtn, showGoal && s.iconBtnActive]} hitSlop={8}>
@@ -113,11 +118,12 @@ export function AddTaskBar({ today }: Props) {
           )}
         </View>
       )}
-      <RepeatFields
-        enabled={repeat.enabled} target={repeat.target} interval={repeat.interval}
-        error={repeat.error} disabled={pending}
-        onToggle={repeat.toggle} onTargetChange={repeat.setTarget}
-        onIntervalChange={repeat.setInterval} />
+      {repeat.enabled && (
+        <RepeatFields
+          target={repeat.target} interval={repeat.interval}
+          error={repeat.error} disabled={pending}
+          onTargetChange={repeat.setTarget} onIntervalChange={repeat.setInterval} />
+      )}
     </View>
   );
 }

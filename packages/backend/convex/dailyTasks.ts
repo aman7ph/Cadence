@@ -4,6 +4,7 @@ import { mutation } from "./_generated/server";
 import { requireUser } from "./lib/auth";
 import { upsertDayStats } from "./lib/dayStats";
 import { applyGoalContribution } from "./lib/goalContribution";
+import { deleteTaskDays, recordTaskDaySpan } from "./lib/taskDay";
 import { assertPlainTask, deleteTaskCompletions } from "./lib/taskRepeat";
 
 export const create = mutation({
@@ -22,7 +23,7 @@ export const create = mutation({
     const trimmed = args.title.trim();
     if (!trimmed) throw new Error("Task title is required");
     validateRepeatArgs(args.repeatTarget, args.repeatIntervalMinutes);
-    return await ctx.db.insert("dailyTasks", {
+    const taskId = await ctx.db.insert("dailyTasks", {
       userId: user._id,
       title: trimmed,
       description: args.description?.trim() || undefined,
@@ -37,6 +38,8 @@ export const create = mutation({
       repeatTarget: args.repeatTarget,
       repeatIntervalMinutes: args.repeatIntervalMinutes,
     });
+    await recordTaskDaySpan(ctx, user._id, taskId, args.today, args.today);
+    return taskId;
   },
 });
 
@@ -119,31 +122,10 @@ export const remove = mutation({
     }
     const affectedDate = task.status === "completed" ? (task.completedDate ?? task.currentDate) : task.status === "dismissed" ? task.currentDate : null;
     await deleteTaskCompletions(ctx, taskId);
+    await deleteTaskDays(ctx, taskId);
     await ctx.db.delete(taskId);
     if (affectedDate) {
       await upsertDayStats(ctx, user._id, affectedDate);
-    }
-  },
-});
-
-// Idempotent rollover: advances open tasks to today and bumps carryoverCount. See docs §2.5.
-export const rolloverOpenTasks = mutation({
-  args: { today: v.string() },
-  handler: async (ctx, { today }) => {
-    const user = await requireUser(ctx);
-    const openTasks = await ctx.db
-      .query("dailyTasks")
-      .withIndex("by_user_status", (q) =>
-        q.eq("userId", user._id).eq("status", "open"),
-      )
-      .collect();
-    for (const t of openTasks) {
-      if (t.currentDate < today) {
-        await ctx.db.patch(t._id, {
-          currentDate: today,
-          carryoverCount: t.carryoverCount + 1,
-        });
-      }
     }
   },
 });

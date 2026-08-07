@@ -51,3 +51,22 @@ export const taskCompletions = defineTable({
   .index("by_task_date", ["taskId", "date"])
   .index("by_task", ["taskId"])
   .index("by_user_date", ["userId", "date"]);
+
+// One row per (task, day the task sat on the user's plate). A dailyTasks row is
+// mutable — rolloverOpenTasks moves currentDate forward — so the row alone can
+// never answer "which days was this on?", and a day view keyed on currentDate
+// loses every task that has since rolled over. This log is that answer, in the
+// same shape and with the same index set as taskCompletions above.
+//
+// Deliberately status-free. The status a task had on a given day is derived
+// (completedDate === date ⇒ completed; dismissed && currentDate === date ⇒
+// dismissed; otherwise open), because a stored second copy would drift the
+// first time uncomplete runs.
+export const taskDays = defineTable({
+  userId: v.id("users"),
+  taskId: v.id("dailyTasks"),
+  date: v.string(), // client-local YYYY-MM-DD, same convention as the rest of the schema
+})
+  .index("by_task_date", ["taskId", "date"])
+  .index("by_task", ["taskId"])
+  .index("by_user_date", ["userId", "date"]);

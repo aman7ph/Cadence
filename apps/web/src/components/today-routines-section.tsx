@@ -65,6 +65,7 @@ export function TodayRoutinesSection({
               repeatTarget={r.repeatTarget}
               repeatDoneToday={r.repeatDoneToday}
               nextRepAllowedAt={r.nextRepAllowedAt}
+              readOnly={isPast}
             />
           ))}
         </div>

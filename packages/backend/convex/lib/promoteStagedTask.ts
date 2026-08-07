@@ -1,6 +1,7 @@
 import { daysBetween } from "@cadence/shared";
 import type { MutationCtx } from "../_generated/server";
 import type { Doc } from "../_generated/dataModel";
+import { recordTaskDaySpan } from "./taskDay";
 
 // Materializes a scheduled staged task into its destination table and deletes
 // the staged row. Late promotion (today > scheduledDate) mirrors what the
@@ -16,7 +17,7 @@ export async function promoteStagedTask(
     throw new Error("Staged task is not scheduled");
   }
   if (staged.targetType === "task") {
-    await ctx.db.insert("dailyTasks", {
+    const taskId = await ctx.db.insert("dailyTasks", {
       userId: staged.userId,
       title: staged.title,
       description: staged.description,
@@ -30,6 +31,16 @@ export async function promoteStagedTask(
       repeatTarget: staged.repeatTarget,
       repeatIntervalMinutes: staged.repeatIntervalMinutes,
     });
+    // The whole span it was committed to, matching the carryoverCount above:
+    // a task scheduled for the 1st was on the plate on the 1st, whether or not
+    // the app was opened to see it.
+    await recordTaskDaySpan(
+      ctx,
+      staged.userId,
+      taskId,
+      staged.scheduledDate,
+      today,
+    );
   } else {
     if (!staged.routineScheduleType) {
       throw new Error("Staged routine is missing its schedule");

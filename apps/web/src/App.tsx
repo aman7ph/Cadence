@@ -41,7 +41,7 @@ function EnsureProvisioned() {
 
 function RolloverOnForeground() {
   const me = useQuery(api.users.getMe);
-  const rolloverOpenTasks = useMutation(api.dailyTasks.rolloverOpenTasks);
+  const rolloverOpenTasks = useMutation(api.taskDays.rolloverOpenTasks);
   const promoteDueStagedTasks = useMutation(api.stagedTaskScheduling.promoteDue);
   const lastRolloverDate = useRef<string | null>(null);
 

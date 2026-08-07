@@ -3,6 +3,7 @@ import { mutation, query } from "./_generated/server";
 import { requireUser } from "./lib/auth";
 import { resolveUser } from "./lib/resolveUser";
 import { isScheduledOn } from "./lib/schedule";
+import { carryoverOn, loadDayTasks, statusOn } from "./lib/taskDay";
 import { countRepsByTask } from "./lib/taskRepeat";
 import type { Id } from "./_generated/dataModel";
 import type { DayRoutine, DayTask } from "./days";
@@ -94,8 +95,9 @@ export const getDayForGoal = query({
       currentStreak: r.currentStreak, longestStreak: r.longestStreak, goalId: r.goalId,
     }));
 
-    const dayTasks = await ctx.db.query("dailyTasks")
-      .withIndex("by_user_current", (q) => q.eq("userId", user._id).eq("currentDate", date)).collect();
+    // By presence, not currentDate — same reason as days.getDay: a carried task
+    // still belongs to the days it sat on. See lib/taskDay.ts.
+    const dayTasks = await loadDayTasks(ctx, user._id, date);
     const goalTasks = dayTasks.filter((t) => t.goalId === goalId);
     // Repeat progress, so a repeat task on the goal's daily tracking shows
     // "2/5" like it does everywhere else instead of rendering as a plain row.
@@ -104,8 +106,8 @@ export const getDayForGoal = query({
       : new Map<Id<"dailyTasks">, number>();
     const tasks: DayTask[] = goalTasks.map((t) => ({
       taskId: t._id, title: t.title, description: t.description, category: t.category,
-      status: t.status, isCarriedOver: t.currentDate > t.originalDate,
-      originalDate: t.originalDate, carryoverCount: t.carryoverCount,
+      status: statusOn(t, date), isCarriedOver: date > t.originalDate,
+      originalDate: t.originalDate, carryoverCount: carryoverOn(t, date),
       repeatTarget: t.repeatTarget,
       repeatDoneToday: t.repeatTarget ? (repCounts.get(t._id) ?? 0) : undefined,
     }));

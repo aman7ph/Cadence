@@ -8,7 +8,7 @@ const isTauri = "__TAURI_INTERNALS__" in window;
 export function EnsureProvisioned() {
   const me = useQuery(api.users.getMe);
   const ensureProvisioned = useMutation(api.users.ensureProvisioned);
-  const rollover = useMutation(api.dailyTasks.rolloverOpenTasks);
+  const rollover = useMutation(api.taskDays.rolloverOpenTasks);
 
   // Provision user record on first sign-in
   useEffect(() => {

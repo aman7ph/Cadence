@@ -28,6 +28,7 @@ import type * as lib_routineRepeat from "../lib/routineRepeat.js";
 import type * as lib_routineSetStatus from "../lib/routineSetStatus.js";
 import type * as lib_schedule from "../lib/schedule.js";
 import type * as lib_streak from "../lib/streak.js";
+import type * as lib_taskDay from "../lib/taskDay.js";
 import type * as lib_taskRepeat from "../lib/taskRepeat.js";
 import type * as reflections from "../reflections.js";
 import type * as routineManagement from "../routineManagement.js";
@@ -36,6 +37,7 @@ import type * as routines from "../routines.js";
 import type * as stagedTaskScheduling from "../stagedTaskScheduling.js";
 import type * as stagedTasks from "../stagedTasks.js";
 import type * as tables_tasks from "../tables/tasks.js";
+import type * as taskDays from "../taskDays.js";
 import type * as users from "../users.js";
 
 import type {
@@ -65,6 +67,7 @@ declare const fullApi: ApiFromModules<{
   "lib/routineSetStatus": typeof lib_routineSetStatus;
   "lib/schedule": typeof lib_schedule;
   "lib/streak": typeof lib_streak;
+  "lib/taskDay": typeof lib_taskDay;
   "lib/taskRepeat": typeof lib_taskRepeat;
   reflections: typeof reflections;
   routineManagement: typeof routineManagement;
@@ -73,6 +76,7 @@ declare const fullApi: ApiFromModules<{
   stagedTaskScheduling: typeof stagedTaskScheduling;
   stagedTasks: typeof stagedTasks;
   "tables/tasks": typeof tables_tasks;
+  taskDays: typeof taskDays;
   users: typeof users;
 }>;
 

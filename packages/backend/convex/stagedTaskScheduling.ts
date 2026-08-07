@@ -105,7 +105,7 @@ export const unschedule = mutation({
 // Idempotent: promoted rows are deleted, so re-running (or concurrent runs
 // from multiple devices) finds nothing left to promote. Called from the
 // RolloverOnForeground workers with the client's local today, same as
-// dailyTasks.rolloverOpenTasks.
+// taskDays.rolloverOpenTasks.
 export const promoteDue = mutation({
   args: { today: v.string() },
   handler: async (ctx, { today }) => {

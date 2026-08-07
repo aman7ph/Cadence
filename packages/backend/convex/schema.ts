@@ -1,6 +1,6 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { dailyTasks, taskCompletions } from "./tables/tasks";
+import { dailyTasks, taskCompletions, taskDays } from "./tables/tasks";
 
 export default defineSchema({
   users: defineTable({
@@ -68,6 +68,7 @@ export default defineSchema({
   // Defined in ./tables/tasks.ts — see the note there.
   dailyTasks,
   taskCompletions,
+  taskDays,
 
   // Staging area: tasks captured before being assigned to a destination.
   // Unscheduled ⇔ scheduledDate/targetType absent. Once scheduledDate arrives,

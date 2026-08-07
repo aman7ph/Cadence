@@ -69,6 +69,7 @@ export function TodayTasksSection({
               repeatTarget={t.repeatTarget}
               repeatDoneToday={t.repeatDoneToday}
               nextRepAllowedAt={t.nextRepAllowedAt}
+              readOnly={isPast}
             />
           ))}
         </div>
@@ -99,6 +100,7 @@ export function TodayTasksSection({
                   carryoverCount={t.carryoverCount}
                   viewedDate={viewedDate}
                   goalTitle={t.goalTitle}
+                  readOnly={isPast}
                 />
               ))}
             </div>

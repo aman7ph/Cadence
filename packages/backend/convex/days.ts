@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { isScheduledOn } from "./lib/schedule";
 import { loadDayReflection } from "./lib/dayReflection";
+import { carryoverOn, loadDayTasks, statusOn } from "./lib/taskDay";
 import { countRepsByTask } from "./lib/taskRepeat";
 import { countRepsByRoutine } from "./lib/routineRepeat";
 import type { DayReflection } from "./lib/dayReflection";
@@ -29,11 +30,14 @@ export const getDay = query({
       .unique();
     if (!user) return null;
 
-    const activeRoutines = await ctx.db
+    // All routines, not just active ones: isScheduledOn already excludes any
+    // date before createdDate or after archivedDate, so filtering on isActive
+    // here only ever erased archived routines from the *past* days they really
+    // ran on. This is the same read upsertDayStats does, so the day view and
+    // the day's score now agree on what was scheduled.
+    const allRoutines = await ctx.db
       .query("routines")
-      .withIndex("by_user_active", (q) =>
-        q.eq("userId", user._id).eq("isActive", true),
-      )
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
       .collect();
 
     const completionsToday = await ctx.db
@@ -50,7 +54,7 @@ export const getDay = query({
       completionByRoutine.set(c.routineId, c);
     }
 
-    const scheduledRoutines = activeRoutines.filter((r) => isScheduledOn(r, date));
+    const scheduledRoutines = allRoutines.filter((r) => isScheduledOn(r, date));
     const goalIds = [...new Set(scheduledRoutines.map((r) => r.goalId).filter((id): id is Id<"goals"> => !!id))];
     const goalTitleMap = new Map<Id<"goals">, string>((await Promise.all(goalIds.map((id) => ctx.db.get(id)))).filter(Boolean).map((g) => [g!._id, g!.title]));
 
@@ -83,12 +87,9 @@ export const getDay = query({
       });
     }
 
-    const tasksToday = await ctx.db
-      .query("dailyTasks")
-      .withIndex("by_user_current", (q) =>
-        q.eq("userId", user._id).eq("currentDate", date),
-      )
-      .collect();
+    // Read by presence, not by currentDate: a task that has since rolled over
+    // still belongs to the days it actually sat on. See lib/taskDay.ts.
+    const tasksToday = await loadDayTasks(ctx, user._id, date);
     const tkGoalIds = [...new Set(tasksToday.map(t => t.goalId).filter((id): id is Id<"goals"> => !!id))].filter(id => !goalTitleMap.has(id));
     (await Promise.all(tkGoalIds.map(id => ctx.db.get(id)))).forEach(g => g && goalTitleMap.set(g._id, g.title));
 
@@ -103,10 +104,10 @@ export const getDay = query({
       title: t.title,
       description: t.description,
       category: t.category,
-      status: t.status,
-      isCarriedOver: t.currentDate > t.originalDate,
+      status: statusOn(t, date),
+      isCarriedOver: date > t.originalDate,
       originalDate: t.originalDate,
-      carryoverCount: t.carryoverCount,
+      carryoverCount: carryoverOn(t, date),
       completedDate: t.completedDate,
       goalTitle: t.goalId ? goalTitleMap.get(t.goalId) : undefined,
       repeatTarget: t.repeatTarget,

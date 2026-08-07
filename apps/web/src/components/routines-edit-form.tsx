@@ -5,8 +5,7 @@ import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GoalLinkField } from "./goal-link-field";
-import { RepeatField } from "./repeat-field";
-import { RepeatToggle } from "./repeat-toggle";
+import { RepeatSection } from "./repeat-section";
 import { ScheduleForm } from "./routines-schedule-form";
 import type { ScheduleType } from "./routines-schedule-form";
 import { useRepeatFields } from "@/lib/use-repeat-fields";
@@ -110,18 +109,7 @@ export function EditRoutineForm({
         onGoalChange={setGoalId}
         onContributionChange={setContribution}
       />
-      <RepeatToggle enabled={repeat.enabled} onToggle={repeat.toggle} />
-      {repeat.enabled && (
-        <RepeatField
-          target={repeat.target}
-          interval={repeat.interval}
-          onTargetChange={repeat.setTarget}
-          onIntervalChange={repeat.setInterval}
-          cadenceLabel="each day"
-          disabled={pending}
-        />
-      )}
-      {repeat.error && <p className="text-[12px] text-[var(--red-600)]">{repeat.error}</p>}
+      <RepeatSection repeat={repeat} disabled={pending} />
       <div className="flex gap-2">
         <Button
           type="submit"

@@ -93,7 +93,8 @@ export function GoalDetailLinked({ goalId, createdAt, endDate }: Props) {
                     <TaskRow key={t.taskId} taskId={t.taskId} title={t.title}
                       description={t.description} status={t.status} isCarriedOver={t.isCarriedOver}
                       originalDate={t.originalDate} carryoverCount={t.carryoverCount}
-                      viewedDate={selectedDate} readOnly />
+                      viewedDate={selectedDate} repeatTarget={t.repeatTarget}
+                      repeatDoneToday={t.repeatDoneToday} readOnly />
                   ))}
             </section>
           </div>

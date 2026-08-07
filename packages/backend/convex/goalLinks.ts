@@ -3,6 +3,8 @@ import { mutation, query } from "./_generated/server";
 import { requireUser } from "./lib/auth";
 import { resolveUser } from "./lib/resolveUser";
 import { isScheduledOn } from "./lib/schedule";
+import { countRepsByTask } from "./lib/taskRepeat";
+import type { Id } from "./_generated/dataModel";
 import type { DayRoutine, DayTask } from "./days";
 
 export const getWithLinkedCounts = query({
@@ -94,10 +96,18 @@ export const getDayForGoal = query({
 
     const dayTasks = await ctx.db.query("dailyTasks")
       .withIndex("by_user_current", (q) => q.eq("userId", user._id).eq("currentDate", date)).collect();
-    const tasks: DayTask[] = dayTasks.filter((t) => t.goalId === goalId).map((t) => ({
+    const goalTasks = dayTasks.filter((t) => t.goalId === goalId);
+    // Repeat progress, so a repeat task on the goal's daily tracking shows
+    // "2/5" like it does everywhere else instead of rendering as a plain row.
+    const repCounts = goalTasks.some((t) => t.repeatTarget)
+      ? await countRepsByTask(ctx, user._id, date)
+      : new Map<Id<"dailyTasks">, number>();
+    const tasks: DayTask[] = goalTasks.map((t) => ({
       taskId: t._id, title: t.title, description: t.description, category: t.category,
       status: t.status, isCarriedOver: t.currentDate > t.originalDate,
       originalDate: t.originalDate, carryoverCount: t.carryoverCount,
+      repeatTarget: t.repeatTarget,
+      repeatDoneToday: t.repeatTarget ? (repCounts.get(t._id) ?? 0) : undefined,
     }));
 
     return { routines, tasks };

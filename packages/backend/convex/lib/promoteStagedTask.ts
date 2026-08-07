@@ -27,6 +27,8 @@ export async function promoteStagedTask(
       createdAt: Date.now(),
       goalId: staged.goalId,
       goalContribution: staged.goalContribution,
+      repeatTarget: staged.repeatTarget,
+      repeatIntervalMinutes: staged.repeatIntervalMinutes,
     });
   } else {
     if (!staged.routineScheduleType) {
@@ -47,6 +49,8 @@ export async function promoteStagedTask(
       longestStreak: 0,
       goalId: staged.goalId,
       goalContribution: staged.goalContribution,
+      repeatTarget: staged.repeatTarget,
+      repeatIntervalMinutes: staged.repeatIntervalMinutes,
     });
   }
   await ctx.db.delete(staged._id);

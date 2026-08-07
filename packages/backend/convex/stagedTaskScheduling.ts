@@ -1,3 +1,4 @@
+import { validateRepeatArgs } from "@cadence/shared";
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { requireUser } from "./lib/auth";
@@ -21,6 +22,8 @@ export const schedule = mutation({
     routineCustomDays: v.optional(v.array(v.number())),
     goalId: v.optional(v.id("goals")),
     goalContribution: v.optional(v.number()),
+    repeatTarget: v.optional(v.number()),
+    repeatIntervalMinutes: v.optional(v.number()),
     today: v.string(),
   },
   handler: async (ctx, args) => {
@@ -37,6 +40,7 @@ export const schedule = mutation({
     if (args.scheduledDate < args.today) {
       throw new Error("Scheduled date cannot be in the past");
     }
+    validateRepeatArgs(args.repeatTarget, args.repeatIntervalMinutes);
     if (args.targetType === "routine") {
       if (!args.routineScheduleType) {
         throw new Error("Routine schedule is required");
@@ -65,6 +69,8 @@ export const schedule = mutation({
           : undefined,
       goalId: args.goalId,
       goalContribution: args.goalContribution,
+      repeatTarget: args.repeatTarget,
+      repeatIntervalMinutes: args.repeatIntervalMinutes,
     });
     if (args.scheduledDate <= args.today) {
       const fresh = await ctx.db.get(args.stagedTaskId);
@@ -90,6 +96,8 @@ export const unschedule = mutation({
       routineCustomDays: undefined,
       goalId: undefined,
       goalContribution: undefined,
+      repeatTarget: undefined,
+      repeatIntervalMinutes: undefined,
     });
   },
 });

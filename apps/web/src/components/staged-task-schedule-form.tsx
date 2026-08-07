@@ -6,7 +6,9 @@ import { todayLocal } from "@cadence/shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GoalLinkField } from "./goal-link-field";
+import { RepeatSection } from "./repeat-section";
 import { ScheduleForm } from "./routines-schedule-form";
+import { useRepeatFields } from "@/lib/use-repeat-fields";
 import type { ScheduleType } from "./routines-schedule-form";
 import { StagedTaskDestinationToggle } from "./staged-task-destination-toggle";
 import type { StagedTaskDestination } from "./staged-task-destination-toggle";
@@ -32,6 +34,7 @@ export function StagedTaskScheduleForm({ stagedTask, onDone }: StagedTaskSchedul
     stagedTask.goalContribution !== undefined ? String(stagedTask.goalContribution) : "",
   );
   const [pending, setPending] = useState(false);
+  const repeat = useRepeatFields(stagedTask.repeatTarget, stagedTask.repeatIntervalMinutes);
 
   const toggleDay = (d: number) =>
     setCustomDays((p) => (p.includes(d) ? p.filter((x) => x !== d) : [...p, d].sort()));
@@ -45,6 +48,8 @@ export function StagedTaskScheduleForm({ stagedTask, onDone }: StagedTaskSchedul
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (invalid || pending) return;
+    const repeatArgs = repeat.collect();
+    if (!repeatArgs) return;
     setPending(true);
     try {
       await schedule({
@@ -58,6 +63,7 @@ export function StagedTaskScheduleForm({ stagedTask, onDone }: StagedTaskSchedul
           destination === "routine" && scheduleType === "custom" ? customDays : undefined,
         goalId: goalId || undefined,
         goalContribution: goalId && contribution ? parseFloat(contribution) : undefined,
+        ...repeatArgs,
         today,
       });
       onDone();
@@ -122,6 +128,8 @@ export function StagedTaskScheduleForm({ stagedTask, onDone }: StagedTaskSchedul
         onGoalChange={setGoalId}
         onContributionChange={setContribution}
       />
+
+      <RepeatSection repeat={repeat} cadenceLabel={destination === "routine" ? "each day" : "today"} disabled={pending} />
 
       <div className="flex gap-2">
         <Button type="submit" size="sm" disabled={pending || invalid}>

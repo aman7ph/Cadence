@@ -21,6 +21,8 @@ export interface StagedTaskData {
   routineCustomDays?: number[];
   goalId?: Id<"goals">;
   goalContribution?: number;
+  repeatTarget?: number;
+  repeatIntervalMinutes?: number;
 }
 
 interface Props {

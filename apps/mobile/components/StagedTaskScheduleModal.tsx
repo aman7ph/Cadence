@@ -11,10 +11,12 @@ import { SchedulePicker } from "./SchedulePicker";
 import type { ScheduleType } from "./SchedulePicker";
 import { DatePickerModal } from "./DatePickerModal";
 import { GoalChipsField } from "./GoalChipsField";
+import { RepeatSection } from "./RepeatSection";
 import { StagedTaskDestinationPills } from "./StagedTaskDestinationPills";
 import type { StagedTaskDestination } from "./StagedTaskDestinationPills";
 import type { StagedTaskData } from "./StagedTaskItem";
 import { useColors } from "../lib/theme";
+import { useRepeatFields } from "../lib/useRepeatFields";
 import { fmtLong } from "../lib/dateUtils";
 
 interface Props { visible: boolean; stagedTask: StagedTaskData | null; onDone: () => void }
@@ -34,6 +36,7 @@ export function StagedTaskScheduleModal({ visible, stagedTask, onDone }: Props) 
   const [contrib, setCtb] = useState(stagedTask?.goalContribution?.toString() ?? "");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pending, setPending] = useState(false);
+  const repeat = useRepeatFields(stagedTask?.repeatTarget, stagedTask?.repeatIntervalMinutes);
 
   const invalid =
     !title.trim() || !date || date < today ||
@@ -43,6 +46,8 @@ export function StagedTaskScheduleModal({ visible, stagedTask, onDone }: Props) 
 
   const submit = async () => {
     if (invalid || pending || !stagedTask) return;
+    const repeatArgs = repeat.collect();
+    if (!repeatArgs) return;
     setPending(true);
     try {
       await schedule({
@@ -55,6 +60,7 @@ export function StagedTaskScheduleModal({ visible, stagedTask, onDone }: Props) 
         routineCustomDays: destination === "routine" && sched === "custom" ? days : undefined,
         goalId: goalId || undefined,
         goalContribution: goalId && contrib ? parseFloat(contrib) : undefined,
+        ...repeatArgs,
         today,
       });
       onDone();
@@ -119,6 +125,8 @@ export function StagedTaskScheduleModal({ visible, stagedTask, onDone }: Props) 
                   disabled={pending} onChange={setSched} onDayToggle={toggleDay} />
               </View>
             )}
+            <RepeatSection repeat={repeat} disabled={pending}
+              cadenceLabel={destination === "routine" ? "each day" : "today"} />
             <GoalChipsField goalId={goalId} contribution={contrib} disabled={pending}
               onGoalChange={(id) => { setGoalId(id); setCtb(""); }} onContributionChange={setCtb} />
           </ScrollView>

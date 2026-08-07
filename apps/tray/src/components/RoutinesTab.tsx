@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
+import { RepeatActions } from "./RepeatActions";
 
 function todayStr(): string {
   const d = new Date();
@@ -13,6 +14,8 @@ export function RoutinesTab() {
   const complete = useMutation(api.routines.complete);
   const skip = useMutation(api.routines.skip);
   const uncomplete = useMutation(api.routines.uncomplete);
+  const logRep = useMutation(api.routineRepeats.logRep);
+  const undoRep = useMutation(api.routineRepeats.undoRep);
 
   if (day === undefined) {
     return (
@@ -52,13 +55,23 @@ export function RoutinesTab() {
           <div className="task-actions">
             {r.status === "pending" && (
               <>
-                <button
-                  className="task-action-btn"
-                  title="Complete"
-                  onClick={() => complete({ routineId: r.routineId, date: today, today })}
-                >
-                  ✓
-                </button>
+                {r.repeatTarget !== undefined ? (
+                  <RepeatActions
+                    doneToday={r.repeatDoneToday ?? 0}
+                    target={r.repeatTarget}
+                    nextRepAllowedAt={r.nextRepAllowedAt}
+                    onRep={() => void logRep({ routineId: r.routineId, date: today, today })}
+                    onUndo={() => void undoRep({ routineId: r.routineId, date: today, today })}
+                  />
+                ) : (
+                  <button
+                    className="task-action-btn"
+                    title="Complete"
+                    onClick={() => complete({ routineId: r.routineId, date: today, today })}
+                  >
+                    ✓
+                  </button>
+                )}
                 <button
                   className="task-action-btn danger"
                   title="Skip"
@@ -69,13 +82,26 @@ export function RoutinesTab() {
               </>
             )}
             {(r.status === "completed" || r.status === "skipped") && (
-              <button
-                className="task-action-btn"
-                title="Undo"
-                onClick={() => uncomplete({ routineId: r.routineId, date: today, today })}
-              >
-                ↩
-              </button>
+              <>
+                {r.repeatTarget !== undefined && r.status === "completed" && (
+                  <span className="repeat-count">
+                    {r.repeatDoneToday ?? 0}/{r.repeatTarget}
+                  </span>
+                )}
+                <button
+                  className="task-action-btn"
+                  title="Undo"
+                  onClick={() =>
+                    // A skipped day is un-skipped by the plain mutation; only a
+                    // completion has to go back through undoRep.
+                    r.repeatTarget !== undefined && r.status === "completed"
+                      ? void undoRep({ routineId: r.routineId, date: today, today })
+                      : void uncomplete({ routineId: r.routineId, date: today, today })
+                  }
+                >
+                  ↩
+                </button>
+              </>
             )}
           </div>
         </div>

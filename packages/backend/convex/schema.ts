@@ -88,6 +88,10 @@ export default defineSchema({
     routineCustomDays: v.optional(v.array(v.number())),
     goalId: v.optional(v.id("goals")),
     goalContribution: v.optional(v.number()),
+    // Repeat config, passed through verbatim at promotion to whichever
+    // destination is chosen — both dailyTasks and routines support it.
+    repeatTarget: v.optional(v.number()),
+    repeatIntervalMinutes: v.optional(v.number()),
   }).index("by_user", ["userId"]),
 
   dayStats: defineTable({

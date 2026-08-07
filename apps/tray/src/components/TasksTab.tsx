@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
+import { RepeatActions } from "./RepeatActions";
 
 function todayStr(): string {
   const d = new Date();
@@ -13,6 +14,8 @@ export function TasksTab() {
   const complete = useMutation(api.dailyTasks.complete);
   const uncomplete = useMutation(api.dailyTasks.uncomplete);
   const dismiss = useMutation(api.dailyTasks.dismiss);
+  const logRep = useMutation(api.dailyTaskRepeats.logRep);
+  const undoRep = useMutation(api.dailyTaskRepeats.undoRep);
 
   if (day === undefined) {
     return (
@@ -46,13 +49,23 @@ export function TasksTab() {
             {t.title}
           </span>
           <div className="task-actions">
-            <button
-              className="task-action-btn"
-              title="Complete"
-              onClick={() => complete({ taskId: t.taskId, today })}
-            >
-              ✓
-            </button>
+            {t.repeatTarget !== undefined ? (
+              <RepeatActions
+                doneToday={t.repeatDoneToday ?? 0}
+                target={t.repeatTarget}
+                nextRepAllowedAt={t.nextRepAllowedAt}
+                onRep={() => void logRep({ taskId: t.taskId, today })}
+                onUndo={() => void undoRep({ taskId: t.taskId, today })}
+              />
+            ) : (
+              <button
+                className="task-action-btn"
+                title="Complete"
+                onClick={() => complete({ taskId: t.taskId, today })}
+              >
+                ✓
+              </button>
+            )}
             <button
               className="task-action-btn danger"
               title="Dismiss"
@@ -72,10 +85,19 @@ export function TasksTab() {
               <span className="task-dot green" />
               <span className="task-title done">{t.title}</span>
               <div className="task-actions">
+                {t.repeatTarget !== undefined && (
+                  <span className="repeat-count">
+                    {t.repeatDoneToday ?? 0}/{t.repeatTarget}
+                  </span>
+                )}
                 <button
                   className="task-action-btn"
                   title="Undo"
-                  onClick={() => uncomplete({ taskId: t.taskId })}
+                  onClick={() =>
+                    t.repeatTarget !== undefined
+                      ? void undoRep({ taskId: t.taskId, today })
+                      : void uncomplete({ taskId: t.taskId })
+                  }
                 >
                   ↩
                 </button>

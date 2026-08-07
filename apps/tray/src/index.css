@@ -334,6 +334,43 @@ body {
   color: var(--red);
 }
 
+.task-action-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.task-action-btn:disabled:hover {
+  color: var(--text-muted);
+  background: none;
+}
+
+/* Repeat progress + interval countdown. These live inside .task-actions,
+   which is hover-revealed, but "3/20" and the wait are status rather than
+   actions — they stay legible without hovering. */
+.task-actions:has(.repeat-count) {
+  opacity: 1;
+}
+
+.repeat-count,
+.repeat-wait {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  padding: 1px 5px;
+  border-radius: 999px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.repeat-count {
+  color: var(--blue);
+  background: rgba(96, 165, 250, 0.14);
+}
+
+.repeat-wait {
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.07);
+}
+
 /* ── sign-in screen ────────────────────────────────────────────── */
 
 .sign-in-screen {

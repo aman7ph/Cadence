@@ -1,23 +1,33 @@
 import { productivityScore } from "@cadence/shared";
-import type { MutationCtx } from "../_generated/server";
+import type { MutationCtx, QueryCtx } from "../_generated/server";
 import type { Id } from "../_generated/dataModel";
 import { isScheduledOn } from "./schedule";
+import { loadDayTasks, statusOn } from "./taskDay";
 
-// Recomputes and upserts the dayStats row for (userId, date) by counting
-// scheduled / completed / resolved events as they exist at call time. Call
-// from every completion mutation that could change those counts.
-export async function upsertDayStats(
-  ctx: MutationCtx,
+export type DayStatsPayload = {
+  userId: Id<"users">;
+  date: string;
+  routineScheduled: number;
+  routineCompleted: number;
+  randomTotal: number;
+  randomCompleted: number;
+  productivityScore: number;
+};
+
+// Counts the scheduled / completed / resolved events for (userId, date) as they
+// stand right now, WITHOUT writing. Split from the upsert so the recompute pass
+// in taskDays.ts can diff a proposed result against the stored row before
+// touching it.
+export async function computeDayStats(
+  ctx: QueryCtx,
   userId: Id<"users">,
   date: string,
-): Promise<void> {
+): Promise<DayStatsPayload> {
   const routines = await ctx.db
     .query("routines")
     .withIndex("by_user", (q) => q.eq("userId", userId))
     .collect();
-  const routineScheduled = routines.filter((r) =>
-    isScheduledOn(r, date),
-  ).length;
+  const routineScheduled = routines.filter((r) => isScheduledOn(r, date)).length;
 
   const completionsOnDate = await ctx.db
     .query("routineCompletions")
@@ -29,57 +39,27 @@ export async function upsertDayStats(
     (c) => c.status === "completed",
   ).length;
 
-  // randomCompleted: tasks whose completedDate === date.  We scan completed
-  // tasks for the user and filter — there is no index on completedDate, and
-  // for a personal app the volume is small.  See doc/implementation-plan.md
-  // Phase 7 (§5) for the broader .collect() audit.
-  const completedTasks = await ctx.db
-    .query("dailyTasks")
-    .withIndex("by_user_status", (q) =>
-      q.eq("userId", userId).eq("status", "completed"),
-    )
-    .collect();
-  const randomCompleted = completedTasks.filter(
-    (t) => t.completedDate === date,
+  // Tasks by presence: every task that was on the plate that day counts once,
+  // and the status it held THAT day decides whether it counts as done.
+  //
+  // This replaces three reads — every completed task the user has ever had,
+  // plus open and dismissed tasks keyed on the mutable currentDate — with one
+  // indexed read of the day's presence rows. It is both cheaper and correct for
+  // past days: a task carried through a day used to vanish from that day's
+  // plate the moment it rolled forward.
+  const dayTasks = await loadDayTasks(ctx, userId, date);
+  const randomTotal = dayTasks.length;
+  const randomCompleted = dayTasks.filter(
+    (t) => statusOn(t, date) === "completed",
   ).length;
-
-  // Open tasks sitting on this date AND dismissed tasks credited to this
-  // date both contribute to the day's task plate. They count against the
-  // score until completed.
-  const openOnDate = await ctx.db
-    .query("dailyTasks")
-    .withIndex("by_user_current", (q) =>
-      q.eq("userId", userId).eq("currentDate", date).eq("status", "open"),
-    )
-    .collect();
-  const dismissedOnDate = await ctx.db
-    .query("dailyTasks")
-    .withIndex("by_user_current", (q) =>
-      q.eq("userId", userId).eq("currentDate", date).eq("status", "dismissed"),
-    )
-    .collect();
-  const randomTotal =
-    randomCompleted + openOnDate.length + dismissedOnDate.length;
 
   const user = await ctx.db.get(userId);
   const score = productivityScore(
-    {
-      routineCompleted,
-      routineScheduled,
-      randomCompleted,
-      randomTotal,
-    },
+    { routineCompleted, routineScheduled, randomCompleted, randomTotal },
     user?.routineWeight,
   );
 
-  const existing = await ctx.db
-    .query("dayStats")
-    .withIndex("by_user_date", (q) =>
-      q.eq("userId", userId).eq("date", date),
-    )
-    .unique();
-
-  const payload = {
+  return {
     userId,
     date,
     routineScheduled,
@@ -88,6 +68,22 @@ export async function upsertDayStats(
     randomCompleted,
     productivityScore: score,
   };
+}
+
+// Recomputes and upserts the dayStats row for (userId, date). Call from every
+// completion mutation that could change those counts.
+export async function upsertDayStats(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+  date: string,
+): Promise<void> {
+  const payload = await computeDayStats(ctx, userId, date);
+  const existing = await ctx.db
+    .query("dayStats")
+    .withIndex("by_user_date", (q) =>
+      q.eq("userId", userId).eq("date", date),
+    )
+    .unique();
 
   if (existing) {
     await ctx.db.patch(existing._id, payload);

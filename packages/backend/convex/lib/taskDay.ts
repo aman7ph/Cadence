@@ -18,6 +18,23 @@ import type { Doc, Id } from "../_generated/dataModel";
 // and drops the oldest — an explicit, documented loss beats an unbounded write.
 export const MAX_SPAN_DAYS = 120;
 
+// The days in an inclusive span, with the cap applied. Shared so that the
+// presence writer and anything reasoning about "which days did this change"
+// (rolloverOpenTasks recomputing day stats) agree exactly on the range.
+export function spanDates(from: string, to: string): string[] {
+  if (from > to) return [];
+  // daysBetween is inclusive, so a 120-day cap starts 119 days before the end.
+  const start =
+    daysBetween(from, to) > MAX_SPAN_DAYS
+      ? addDays(to, -(MAX_SPAN_DAYS - 1))
+      : from;
+  const dates: string[] = [];
+  for (let date = start; date <= to; date = addDays(date, 1)) {
+    dates.push(date);
+  }
+  return dates;
+}
+
 export type SpanResult = { inserted: number; skipped: number };
 
 // Idempotent per day: rollover runs on every foreground and the backfill is
@@ -36,13 +53,7 @@ export async function recordTaskDaySpan(
   opts: { dryRun?: boolean } = {},
 ): Promise<SpanResult> {
   const result: SpanResult = { inserted: 0, skipped: 0 };
-  if (from > to) return result;
-  // daysBetween is inclusive, so a 120-day cap starts 119 days before the end.
-  const start =
-    daysBetween(from, to) > MAX_SPAN_DAYS
-      ? addDays(to, -(MAX_SPAN_DAYS - 1))
-      : from;
-  for (let date = start; date <= to; date = addDays(date, 1)) {
+  for (const date of spanDates(from, to)) {
     const existing = await ctx.db
       .query("taskDays")
       .withIndex("by_task_date", (q) =>

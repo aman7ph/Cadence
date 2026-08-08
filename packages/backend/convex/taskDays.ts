@@ -2,7 +2,8 @@ import { addDays } from "@cadence/shared";
 import { v } from "convex/values";
 import { internalMutation, mutation } from "./_generated/server";
 import { requireUser } from "./lib/auth";
-import { recordTaskDaySpan } from "./lib/taskDay";
+import { computeDayStats, upsertDayStats } from "./lib/dayStats";
+import { recordTaskDaySpan, spanDates } from "./lib/taskDay";
 
 // Day-tracking mutations for daily tasks: which day a task sits on, and which
 // days it has sat on. Split out of dailyTasks.ts (which was at exactly 149 of
@@ -22,23 +23,34 @@ export const rolloverOpenTasks = mutation({
         q.eq("userId", user._id).eq("status", "open"),
       )
       .collect();
+    const touchedDates = new Set<string>();
     for (const t of openTasks) {
       if (t.currentDate < today) {
         // Every day the task silently sat through, not just today: this fires
         // only on app open, so a multi-day absence is one jump here but was
         // several days on the user's plate. See lib/taskDay.ts.
-        await recordTaskDaySpan(
-          ctx,
-          user._id,
-          t._id,
-          addDays(t.currentDate, 1),
-          today,
-        );
+        const from = addDays(t.currentDate, 1);
+        await recordTaskDaySpan(ctx, user._id, t._id, from, today);
+        for (const d of spanDates(from, today)) touchedDates.add(d);
         await ctx.db.patch(t._id, {
           currentDate: today,
           carryoverCount: t.carryoverCount + 1,
         });
       }
+    }
+
+    // Those days' task plates just grew, so any score already recorded for them
+    // is now stale. Only EXISTING rows are refreshed — creating rows here would
+    // manufacture scores for days the user never interacted with, newly
+    // painting the history heatmap for days that showed nothing before.
+    for (const date of touchedDates) {
+      const existing = await ctx.db
+        .query("dayStats")
+        .withIndex("by_user_date", (q) =>
+          q.eq("userId", user._id).eq("date", date),
+        )
+        .unique();
+      if (existing) await upsertDayStats(ctx, user._id, date);
     }
   },
 });
@@ -84,5 +96,42 @@ export const backfillTaskDays = internalMutation({
     }
 
     return { tasksScanned: tasks.length, rowsInserted, rowsSkipped, dryRun: !!dryRun };
+  },
+});
+
+// One-off companion to the backfill: existing dayStats rows were computed under
+// the old currentDate-keyed counting, so they disagree with what
+// computeDayStats now returns. Without this pass, a day's score would silently
+// change the next time any mutation happened to touch that date.
+//
+// Only EXISTING rows are recomputed — same reasoning as the rollover above.
+// `dryRun` reports the full before/after diff without writing.
+export const recomputeDayStats = internalMutation({
+  args: { userId: v.id("users"), dryRun: v.optional(v.boolean()) },
+  handler: async (ctx, { userId, dryRun }) => {
+    const rows = await ctx.db
+      .query("dayStats")
+      .withIndex("by_user_date", (q) => q.eq("userId", userId))
+      .collect();
+
+    const changes = [];
+    for (const row of rows) {
+      const next = await computeDayStats(ctx, userId, row.date);
+      const differs =
+        next.routineScheduled !== row.routineScheduled ||
+        next.routineCompleted !== row.routineCompleted ||
+        next.randomTotal !== row.randomTotal ||
+        next.randomCompleted !== row.randomCompleted ||
+        next.productivityScore !== row.productivityScore;
+      if (!differs) continue;
+      changes.push({
+        date: row.date,
+        before: `r ${row.routineCompleted}/${row.routineScheduled} t ${row.randomCompleted}/${row.randomTotal} score ${row.productivityScore}`,
+        after: `r ${next.routineCompleted}/${next.routineScheduled} t ${next.randomCompleted}/${next.randomTotal} score ${next.productivityScore}`,
+      });
+      if (!dryRun) await ctx.db.patch(row._id, next);
+    }
+
+    return { rowsScanned: rows.length, changed: changes.length, dryRun: !!dryRun, changes };
   },
 });

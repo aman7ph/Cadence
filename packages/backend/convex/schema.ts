@@ -1,17 +1,11 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import { dailyTasks, taskCompletions, taskDays } from "./tables/tasks";
+import { users } from "./tables/users";
 
 export default defineSchema({
-  users: defineTable({
-    tokenIdentifier: v.string(),
-    email: v.string(),
-    name: v.optional(v.string()),
-    timezone: v.optional(v.string()),
-    // 0..1 — how much routines outweigh random tasks in productivityScore.
-    // Absent → use the default (see packages/shared scoring.ts).
-    routineWeight: v.optional(v.number()),
-  }).index("by_token", ["tokenIdentifier"]),
+  // Defined in ./tables/users.ts — see the note there.
+  users,
 
   routines: defineTable({
     userId: v.id("users"),

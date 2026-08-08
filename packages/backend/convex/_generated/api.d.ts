@@ -37,6 +37,7 @@ import type * as routines from "../routines.js";
 import type * as stagedTaskScheduling from "../stagedTaskScheduling.js";
 import type * as stagedTasks from "../stagedTasks.js";
 import type * as tables_tasks from "../tables/tasks.js";
+import type * as tables_users from "../tables/users.js";
 import type * as taskDays from "../taskDays.js";
 import type * as users from "../users.js";
 
@@ -76,6 +77,7 @@ declare const fullApi: ApiFromModules<{
   stagedTaskScheduling: typeof stagedTaskScheduling;
   stagedTasks: typeof stagedTasks;
   "tables/tasks": typeof tables_tasks;
+  "tables/users": typeof tables_users;
   taskDays: typeof taskDays;
   users: typeof users;
 }>;

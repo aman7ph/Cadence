@@ -1,6 +1,8 @@
 import { v } from "convex/values";
+import { validateReminder } from "@cadence/shared";
 import { query, mutation } from "./_generated/server";
 import { requireUser } from "./lib/auth";
+import { reminderValidator } from "./tables/users";
 
 export const getMe = query({
   args: {},
@@ -30,5 +32,20 @@ export const setRoutineWeight = mutation({
     }
     const user = await requireUser(ctx);
     await ctx.db.patch(user._id, { routineWeight });
+  },
+});
+
+// The nudge reminder's settings (mobile only — see
+// .agent/nudge-reminder-implementation-plan.md). Validation is the shared
+// helper rather than a local copy, so the server rejects exactly what the
+// settings form rejects. `enabled` is part of the object rather than its own
+// mutation: the form saves the whole thing at once, and validating the values
+// even while disabled stops bad settings being stored to fail later.
+export const setReminder = mutation({
+  args: { reminder: reminderValidator },
+  handler: async (ctx, { reminder }) => {
+    validateReminder(reminder);
+    const user = await requireUser(ctx);
+    await ctx.db.patch(user._id, { reminder });
   },
 });

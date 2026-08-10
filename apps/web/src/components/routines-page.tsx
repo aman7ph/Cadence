@@ -11,7 +11,7 @@ import { CreateRoutineForm } from "./routines-create-form";
 
 export function RoutinesPage() {
   const today = todayLocal();
-  const allRoutines = useQuery(api.routines.list, { includeArchived: true });
+  const allRoutines = useQuery(api.routines.list, { includeArchived: true, today });
   const activeGoals = useQuery(api.goals.list, {});
   const [archivedOpen, setArchivedOpen] = useState(false);
 

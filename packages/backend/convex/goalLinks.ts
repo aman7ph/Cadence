@@ -5,6 +5,8 @@ import { resolveUser } from "./lib/resolveUser";
 import { isScheduledOn } from "./lib/schedule";
 import { carryoverOn, loadDayTasks, statusOn } from "./lib/taskDay";
 import { countRepsByTask } from "./lib/taskRepeat";
+import { deriveStreaksFrom, streakRangeStart } from "./lib/streak";
+import { loadCompletionsByRoutine } from "./lib/routineCompletions";
 import type { Id } from "./_generated/dataModel";
 import type { DayRoutine, DayTask } from "./days";
 
@@ -85,14 +87,17 @@ export const getDayForGoal = query({
     const goalRoutines = await ctx.db.query("routines")
       .withIndex("by_goal", (q) => q.eq("goalId", goalId)).collect();
     const scheduled = goalRoutines.filter((r) => r.isActive && isScheduledOn(r, date));
-    const completions = await ctx.db.query("routineCompletions")
-      .withIndex("by_user_date", (q) => q.eq("userId", user._id).eq("date", date)).collect();
-    const compMap = new Map(completions.map((c) => [c.routineId, c.status as "completed" | "skipped"]));
+    // One read for both the day's statuses and the streaks, as days.getDay does
+    // — the viewed date sits inside the streak lookback that ends on it.
+    const completions = await loadCompletionsByRoutine(ctx, user._id, streakRangeStart(date), date);
+    // Derived as of the viewed date, exactly as days.getDay does — the two
+    // render the same rows and must not disagree about a streak.
+    const streaks = deriveStreaksFrom(scheduled, completions, date);
     const routines: DayRoutine[] = scheduled.map((r) => ({
       routineId: r._id, name: r.name, description: r.description,
       scheduleType: r.scheduleType, customDays: r.customDays,
-      status: compMap.get(r._id) ?? "pending",
-      currentStreak: r.currentStreak, longestStreak: r.longestStreak, goalId: r.goalId,
+      status: completions.get(r._id)?.get(date) ?? "pending",
+      currentStreak: streaks.get(r._id) ?? 0, longestStreak: r.longestStreak, goalId: r.goalId,
     }));
 
     // By presence, not currentDate — same reason as days.getDay: a carried task

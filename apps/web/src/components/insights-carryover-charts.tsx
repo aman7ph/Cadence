@@ -9,8 +9,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { api } from "@cadence/backend/convex/_generated/api";
-import { bucketByWeek, bucketByMonth, formatXLabel } from "@/lib/chartUtils";
+import { bucketCountsByWeek, bucketCountsByMonth, formatXLabel } from "@/lib/chartUtils";
 import type { Granularity } from "@/lib/chartUtils";
+import { fillDailyGaps } from "@cadence/shared";
 import type { DateRange } from "@cadence/shared";
 import { tooltipStyle, axisStyle, numFmt, Loading, Empty } from "./insights-chart-card";
 
@@ -65,13 +66,15 @@ export function NeverDoneTrendChart({ range, granularity }: { range: DateRange; 
     return <Empty>No tasks still open from this window — all resolved!</Empty>;
   }
 
-  const valueRows = rawRows.map((r) => ({ date: r.date, value: r.count }));
-  const bucketed =
-    granularity === "weekly" ? bucketByWeek(valueRows) :
-    granularity === "monthly" ? bucketByMonth(valueRows) :
-    valueRows;
-
-  const data = bucketed.map((r) => ({ date: r.date, count: Math.round(r.value) }));
+  // Counts are SUMMED across a bucket, never averaged — the chart beside this
+  // one already sums, and averaging made a week of five open tasks read as one.
+  // Gaps are filled first so a quiet day plots 0 instead of vanishing from the
+  // axis, which would also make the weekly sums come from an incomplete series.
+  const filled = fillDailyGaps(rawRows, range.from, range.to, (date) => ({ date, count: 0 }));
+  const data =
+    granularity === "weekly" ? bucketCountsByWeek(filled, ["count"]) :
+    granularity === "monthly" ? bucketCountsByMonth(filled, ["count"]) :
+    filled;
 
   return (
     <ResponsiveContainer width="100%" height={180}>

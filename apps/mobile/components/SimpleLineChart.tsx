@@ -18,15 +18,22 @@ export function SimpleLineChart({
         const [yMin, yMax] = domainY;
         const yRange = yMax - yMin || 1;
         const chartH = height - PAD * 2;
-        const pts = s.data.map((v, i) => ({
-          x: (i / (n - 1)) * w,
-          y: PAD + chartH - ((Math.max(yMin, Math.min(yMax, v)) - yMin) / yRange) * chartH,
-        }));
+        const pts = s.data.map((v, i) =>
+          v === null
+            ? null
+            : {
+                x: (i / (n - 1)) * w,
+                y: PAD + chartH - ((Math.max(yMin, Math.min(yMax, v)) - yMin) / yRange) * chartH,
+              },
+        );
         const sw = s.strokeWidth ?? 2;
         return (
           <View key={si} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, opacity: s.opacity ?? 1 }}>
             {pts.slice(1).map((p, i) => {
-              const p0 = pts[i]!;
+              const p0 = pts[i];
+              // A null at either end is a gap in the routine's own schedule —
+              // draw nothing rather than a segment down to the floor.
+              if (!p || !p0) return null;
               const dx = p.x - p0.x;
               const dy = p.y - p0.y;
               const len = Math.sqrt(dx * dx + dy * dy);

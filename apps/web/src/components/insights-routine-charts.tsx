@@ -10,23 +10,24 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { api } from "@cadence/backend/convex/_generated/api";
+import { MIN_ACTIVE_BAND, NO_ACTIVITY_BAND, scoreToHeatBand } from "@cadence/shared";
 import type { DateRange } from "@cadence/shared";
 import { tooltipStyle, axisStyle, numFmt, DOW_LABELS, CHART_COLORS, Loading, Empty } from "./insights-chart-card";
 
-export function DowHeatmap({ range }: { range: DateRange }) {
-  const stats = useQuery(api.analyticsProductivity.dayOfWeekStats, { from: range.from, to: range.to });
+export function DowHeatmap({ range, today }: { range: DateRange; today: string }) {
+  const stats = useQuery(api.analyticsProductivity.dayOfWeekStats, { from: range.from, to: range.to, today });
   if (!stats) return <Loading />;
 
   return (
     <div className="flex gap-2 mt-1">
       {stats.map((s) => {
         const rate = s.rate ?? 0;
+        // Same band scale as both productivity heatmaps, floored so a 0%
+        // weekday stays distinct from a weekday with nothing scheduled.
         const heatLevel =
-          s.scheduled === 0 ? 0
-          : rate >= 80 ? 4
-          : rate >= 60 ? 3
-          : rate >= 40 ? 2
-          : 1;
+          s.scheduled === 0
+            ? NO_ACTIVITY_BAND
+            : Math.max(MIN_ACTIVE_BAND, scoreToHeatBand(rate));
         return (
           <div key={s.weekday} className="flex flex-col items-center gap-1.5 flex-1">
             <div
@@ -45,8 +46,8 @@ export function DowHeatmap({ range }: { range: DateRange }) {
   );
 }
 
-export function RoutineComparisonChart({ range }: { range: DateRange }) {
-  const rows = useQuery(api.analyticsRoutines.routineConsistency, { from: range.from, to: range.to });
+export function RoutineComparisonChart({ range, today }: { range: DateRange; today: string }) {
+  const rows = useQuery(api.analyticsRoutines.routineConsistency, { from: range.from, to: range.to, today });
   if (!rows) return <Loading />;
   if (rows.length === 0) return <Empty>No active routines.</Empty>;
 

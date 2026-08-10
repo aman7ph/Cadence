@@ -3,7 +3,8 @@ import { todayLocal } from "@cadence/shared";
 import type { DateRange } from "@cadence/shared";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { getGranularity } from "@/lib/chartUtils";
-import { ChartCard, granularityLabel } from "./insights-chart-card";
+import { granularityLabel, rollingWindowLabel } from "@cadence/shared";
+import { ChartCard } from "./insights-chart-card";
 import { MomentumChart } from "./insights-momentum-chart";
 import { DowHeatmap, RoutineComparisonChart } from "./insights-routine-charts";
 import { RoutineCompletionLines } from "./insights-timeline-chart";
@@ -53,14 +54,14 @@ export function InsightsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ChartCard title="Day-of-week consistency">
-          <DowHeatmap range={range} />
+          <DowHeatmap range={range} today={today} />
         </ChartCard>
         <ChartCard title="Routine comparison" label="completion %">
-          <RoutineComparisonChart range={range} />
+          <RoutineComparisonChart range={range} today={today} />
         </ChartCard>
       </div>
 
-      <ChartCard title="Routine completion rate" label={granularityLabel(granularity)}>
+      <ChartCard title="Routine completion rate" label={rollingWindowLabel(granularity)}>
         <RoutineCompletionLines range={range} granularity={granularity} today={today} />
       </ChartCard>
 

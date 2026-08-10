@@ -47,6 +47,7 @@ export function AnalyticsRail() {
   const rows = useQuery(api.analyticsRoutines.routineConsistency, {
     from: addDays(today, -(CONSISTENCY_WINDOW_DAYS - 1)),
     to: today,
+    today,
   });
   const recentReflections = useQuery(api.reflections.getRecent, { limit: 3 });
 

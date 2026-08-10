@@ -1,13 +1,13 @@
-import { addDays, daysBetween, formatDateShort, formatMonthYear, startOfWeek } from "@cadence/shared";
+import { formatDateShort, formatMonthYear, startOfWeek } from "@cadence/shared";
+import type { Granularity } from "@cadence/shared";
 
-export type Granularity = "daily" | "weekly" | "monthly";
-
-export function getGranularity(from: string, to: string): Granularity {
-  const days = daysBetween(from, to);
-  if (days <= 90) return "daily";
-  if (days <= 365) return "weekly";
-  return "monthly";
-}
+// `getGranularity` and its thresholds moved to @cadence/shared in Step 11.
+// Web switched at 90/365 days and mobile at 30/180, so "Last 90 days" rendered
+// as 90 daily points on one platform and weekly averages on the other — the
+// same range over the same data showing two different sets of numbers. Both now
+// read one implementation. Re-exported here so existing imports keep working.
+export type { Granularity } from "@cadence/shared";
+export { getGranularity } from "@cadence/shared";
 
 export function formatXLabel(date: string, granularity: Granularity): string {
   if (granularity === "monthly") return formatMonthYear(date);
@@ -84,19 +84,6 @@ export function bucketCountsByMonth<K extends string>(
     .map(([date, counts]) => ({ date, ...counts }) as { date: string } & Record<K, number>);
 }
 
-// Fill gaps in a date series so charts don't skip days.
-// Returns one entry per calendar day in [from, to]; missing dates get value 0.
-export function fillDailyGaps(
-  rows: { date: string; value: number }[],
-  from: string,
-  to: string,
-): { date: string; value: number }[] {
-  const map = new Map(rows.map((r) => [r.date, r.value]));
-  const result: { date: string; value: number }[] = [];
-  const total = daysBetween(from, to);
-  for (let i = 0; i < total; i++) {
-    const date = addDays(from, i);
-    result.push({ date, value: map.get(date) ?? 0 });
-  }
-  return result;
-}
+// `fillDailyGaps` used to live here and was never called by anything. It moved
+// to @cadence/shared in Step 9, where mobile needs it too and where it is
+// tested — see packages/shared/src/chart.ts.

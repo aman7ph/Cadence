@@ -66,7 +66,8 @@ function DayModalContent({ date, today, onClose }: { date: string; today: string
   const routines     = day?.routines ?? [];
   const allTasks     = day?.randomTasks ?? [];
   const visibleTasks = allTasks.filter((t) => t.status !== "dismissed");
-  const rDone        = routines.filter((r) => r.status === "completed").length;
+  const counted      = routines.filter((r) => r.status !== "skipped"); // skips excused
+  const rDone        = counted.filter((r) => r.status === "completed").length;
   const tDone        = visibleTasks.filter((t) => t.status === "completed").length;
   const isEmpty      = day !== undefined && day !== null && routines.length === 0 && visibleTasks.length === 0;
 
@@ -97,7 +98,7 @@ function DayModalContent({ date, today, onClose }: { date: string; today: string
               {/* Routines */}
               <View style={s.secHdr}>
                 <Text style={s.secLbl}>Routines</Text>
-                <Text style={s.secCnt}>{rDone}/{routines.length}</Text>
+                <Text style={s.secCnt}>{rDone}/{counted.length}</Text>
               </View>
               {routines.length === 0
                 ? <Text style={s.italic}>None scheduled</Text>

@@ -37,7 +37,7 @@ export function TodayTasksSection({ tasks, viewedDate, isPast }: Props) {
     <View style={s.section}>
       <View style={s.head}>
         <Text style={s.lbl}>Tasks</Text>
-        {visible.length > 0 && <Text style={s.cnt}>{done} / {visible.length}</Text>}
+        {tasks.length > 0 && <Text style={s.cnt}>{done} / {tasks.length}</Text>}
       </View>
       {visible.length === 0 ? (
         <View style={s.empty}>

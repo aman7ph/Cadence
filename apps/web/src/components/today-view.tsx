@@ -1,7 +1,7 @@
 import { useQuery } from "convex/react";
 import { useUser } from "@clerk/clerk-react";
 import { api } from "@cadence/backend/convex/_generated/api";
-import { addDays, productivityScore, todayLocal } from "@cadence/shared";
+import { addDays, bestStreakOf, productivityScore, todayLocal } from "@cadence/shared";
 import { useState } from "react";
 import { AnalyticsRail } from "./analytics-rail";
 import { DayNavigator } from "./day-navigator";
@@ -36,6 +36,7 @@ export function TodayView({ onNavigate }: { onNavigate?: (view: AppView) => void
     from: addDays(today, -(THIRTY_DAY_WINDOW - 1)),
     to: today,
   });
+  const allRoutines = useQuery(api.routines.list, { today });
   const me = useQuery(api.users.getMe);
   const { user } = useUser();
 
@@ -51,15 +52,21 @@ export function TodayView({ onNavigate }: { onNavigate?: (view: AppView) => void
   }
   if (day === null) return null;
 
-  const routinesDone = day.routines.filter((r) => r.status === "completed").length;
-  const routinesScheduled = day.routines.length;
+  // One set of denominators for the whole page: a skipped routine is excused and
+  // leaves the fraction, a dismissed task does not. These are exactly the counts
+  // the backend scores with (lib/dayStatsDerive.foldDayStats), so the tile, the
+  // heatmap and the History calendar cannot disagree about the same day.
+  const countedRoutines = day.routines.filter((r) => r.status !== "skipped");
+  const routinesScheduled = countedRoutines.length;
+  const routinesDone = countedRoutines.filter((r) => r.status === "completed").length;
   const dismissedTasks = day.randomTasks.filter((t) => t.status === "dismissed");
   const tasksDismissed = dismissedTasks.length;
   const visibleTasks = day.randomTasks.filter((t) => t.status !== "dismissed");
   const tasksDone = visibleTasks.filter((t) => t.status === "completed").length;
   const tasksOpen = visibleTasks.filter((t) => t.status === "open").length;
+  const randomTotal = day.randomTasks.length;
 
-  const totalScheduled = routinesScheduled + tasksDone + tasksOpen;
+  const totalScheduled = routinesScheduled + randomTotal;
   const totalDone = routinesDone + tasksDone;
   const dayPct = totalScheduled > 0 ? Math.round((totalDone / totalScheduled) * 100) : null;
 
@@ -68,13 +75,12 @@ export function TodayView({ onNavigate }: { onNavigate?: (view: AppView) => void
       routineCompleted: routinesDone,
       routineScheduled: routinesScheduled,
       randomCompleted: tasksDone,
-      randomTotal: tasksDone + tasksOpen + tasksDismissed,
+      randomTotal,
     },
     me?.routineWeight,
   );
 
-  const bestStreak = day.routines.reduce((max, r) => Math.max(max, r.longestStreak), 0);
-  const bestStreakName = day.routines.find((r) => r.longestStreak === bestStreak)?.name ?? "—";
+  const best = bestStreakOf(allRoutines);
 
   return (
     <div className="flex flex-col gap-7">
@@ -96,8 +102,8 @@ export function TodayView({ onNavigate }: { onNavigate?: (view: AppView) => void
         dayPct={dayPct}
         totalDone={totalDone}
         totalScheduled={totalScheduled}
-        bestStreak={bestStreak}
-        bestStreakName={bestStreakName}
+        bestStreak={best.days}
+        bestStreakName={best.name}
         productivity={productivity}
         isPast={isPast}
         thirtyDayRate={thirtyDayRate}

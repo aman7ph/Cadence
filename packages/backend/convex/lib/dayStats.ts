@@ -1,8 +1,7 @@
-import { productivityScore } from "@cadence/shared";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 import type { Id } from "../_generated/dataModel";
-import { isScheduledOn } from "./schedule";
-import { loadDayTasks, statusOn } from "./taskDay";
+import { foldDayStats } from "./dayStatsDerive";
+import { loadDayTasks } from "./taskDay";
 
 export type DayStatsPayload = {
   userId: Id<"users">;
@@ -27,7 +26,6 @@ export async function computeDayStats(
     .query("routines")
     .withIndex("by_user", (q) => q.eq("userId", userId))
     .collect();
-  const routineScheduled = routines.filter((r) => isScheduledOn(r, date)).length;
 
   const completionsOnDate = await ctx.db
     .query("routineCompletions")
@@ -35,9 +33,9 @@ export async function computeDayStats(
       q.eq("userId", userId).eq("date", date),
     )
     .collect();
-  const routineCompleted = completionsOnDate.filter(
-    (c) => c.status === "completed",
-  ).length;
+  const statusByRoutine = new Map(
+    completionsOnDate.map((c) => [c.routineId, c.status] as const),
+  );
 
   // Tasks by presence: every task that was on the plate that day counts once,
   // and the status it held THAT day decides whether it counts as done.
@@ -48,25 +46,20 @@ export async function computeDayStats(
   // past days: a task carried through a day used to vanish from that day's
   // plate the moment it rolled forward.
   const dayTasks = await loadDayTasks(ctx, userId, date);
-  const randomTotal = dayTasks.length;
-  const randomCompleted = dayTasks.filter(
-    (t) => statusOn(t, date) === "completed",
-  ).length;
-
   const user = await ctx.db.get(userId);
-  const score = productivityScore(
-    { routineCompleted, routineScheduled, randomCompleted, randomTotal },
-    user?.routineWeight,
-  );
 
+  // The counting itself lives in lib/dayStatsDerive.ts, shared with the derived
+  // read path, so the stored row and the range query cannot drift apart.
   return {
     userId,
     date,
-    routineScheduled,
-    routineCompleted,
-    randomTotal,
-    randomCompleted,
-    productivityScore: score,
+    ...foldDayStats({
+      routines,
+      statusByRoutine,
+      tasks: dayTasks,
+      date,
+      routineWeight: user?.routineWeight,
+    }),
   };
 }
 

@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { resolveUser } from "./lib/resolveUser";
+import { carryoverForTask } from "./lib/carryover";
 
 export type RandomByDayRow = {
   date: string;
@@ -68,19 +69,15 @@ export const avgCarryover = query({
     const counts = [0, 0, 0, 0];
     let totalCarryovers = 0;
     for (const t of tasks) {
-      const c = t.carryoverCount ?? 0;
+      const c = carryoverForTask(t); // derived, not the stored event counter
       totalCarryovers += c;
-      counts[Math.min(c, 3)]! += 1;
+      counts[Math.min(c, counts.length - 1)]! += 1;
     }
 
     return {
       avg: totalCarryovers / tasks.length,
-      distribution: [
-        { times: 0, count: counts[0]! },
-        { times: 1, count: counts[1]! },
-        { times: 2, count: counts[2]! },
-        { times: 3, count: counts[3]! },
-      ],
+      // Index is the carry count; the last bucket is the "3+" overflow.
+      distribution: counts.map((count, times) => ({ times, count })),
     };
   },
 });
@@ -139,7 +136,8 @@ export const randomStats = query({
     let never = 0;
     for (const t of tasks) {
       if (t.status === "completed") {
-        if (t.carryoverCount === 0) onTime += 1;
+        // "On time" must mean it never sat overnight — see lib/carryover.ts.
+        if (carryoverForTask(t) === 0) onTime += 1;
         else afterCarryover += 1;
       } else if (t.status === "dismissed") {
         never += 1;

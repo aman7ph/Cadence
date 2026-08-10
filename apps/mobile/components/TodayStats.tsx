@@ -11,7 +11,9 @@ export interface TodayStatsProps {
   scoreDelta?: number;
   rate30?: number;
   dayStatsLength?: number;
-  routineWeight: number;
+  // Undefined ⇒ never set; ProductivityTile applies DEFAULT_ROUTINE_WEIGHT, the
+  // same default the score itself was computed with.
+  routineWeight: number | undefined;
   isPast?: boolean;
 }
 

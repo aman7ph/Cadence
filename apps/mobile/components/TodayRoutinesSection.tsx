@@ -11,7 +11,9 @@ interface Props {
 
 export function TodayRoutinesSection({ routines, date, isPast }: Props) {
   const c = useColors();
-  const done = routines.filter((r) => r.status === "completed").length;
+  // Skips are excused here too, so this counter matches the score above it.
+  const counted = routines.filter((r) => r.status !== "skipped");
+  const done = counted.filter((r) => r.status === "completed").length;
 
   const s = StyleSheet.create({
     section:  { marginHorizontal: 16, marginBottom: 20, gap: 6 },
@@ -29,7 +31,7 @@ export function TodayRoutinesSection({ routines, date, isPast }: Props) {
     <View style={s.section}>
       <View style={s.head}>
         <Text style={s.lbl}>Routines</Text>
-        {routines.length > 0 && <Text style={s.cnt}>{done} / {routines.length}</Text>}
+        {counted.length > 0 && <Text style={s.cnt}>{done} / {counted.length}</Text>}
       </View>
       {routines.length === 0 ? (
         <View style={s.empty}>

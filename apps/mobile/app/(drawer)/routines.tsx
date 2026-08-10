@@ -19,7 +19,7 @@ import { useColors } from "../../lib/theme";
 export default function RoutinesScreen() {
   const c = useColors();
   const today       = todayLocal();
-  const allRoutines = useQuery(api.routines.list, { includeArchived: true });
+  const allRoutines = useQuery(api.routines.list, { includeArchived: true, today });
   const activeGoals = useQuery(api.goals.list, {});
   const archive     = useMutation(api.routineManagement.archive);
 

@@ -42,9 +42,9 @@ export function TodayTasksSection({
     <section className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between">
         <h2 className="text-[11px] font-bold uppercase tracking-[0.10em] text-[var(--text-tertiary)]">Tasks</h2>
-        {tasksOpen + tasksDone > 0 && (
+        {tasksDone + tasksOpen + tasksDismissed > 0 && (
           <span className="text-[11px] text-[var(--text-tertiary)] font-mono">
-            {tasksDone} / {tasksDone + tasksOpen} done
+            {tasksDone} / {tasksDone + tasksOpen + tasksDismissed} done
           </span>
         )}
       </div>

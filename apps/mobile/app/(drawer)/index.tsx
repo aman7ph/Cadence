@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "convex/react";
 import { useUser } from "@clerk/clerk-expo";
 import { api } from "@cadence/backend/convex/_generated/api";
-import { productivityScore, todayLocal, addDays } from "@cadence/shared";
+import { bestStreakOf, productivityScore, todayLocal, addDays } from "@cadence/shared";
 import { fmtLong } from "../../lib/dateUtils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -34,6 +34,7 @@ export default function Today() {
   const onRefresh = () => { setRefreshing(true); setTimeout(() => setRefreshing(false), 600); };
 
   const me    = useQuery(api.users.getMe);
+  const allRoutines = useQuery(api.routines.list, { today });
   const day   = useQuery(api.days.getDay, { date: viewedDate });
   const range = useQuery(api.analyticsProductivity.dayStatsRange, {
     from: addDays(today, -(THIRTY - 1)), to: today,
@@ -67,16 +68,18 @@ export default function Today() {
   const firstName = user?.firstName ?? user?.username ?? "friend";
   const routines = day.routines ?? [];
   const allTasks = day.randomTasks ?? [];
-  const rDone  = routines.filter((r) => r.status === "completed").length;
+  // Skipped routines are excused, dismissed tasks are not — the same
+  // denominators the backend scores with (lib/dayStatsDerive.foldDayStats), so
+  // the tile agrees with the heatmap and with web.
+  const countedRoutines = routines.filter((r) => r.status !== "skipped");
+  const rDone  = countedRoutines.filter((r) => r.status === "completed").length;
   const visible = allTasks.filter((t) => t.status !== "dismissed");
   const tDone  = visible.filter((t) => t.status === "completed").length;
-  const tasksDismissed = allTasks.filter((t) => t.status === "dismissed").length;
-  const bestR = routines.reduce<typeof routines[0] | null>(
-    (best, r) => (!best || r.longestStreak > best.longestStreak) ? r : best, null,
-  );
+  const randomTotal = allTasks.length;
+  const best = bestStreakOf(allRoutines);
   const score = productivityScore(
-    { routineCompleted: rDone, routineScheduled: routines.length,
-      randomCompleted: tDone, randomTotal: tDone + visible.filter((t) => t.status === "open").length + tasksDismissed },
+    { routineCompleted: rDone, routineScheduled: countedRoutines.length,
+      randomCompleted: tDone, randomTotal },
     me?.routineWeight,
   );
   const rate30 = range && range.length > 0
@@ -107,10 +110,10 @@ export default function Today() {
             onNext={() => setViewedDate((d) => addDays(d, 1))}
             onToday={() => setViewedDate(today)} />
         </View>
-        <TodayStats done={rDone + tDone} total={routines.length + visible.length}
-          bestStreak={bestR?.longestStreak ?? 0} bestStreakName={bestR?.name}
+        <TodayStats done={rDone + tDone} total={countedRoutines.length + randomTotal}
+          bestStreak={best.days} bestStreakName={best.name}
           score={score} scoreDelta={scoreDelta} rate30={rate30}
-          dayStatsLength={range?.length} routineWeight={me?.routineWeight ?? 0.5} isPast={isPast} />
+          dayStatsLength={range?.length} routineWeight={me?.routineWeight} isPast={isPast} />
         <TodayRoutinesSection routines={routines} date={viewedDate} isPast={isPast} />
         <TodayTasksSection tasks={allTasks} viewedDate={viewedDate} isPast={isPast} />
         <ReflectionCard date={viewedDate} reflection={day.reflection}

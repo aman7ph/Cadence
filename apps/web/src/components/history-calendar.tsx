@@ -1,15 +1,12 @@
-import { daysInMonth, firstWeekdayOfMonth } from "@cadence/shared";
+import { daysInMonth, firstWeekdayOfMonth, scoreToHeatBand } from "@cadence/shared";
 import { cn } from "@/lib/utils";
 
 const DOW_HEADERS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-export function scoreToHeat(score: number | undefined): 0 | 1 | 2 | 3 | 4 {
-  if (score === undefined || score === 0) return 0;
-  if (score < 25) return 1;
-  if (score < 50) return 2;
-  if (score < 75) return 3;
-  return 4;
-}
+// The local scoreToHeat used to live here with its own 25/50/75 cuts, which
+// disagreed with the activity heatmap's 1/40/60/80 cuts on 30 of the 101
+// possible scores — under one shared "Less → More" legend. Both now read the
+// same scale from @cadence/shared. See packages/shared/src/heat.ts.
 
 export function formatFullDate(date: string): string {
   const [y, m, d] = date.split("-").map(Number);
@@ -55,7 +52,7 @@ export function CalendarGrid({ viewMonth, today, scoreByDate, selectedDate, onSe
           const isFuture = date > today;
           const isToday = date === today;
           const isSelected = date === selectedDate;
-          const heat = scoreToHeat(scoreByDate.get(date));
+          const heat = scoreToHeatBand(scoreByDate.get(date));
 
           return (
             <button

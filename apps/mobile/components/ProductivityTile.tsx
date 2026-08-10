@@ -1,11 +1,15 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useMutation } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
+import { DEFAULT_ROUTINE_WEIGHT } from "@cadence/shared";
 import { useColors } from "../lib/theme";
 
 interface Props {
   score: number;
-  routineWeight: number;
+  // Undefined means the user has never set one — the tile must then show the
+  // same default the score was computed with. Passing a hard-coded 0.5 here is
+  // what made a fresh account read "50%" beside a score weighted 60/40.
+  routineWeight: number | undefined;
   delta?: number;
   isPast?: boolean;
 }
@@ -13,7 +17,7 @@ interface Props {
 export function ProductivityTile({ score, routineWeight, delta, isPast }: Props) {
   const c = useColors();
   const setWeight = useMutation(api.users.setRoutineWeight);
-  const pct = Math.round(routineWeight * 100);
+  const pct = Math.round((routineWeight ?? DEFAULT_ROUTINE_WEIGHT) * 100);
 
   const adjust = (dir: 1 | -1) => {
     const next = Math.min(100, Math.max(0, pct + dir * 5));

@@ -9,7 +9,8 @@ import { MomentumChart, DowHeatmap } from "../../components/ProductivityCharts";
 import { RoutineComparisonChart, RoutineCompletionLines } from "../../components/RoutineInsightCharts";
 import { TasksByDayChart, TaskBreakdownChart, CarryoverCard, OpenTasksTrendChart } from "../../components/TaskInsightCharts";
 import { ChartCard } from "../../components/InsightShared";
-import { getGranularity, granLabel } from "../../lib/insightUtils";
+import { getGranularity } from "../../lib/insightUtils";
+import { granularityLabel, rollingWindowLabel } from "@cadence/shared";
 import { useColors } from "../../lib/theme";
 
 export default function InsightsScreen() {
@@ -49,19 +50,19 @@ export default function InsightsScreen() {
           </TouchableOpacity>
         </View>
 
-        <ChartCard title="Productivity momentum" label={g === "daily" ? "7-day EMA" : granLabel(g)}>
+        <ChartCard title="Productivity momentum" label={g === "daily" ? "7-day EMA" : granularityLabel(g)}>
           <MomentumChart range={range} granularity={g} />
         </ChartCard>
         <ChartCard title="Day-of-week consistency">
-          <DowHeatmap range={range} />
+          <DowHeatmap range={range} today={today} />
         </ChartCard>
         <ChartCard title="Routine comparison" label="completion %">
-          <RoutineComparisonChart range={range} />
+          <RoutineComparisonChart range={range} today={today} />
         </ChartCard>
-        <ChartCard title="Routine completion rate" label={granLabel(g)}>
+        <ChartCard title="Routine completion rate" label={rollingWindowLabel(g)}>
           <RoutineCompletionLines range={range} granularity={g} today={today} />
         </ChartCard>
-        <ChartCard title="Tasks added per day" label={granLabel(g)}>
+        <ChartCard title="Tasks added per day" label={granularityLabel(g)}>
           <TasksByDayChart range={range} granularity={g} />
         </ChartCard>
         <ChartCard title="Task resolution breakdown">
@@ -70,7 +71,7 @@ export default function InsightsScreen() {
         <ChartCard title="Carryover distribution" label="completed tasks">
           <CarryoverCard range={range} />
         </ChartCard>
-        <ChartCard title="Tasks still open, by creation date" label={granLabel(g)}>
+        <ChartCard title="Tasks still open, by creation date" label={granularityLabel(g)}>
           <OpenTasksTrendChart range={range} granularity={g} />
         </ChartCard>
       </ScrollView>

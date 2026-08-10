@@ -9,6 +9,7 @@ import { ActivityIndicator, AppState, Text, View } from "react-native";
 import { convex } from "../lib/convexClient";
 import { tokenCache } from "../lib/tokenCache";
 import { ThemeProvider, useTheme, useColors } from "../lib/theme";
+import { useReminderSync } from "../lib/useReminderSync";
 
 const CLERK_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -54,6 +55,12 @@ function RolloverOnForeground() {
   return null;
 }
 
+// Mount point only — the logic lives in lib/useReminderSync.ts.
+function ReminderSync() {
+  useReminderSync();
+  return null;
+}
+
 function LoadingScreen() {
   const c = useColors();
   return (
@@ -79,6 +86,7 @@ function AuthGuard() {
     <>
       {isSignedIn && <EnsureProvisioned />}
       {isSignedIn && <RolloverOnForeground />}
+      {isSignedIn && <ReminderSync />}
       <Slot />
     </>
   );

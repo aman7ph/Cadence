@@ -10,38 +10,32 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { api } from "@cadence/backend/convex/_generated/api";
-import { startOfWeek } from "@cadence/shared";
-import type { DateRange } from "@cadence/shared";
+import { countsTowardRate, rollingCompletionRate, startOfWeek } from "@cadence/shared";
+import type { DateRange, RoutineChartDay } from "@cadence/shared";
 import { formatXLabel } from "@/lib/chartUtils";
 import type { Granularity } from "@/lib/chartUtils";
 import { tooltipStyle, axisStyle, numFmt, CHART_COLORS, Loading, Empty } from "./insights-chart-card";
 
-type RoutineDay = { date: string; status: string };
-type RoutineRow = { name: string; routineId: string; days: RoutineDay[] };
+type RoutineRow = { name: string; routineId: string; days: RoutineChartDay[] };
+type ChartPoint = Record<string, string | number | null>;
 
 function buildRoutineChartData(
   rows: RoutineRow[],
   granularity: Granularity,
-): Record<string, string | number>[] {
+): ChartPoint[] {
   if (granularity === "daily") {
+    // The x-axis is the union of every routine's dates, but each routine's
+    // rolling rate is computed from ITS OWN days — see shared/routineChart.ts.
     const allDates = new Set<string>();
     rows.forEach((r) => r.days.forEach((d) => allDates.add(d.date)));
     const sortedDates = Array.from(allDates).sort();
-    const byRoutine = rows.map((r) => ({
+    const series = rows.map((r) => ({
       name: r.name,
-      byDate: new Map(r.days.map((d) => [d.date, d.status])),
+      values: rollingCompletionRate(r.days, sortedDates),
     }));
-    return sortedDates.map((date) => {
-      const point: Record<string, string | number> = { date };
-      for (const r of byRoutine) {
-        const last7 = sortedDates
-          .filter((d) => d <= date)
-          .slice(-7)
-          .map((d) => r.byDate.get(d))
-          .filter((s) => s === "completed" || s === "missed");
-        const completed = last7.filter((s) => s === "completed").length;
-        point[r.name] = last7.length > 0 ? Math.round((completed / last7.length) * 100) : 0;
-      }
+    return sortedDates.map((date, i) => {
+      const point: ChartPoint = { date };
+      for (const s of series) point[s.name] = s.values[i] ?? null;
       return point;
     });
   }
@@ -55,7 +49,7 @@ function buildRoutineChartData(
   const routineBuckets = rows.map((r) => {
     const buckets = new Map<string, { completed: number; total: number }>();
     for (const d of r.days) {
-      if (d.status !== "completed" && d.status !== "missed") continue;
+      if (!countsTowardRate(d.status)) continue;
       const key = keyFn(d.date);
       allKeys.add(key);
       const b = buckets.get(key) ?? { completed: 0, total: 0 };
@@ -69,10 +63,12 @@ function buildRoutineChartData(
   return Array.from(allKeys)
     .sort()
     .map((key) => {
-      const point: Record<string, string | number> = { date: key };
+      const point: ChartPoint = { date: key };
       for (const r of routineBuckets) {
         const b = r.buckets.get(key);
-        point[r.name] = b && b.total > 0 ? Math.round((b.completed / b.total) * 100) : 0;
+        // null, not 0 — a bucket this routine had no scheduled days in is a
+        // gap, and drawing it on the floor reads as total failure.
+        point[r.name] = b && b.total > 0 ? Math.round((b.completed / b.total) * 100) : null;
       }
       return point;
     });

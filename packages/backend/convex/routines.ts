@@ -4,6 +4,7 @@ import { mutation, query } from "./_generated/server";
 import { requireUser } from "./lib/auth";
 import { clearStatus, setStatus } from "./lib/routineSetStatus";
 import { assertPlainRoutine } from "./lib/routineRepeat";
+import { deriveStreaks } from "./lib/streak";
 
 const scheduleType = v.union(
   v.literal("daily"),
@@ -11,9 +12,12 @@ const scheduleType = v.union(
   v.literal("custom"),
 );
 
+// `today` is required because currentStreak is overridden with the derived
+// value (see lib/streak.ts) — the stored field goes stale the moment a
+// scheduled day is missed, and only the client knows its own local date.
 export const list = query({
-  args: { includeArchived: v.optional(v.boolean()) },
-  handler: async (ctx, { includeArchived }) => {
+  args: { includeArchived: v.optional(v.boolean()), today: v.string() },
+  handler: async (ctx, { includeArchived, today }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return [];
     const user = await ctx.db
@@ -22,20 +26,25 @@ export const list = query({
       .unique();
     if (!user) return [];
 
-    if (includeArchived) {
-      return await ctx.db
-        .query("routines")
-        .withIndex("by_user", (q) => q.eq("userId", user._id))
-        .order("desc")
-        .collect();
-    }
-    return await ctx.db
-      .query("routines")
-      .withIndex("by_user_active", (q) =>
-        q.eq("userId", user._id).eq("isActive", true),
-      )
-      .order("desc")
-      .collect();
+    const routines = includeArchived
+      ? await ctx.db
+          .query("routines")
+          .withIndex("by_user", (q) => q.eq("userId", user._id))
+          .order("desc")
+          .collect()
+      : await ctx.db
+          .query("routines")
+          .withIndex("by_user_active", (q) =>
+            q.eq("userId", user._id).eq("isActive", true),
+          )
+          .order("desc")
+          .collect();
+
+    const streaks = await deriveStreaks(ctx, user._id, routines, today);
+    return routines.map((r) => ({
+      ...r,
+      currentStreak: streaks.get(r._id) ?? 0,
+    }));
   },
 });
 

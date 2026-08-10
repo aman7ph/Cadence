@@ -44,6 +44,8 @@ export function DayDetailPanel({ date, today, onClose }: DayDetailPanelProps) {
 
         {day !== null && day !== undefined && (() => {
           const visibleTasks = day.randomTasks.filter((t) => t.status !== "dismissed");
+          // Same denominators as the Today view and the backend score.
+          const countedRoutines = day.routines.filter((r) => r.status !== "skipped");
           const isEmpty = day.routines.length === 0 && visibleTasks.length === 0;
 
           if (isEmpty) return (
@@ -57,8 +59,8 @@ export function DayDetailPanel({ date, today, onClose }: DayDetailPanelProps) {
               {/* Routines column */}
               <section className="flex flex-col gap-2">
                 <SectionHeader title="Routines"
-                  done={day.routines.filter((r) => r.status === "completed").length}
-                  total={day.routines.length} />
+                  done={countedRoutines.filter((r) => r.status === "completed").length}
+                  total={countedRoutines.length} />
                 {day.routines.length === 0
                   ? <p className="text-[12px] italic text-[var(--text-tertiary)] pt-1">None scheduled</p>
                   : day.routines.map((r) => (
@@ -73,8 +75,8 @@ export function DayDetailPanel({ date, today, onClose }: DayDetailPanelProps) {
               {/* Tasks column */}
               <section className="flex flex-col gap-2">
                 <SectionHeader title="Tasks"
-                  done={visibleTasks.filter((t) => t.status === "completed").length}
-                  total={visibleTasks.length} />
+                  done={day.randomTasks.filter((t) => t.status === "completed").length}
+                  total={day.randomTasks.length} />
                 {visibleTasks.length === 0
                   ? <p className="text-[12px] italic text-[var(--text-tertiary)] pt-1">No tasks</p>
                   : visibleTasks.map((t) => (

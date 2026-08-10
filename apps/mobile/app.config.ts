@@ -4,7 +4,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: "Cadence",
   slug: "cadence",
-  version: "1.0.0",
+  // 1.1.0 — expo-notifications is a native module, so per the runtimeVersion
+  // note below this bump is mandatory and the reminder feature ships as a full
+  // EAS build, not an OTA update.
+  version: "1.1.0",
   orientation: "portrait",
   scheme: "cadence",
   userInterfaceStyle: "dark",

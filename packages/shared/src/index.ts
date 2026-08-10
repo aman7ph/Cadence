@@ -4,3 +4,7 @@ export * from "./streak";
 export * from "./scoring";
 export * from "./repeat";
 export * from "./reminder";
+export * from "./heat";
+export * from "./chart";
+export * from "./routineDay";
+export * from "./routineChart";

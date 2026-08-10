@@ -1,9 +1,12 @@
 import { v } from "convex/values";
-import { addDays, consistencyScore, daysBetween } from "@cadence/shared";
+import { addDays, consistencyScore, countsTowardRate, daysBetween, resolveDayStatus } from "@cadence/shared";
+import type { ScheduledDayStatus } from "@cadence/shared";
 import { query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { isScheduledOn } from "./lib/schedule";
 import { resolveUser } from "./lib/resolveUser";
+import { loadCompletionsByRoutine } from "./lib/routineCompletions";
+import { deriveStreaks } from "./lib/streak";
 
 const CONSISTENCY_TAU_DAYS = 14;
 
@@ -19,9 +22,10 @@ export type RoutineConsistencyRow = {
 };
 
 // Per active-routine recency-weighted consistency score over [from, to].
+// `today` decides which scheduled days are still pending — see lib/routineDay.ts.
 export const routineConsistency = query({
-  args: { from: v.string(), to: v.string() },
-  handler: async (ctx, { from, to }): Promise<RoutineConsistencyRow[]> => {
+  args: { from: v.string(), to: v.string(), today: v.string() },
+  handler: async (ctx, { from, to, today }): Promise<RoutineConsistencyRow[]> => {
     const user = await resolveUser(ctx);
     if (!user) return [];
 
@@ -33,28 +37,15 @@ export const routineConsistency = query({
       .collect();
     if (routines.length === 0) return [];
 
-    const completions = await ctx.db
-      .query("routineCompletions")
-      .withIndex("by_user_date", (q) =>
-        q.eq("userId", user._id).gte("date", from).lte("date", to),
-      )
-      .collect();
-
-    const byRoutine = new Map<Id<"routines">, { completed: Set<string>; skipped: Set<string> }>();
-    for (const c of completions) {
-      let entry = byRoutine.get(c.routineId);
-      if (!entry) {
-        entry = { completed: new Set(), skipped: new Set() };
-        byRoutine.set(c.routineId, entry);
-      }
-      if (c.status === "completed") entry.completed.add(c.date);
-      else entry.skipped.add(c.date);
-    }
+    const byRoutine = await loadCompletionsByRoutine(ctx, user._id, from, to);
+    // Streaks are derived, not read off the stored field — see lib/streak.ts.
+    // Its own range is the streak lookback, which is why it is a separate read.
+    const streaks = await deriveStreaks(ctx, user._id, routines, today);
 
     const windowDays = daysBetween(from, to);
 
     return routines.map((r): RoutineConsistencyRow => {
-      const entry = byRoutine.get(r._id) ?? { completed: new Set<string>(), skipped: new Set<string>() };
+      const entry = byRoutine.get(r._id);
       const entries: Array<{ daysAgo: number; hit: boolean }> = [];
       let scheduled = 0;
       let completedCount = 0;
@@ -63,8 +54,11 @@ export const routineConsistency = query({
         if (day < r.createdDate) break;
         if (day < from) break;
         if (!isScheduledOn(r, day)) continue;
-        if (entry.skipped.has(day)) continue;
-        const hit = entry.completed.has(day);
+        // Skipped days are neutral and pending days have no answer yet, so
+        // both leave the fraction entirely rather than counting as failures.
+        const status = resolveDayStatus(entry?.get(day), day, today);
+        if (!countsTowardRate(status)) continue;
+        const hit = status === "completed";
         entries.push({ daysAgo: i, hit });
         scheduled += 1;
         if (hit) completedCount += 1;
@@ -78,7 +72,7 @@ export const routineConsistency = query({
         completed: completedCount,
         rate,
         consistency,
-        currentStreak: r.currentStreak,
+        currentStreak: streaks.get(r._id) ?? 0,
         longestStreak: r.longestStreak,
       };
     });
@@ -87,7 +81,7 @@ export const routineConsistency = query({
 
 export type RoutineTimelineDay = {
   date: string;
-  status: "completed" | "skipped" | "missed" | "pending";
+  status: ScheduledDayStatus;
 };
 
 export type RoutineTimelineRow = {
@@ -111,34 +105,21 @@ export const routineTimeline = query({
       .collect();
     if (routines.length === 0) return [];
 
-    const completions = await ctx.db
-      .query("routineCompletions")
-      .withIndex("by_user_date", (q) =>
-        q.eq("userId", user._id).gte("date", from).lte("date", to),
-      )
-      .collect();
-
-    const completionMap = new Map<string, "completed" | "skipped">();
-    for (const c of completions) {
-      completionMap.set(`${c.routineId}:${c.date}`, c.status);
-    }
-
+    const byRoutine = await loadCompletionsByRoutine(ctx, user._id, from, to);
     const windowDays = daysBetween(from, to);
 
     return routines.map((r): RoutineTimelineRow => {
+      const records = byRoutine.get(r._id);
       const days: RoutineTimelineDay[] = [];
       for (let i = windowDays - 1; i >= 0; i--) {
         const day = addDays(to, -i);
         if (day < from) continue;
         if (day < r.createdDate) continue;
         if (!isScheduledOn(r, day)) continue;
-        const status = completionMap.get(`${r._id}:${day}`);
-        let resolved: RoutineTimelineDay["status"];
-        if (status === "completed") resolved = "completed";
-        else if (status === "skipped") resolved = "skipped";
-        else if (day < today) resolved = "missed";
-        else resolved = "pending";
-        days.push({ date: day, status: resolved });
+        days.push({
+          date: day,
+          status: resolveDayStatus(records?.get(day), day, today),
+        });
       }
       return { routineId: r._id, name: r.name, days };
     });

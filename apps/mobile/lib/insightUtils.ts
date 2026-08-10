@@ -1,8 +1,11 @@
 import { addDays, daysBetween, startOfWeek, startOfMonth, startOfYear } from "@cadence/shared";
-import type { DateRange } from "@cadence/shared";
+import type { DateRange, Granularity } from "@cadence/shared";
 
-export type Granularity = "daily" | "weekly" | "monthly";
-export type LineSeries = { data: number[]; color: string; strokeWidth?: number; opacity?: number };
+// `null` is a gap, not a zero: a routine with no scheduled days in a stretch
+// must leave a hole rather than draw along the floor. SimpleLineChart skips any
+// segment with a null endpoint. Plain number[] still assigns cleanly, so the
+// momentum and open-task charts needed no change.
+export type LineSeries = { data: (number | null)[]; color: string; strokeWidth?: number; opacity?: number };
 export type TK = "completed" | "dismissed" | "open";
 
 export interface RangePreset {
@@ -29,18 +32,12 @@ export const RANGE_PRESETS: RangePreset[] = [
   { label: "All time",      range: (t) => ({ from: "2020-01-01",     to: t }) },
 ];
 
-export function getGranularity(from: string, to: string): Granularity {
-  const days = daysBetween(from, to);
-  if (days <= 30) return "daily";
-  if (days <= 180) return "weekly";
-  return "monthly";
-}
-
-export function granLabel(g: Granularity): string {
-  if (g === "weekly") return "weekly buckets";
-  if (g === "monthly") return "monthly buckets";
-  return "daily";
-}
+// `getGranularity` and `granLabel` moved to @cadence/shared in Step 11. Mobile
+// switched at 30/180 days while web switched at 90/365, so the same preset
+// produced different charts on each platform. Re-exported so existing imports
+// keep working; `granLabel` is now `granularityLabel`.
+export type { Granularity } from "@cadence/shared";
+export { getGranularity, granularityLabel } from "@cadence/shared";
 
 export function computeEMA(values: number[], period: number): number[] {
   if (values.length === 0) return [];

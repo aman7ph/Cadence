@@ -25,11 +25,11 @@ export function numFmt(v: unknown): number {
   return typeof v === "number" ? v : 0;
 }
 
-export function granularityLabel(g: string): string {
-  if (g === "weekly") return "weekly buckets";
-  if (g === "monthly") return "monthly buckets";
-  return "7-day rolling";
-}
+// `granularityLabel` moved to @cadence/shared in Step 11. The version here
+// returned "7-day rolling" for daily granularity and was hung on two charts
+// that plot plain per-day counts. The rolling chart now labels itself with
+// `rollingWindowLabel`, which is built from the window constant it actually uses.
+export { granularityLabel } from "@cadence/shared";
 
 export const tooltipStyle = {
   backgroundColor: "var(--card)",

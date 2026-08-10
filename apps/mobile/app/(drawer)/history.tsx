@@ -3,8 +3,9 @@ import { useQuery } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
 import {
   daysInMonth, endOfMonth, firstWeekdayOfMonth,
-  formatMonthYear, nextMonth, prevMonth, startOfMonth, todayLocal,
+  formatMonthYear, nextMonth, prevMonth, scoreToHeatBand, startOfMonth, todayLocal,
 } from "@cadence/shared";
+import { HEAT_DARK, HEAT_LIGHT } from "../../lib/insightUtils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AppBar } from "../../components/AppBar";
@@ -13,16 +14,10 @@ import { useColors, useTheme } from "../../lib/theme";
 
 const DOW = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 
-const HEAT_DARK  = ["#20232d", "#1f3a26", "#2b6c3a", "#3aa052", "#6fd581"] as const;
-const HEAT_LIGHT = ["#ebedf0", "#c6e8cb", "#86cf92", "#43ae59", "#1b8a36"] as const;
-
-function scoreToHeat(score: number | undefined): 0 | 1 | 2 | 3 | 4 {
-  if (!score) return 0;
-  if (score < 25) return 1;
-  if (score < 50) return 2;
-  if (score < 75) return 3;
-  return 4;
-}
+// Both the band thresholds and the swatch colours used to be re-declared here,
+// duplicating lib/insightUtils.ts and disagreeing with web's calendar. The
+// bands now come from @cadence/shared and the colours from insightUtils, so
+// each value is written down exactly once.
 
 export default function HistoryScreen() {
   const c = useColors();
@@ -140,7 +135,7 @@ export default function HistoryScreen() {
               const isFuture = date > today;
               const isToday  = date === today;
               const isSel    = date === modalDate;
-              const heatLvl  = scoreToHeat(scoreMap.get(date));
+              const heatLvl  = scoreToHeatBand(scoreMap.get(date));
               return (
                 <TouchableOpacity key={di}
                   style={[s.cell, isSel && s.cellSel, isFuture && { opacity: 0.25 }]}

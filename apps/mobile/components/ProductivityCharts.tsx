@@ -1,5 +1,6 @@
 import { useQuery } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
+import { MIN_ACTIVE_BAND, NO_ACTIVITY_BAND, scoreToHeatBand } from "@cadence/shared";
 import type { DateRange } from "@cadence/shared";
 import { Text, View } from "react-native";
 import { useColors } from "../lib/theme";
@@ -45,9 +46,9 @@ export function MomentumChart({ range, granularity }: { range: DateRange; granul
   );
 }
 
-export function DowHeatmap({ range }: { range: DateRange }) {
+export function DowHeatmap({ range, today }: { range: DateRange; today: string }) {
   const c = useColors();
-  const stats = useQuery(api.analyticsProductivity.dayOfWeekStats, { from: range.from, to: range.to });
+  const stats = useQuery(api.analyticsProductivity.dayOfWeekStats, { from: range.from, to: range.to, today });
 
   if (!stats) return <Loading />;
 
@@ -58,7 +59,10 @@ export function DowHeatmap({ range }: { range: DateRange }) {
     <View style={{ flexDirection: "row", gap: 6, marginTop: 4 }}>
       {stats.map((s) => {
         const rate = s.rate ?? 0;
-        const lvl = s.scheduled === 0 ? 0 : rate >= 80 ? 4 : rate >= 60 ? 3 : rate >= 40 ? 2 : 1;
+        // Same band scale as the productivity heatmaps, floored so a 0% weekday
+        // stays distinct from a weekday with nothing scheduled.
+        const lvl = s.scheduled === 0
+          ? NO_ACTIVITY_BAND : Math.max(MIN_ACTIVE_BAND, scoreToHeatBand(rate));
         return (
           <View key={s.weekday} style={{ flex: 1, alignItems: "center", gap: 5 }}>
             <View style={{ width: "100%", aspectRatio: 1, borderRadius: 8, backgroundColor: heat[lvl] }} />

@@ -4,6 +4,7 @@ import { api } from "@cadence/backend/convex/_generated/api";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AppBar } from "../../components/AppBar";
+import { ReminderSection } from "../../components/ReminderSection";
 import { useColors, useTheme } from "../../lib/theme";
 import type { ThemePreference } from "../../lib/theme";
 
@@ -113,6 +114,11 @@ export default function Settings() {
               </TouchableOpacity>
             </View>
           </View>
+        </View>
+
+        <Text style={s.secLbl}>Reminders</Text>
+        <View style={s.sec}>
+          <ReminderSection />
         </View>
 
         <Text style={s.secLbl}>Data</Text>

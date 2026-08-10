@@ -6,9 +6,11 @@ import { loadDayReflection } from "./lib/dayReflection";
 import { carryoverOn, loadDayTasks, statusOn } from "./lib/taskDay";
 import { countRepsByTask } from "./lib/taskRepeat";
 import { countRepsByRoutine } from "./lib/routineRepeat";
+import { deriveStreaksFrom, streakRangeStart } from "./lib/streak";
+import { loadCompletionsByRoutine } from "./lib/routineCompletions";
 import type { DayReflection } from "./lib/dayReflection";
 import type { DayRoutine, DayTask } from "./lib/dayTypes";
-import type { Doc, Id } from "./_generated/dataModel";
+import type { Id } from "./_generated/dataModel";
 
 export type { DayReflection, DayRoutine, DayTask };
 
@@ -40,19 +42,15 @@ export const getDay = query({
       .withIndex("by_user", (q) => q.eq("userId", user._id))
       .collect();
 
-    const completionsToday = await ctx.db
-      .query("routineCompletions")
-      .withIndex("by_user_date", (q) =>
-        q.eq("userId", user._id).eq("date", date),
-      )
-      .collect();
-    const completionByRoutine = new Map<
-      Id<"routines">,
-      Doc<"routineCompletions">
-    >();
-    for (const c of completionsToday) {
-      completionByRoutine.set(c.routineId, c);
-    }
+    // One read serves both answers. The streak lookback ends at `date`, so the
+    // viewed day's own statuses are already inside it — reading the single date
+    // separately would fetch the same rows twice.
+    const completions = await loadCompletionsByRoutine(
+      ctx,
+      user._id,
+      streakRangeStart(date),
+      date,
+    );
 
     const scheduledRoutines = allRoutines.filter((r) => isScheduledOn(r, date));
     const goalIds = [...new Set(scheduledRoutines.map((r) => r.goalId).filter((id): id is Id<"goals"> => !!id))];
@@ -64,17 +62,19 @@ export const getDay = query({
       ? await countRepsByRoutine(ctx, user._id, date)
       : new Map<Id<"routines">, number>();
 
+    // As of the viewed date, not today: a past day shows the streak it had.
+    const streaks = deriveStreaksFrom(scheduledRoutines, completions, date);
+
     const routines: DayRoutine[] = [];
     for (const r of scheduledRoutines) {
-      const c = completionByRoutine.get(r._id);
       routines.push({
         routineId: r._id,
         name: r.name,
         description: r.description,
         scheduleType: r.scheduleType,
         customDays: r.customDays,
-        status: c ? c.status : "pending",
-        currentStreak: r.currentStreak,
+        status: completions.get(r._id)?.get(date) ?? "pending",
+        currentStreak: streaks.get(r._id) ?? 0,
         longestStreak: r.longestStreak,
         goalId: r.goalId,
         goalTitle: r.goalId ? goalTitleMap.get(r.goalId) : undefined,

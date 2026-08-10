@@ -1,8 +1,10 @@
 import { v } from "convex/values";
-import { addDays, daysBetween, productivityScore } from "@cadence/shared";
+import { addDays, countsTowardRate, daysBetween, resolveDayStatus } from "@cadence/shared";
 import { query } from "./_generated/server";
 import { isScheduledOn } from "./lib/schedule";
 import { resolveUser } from "./lib/resolveUser";
+import { loadCompletionsByRoutine } from "./lib/routineCompletions";
+import { deriveDayStatsRange } from "./lib/dayStatsDerive";
 
 export type DayStatsRow = {
   date: string;
@@ -13,34 +15,22 @@ export type DayStatsRow = {
   productivityScore: number;
 };
 
-// Range of dayStats rows in [from, to] inclusive for the current user.
+// Every day in [from, to] that had something on its plate, derived from source
+// data rather than read from the stored dayStats table.
+//
+// The stored table is still written, but no query reads it any more. It only
+// ever held rows for days a mutation happened to touch, so a day where five
+// routines were scheduled and none were done had no row at all and rendered as
+// "no activity" — and five mutations (task create, open-task delete, routine
+// create, archive/restore/delete, staged promotion) never refreshed the rows
+// that did exist. Deriving removes both failure modes and the second source of
+// truth that caused them. See lib/dayStatsDerive.ts.
 export const dayStatsRange = query({
   args: { from: v.string(), to: v.string() },
   handler: async (ctx, { from, to }): Promise<DayStatsRow[]> => {
     const user = await resolveUser(ctx);
     if (!user) return [];
-    const rows = await ctx.db
-      .query("dayStats")
-      .withIndex("by_user_date", (q) =>
-        q.eq("userId", user._id).gte("date", from).lte("date", to),
-      )
-      .collect();
-    return rows.map((r) => ({
-      date: r.date,
-      routineScheduled: r.routineScheduled,
-      routineCompleted: r.routineCompleted,
-      randomTotal: r.randomTotal,
-      randomCompleted: r.randomCompleted,
-      productivityScore: productivityScore(
-        {
-          routineCompleted: r.routineCompleted,
-          routineScheduled: r.routineScheduled,
-          randomCompleted: r.randomCompleted,
-          randomTotal: r.randomTotal,
-        },
-        user.routineWeight,
-      ),
-    }));
+    return await deriveDayStatsRange(ctx, user._id, from, to, user.routineWeight);
   },
 });
 
@@ -51,10 +41,11 @@ export type DayOfWeekStat = {
   rate: number | null;
 };
 
-// Completion rate by weekday (0=Sun … 6=Sat). Skipped days excluded.
+// Completion rate by weekday (0=Sun … 6=Sat). Skipped and still-pending days
+// are both excluded — see lib/routineDay.ts for why today is not a miss.
 export const dayOfWeekStats = query({
-  args: { from: v.string(), to: v.string() },
-  handler: async (ctx, { from, to }): Promise<DayOfWeekStat[]> => {
+  args: { from: v.string(), to: v.string(), today: v.string() },
+  handler: async (ctx, { from, to, today }): Promise<DayOfWeekStat[]> => {
     const user = await resolveUser(ctx);
     if (!user) return [];
 
@@ -66,17 +57,7 @@ export const dayOfWeekStats = query({
       .collect();
     if (routines.length === 0) return [];
 
-    const completions = await ctx.db
-      .query("routineCompletions")
-      .withIndex("by_user_date", (q) =>
-        q.eq("userId", user._id).gte("date", from).lte("date", to),
-      )
-      .collect();
-
-    const completionMap = new Map<string, "completed" | "skipped">();
-    for (const c of completions) {
-      completionMap.set(`${c.routineId}:${c.date}`, c.status);
-    }
+    const byRoutine = await loadCompletionsByRoutine(ctx, user._id, from, to);
 
     const stats = Array.from({ length: 7 }, (_, i) => ({
       weekday: i, scheduled: 0, completed: 0,
@@ -91,8 +72,12 @@ export const dayOfWeekStats = query({
       for (const r of routines) {
         if (day < r.createdDate) continue;
         if (!isScheduledOn(r, day)) continue;
-        const status = completionMap.get(`${r._id}:${day}`);
-        if (status === "skipped") continue;
+        const status = resolveDayStatus(
+          byRoutine.get(r._id)?.get(day),
+          day,
+          today,
+        );
+        if (!countsTowardRate(status)) continue;
         stats[weekday]!.scheduled += 1;
         if (status === "completed") stats[weekday]!.completed += 1;
       }

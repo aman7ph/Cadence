@@ -4,7 +4,8 @@ import type { DateRange } from "@cadence/shared";
 import { Text, View } from "react-native";
 import { useColors } from "../lib/theme";
 import type { Granularity, TK } from "../lib/insightUtils";
-import { CC, TASK_KEYS, TASK_COLORS, bucketCountsByWeek, bucketCountsByMonth, bucketByWeek, bucketByMonth } from "../lib/insightUtils";
+import { CC, TASK_KEYS, TASK_COLORS, bucketCountsByWeek, bucketCountsByMonth } from "../lib/insightUtils";
+import { fillDailyGaps } from "@cadence/shared";
 import { SimpleLineChart } from "./SimpleLineChart";
 import { Loading, Empty, XLabels } from "./InsightShared";
 
@@ -136,14 +137,17 @@ export function OpenTasksTrendChart({ range, granularity }: { range: DateRange; 
   if (!rawRows) return <Loading />;
   if (rawRows.length === 0) return <Empty msg="No tasks still open from this window — all resolved!" />;
 
-  const daily = rawRows.map((r) => ({ date: r.date, value: r.count }));
-  const bucketed = granularity === "weekly" ? bucketByWeek(daily) : granularity === "monthly" ? bucketByMonth(daily) : daily;
-  const maxVal = Math.max(...bucketed.map((r) => r.value), 1);
+  // Counts are summed across a bucket, never averaged, and quiet days are
+  // filled with 0 so they occupy the axis instead of vanishing from it.
+  const filled = fillDailyGaps(rawRows, range.from, range.to, (date) => ({ date, count: 0 }));
+  const bucketed = granularity === "weekly" ? bucketCountsByWeek(filled, ["count"])
+    : granularity === "monthly" ? bucketCountsByMonth(filled, ["count"]) : filled;
+  const maxVal = Math.max(...bucketed.map((r) => r.count), 1);
 
   return (
     <View>
       <SimpleLineChart
-        series={[{ data: bucketed.map((r) => r.value), color: CC[3]!, strokeWidth: 2 }]}
+        series={[{ data: bucketed.map((r) => r.count), color: CC[3]!, strokeWidth: 2 }]}
         height={140} domainY={[0, maxVal]}
       />
       <XLabels dates={bucketed.map((r) => r.date)} granularity={granularity} />

@@ -1,24 +1,18 @@
 import { useMemo } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
-import { addDays, todayLocal, weekdayOf } from "@cadence/shared";
+import { addDays, scoreToHeatBand, todayLocal, weekdayOf } from "@cadence/shared";
+import type { HeatBand } from "@cadence/shared";
 
 const DAYS = 365;
 
 type Cell =
   | { kind: "pad" }
-  | { kind: "day"; date: string; score: number | null; band: 0 | 1 | 2 | 3 | 4 };
+  | { kind: "day"; date: string; score: number | null; band: HeatBand };
 
-// Banding: empty days are grey (heat-0); a recorded day with any activity
-// at all is at least heat-1. Higher productivityScore steps through 2..4.
-function bandFor(score: number | null): 0 | 1 | 2 | 3 | 4 {
-  if (score === null) return 0;
-  if (score >= 80) return 4;
-  if (score >= 60) return 3;
-  if (score >= 40) return 2;
-  if (score >= 1) return 1;
-  return 0;
-}
+// The band thresholds this file used to hard-code (80 / 60 / 40 / 1) now live
+// once, in packages/shared/src/heat.ts, so the History calendar cannot drift
+// from this heatmap again — the two disagreed on 30 of the 101 possible scores.
 
 function prettyDate(date: string): string {
   return new Date(date + "T00:00:00").toLocaleDateString(undefined, {
@@ -45,7 +39,7 @@ export function ContributionHeatmap() {
     for (let d = 0; d < DAYS; d++) {
       const date = addDays(from, d);
       const score = scoreByDate.get(date) ?? null;
-      out.push({ kind: "day", date, score, band: bandFor(score) });
+      out.push({ kind: "day", date, score, band: scoreToHeatBand(score) });
     }
     return out;
   }, [from, rows]);

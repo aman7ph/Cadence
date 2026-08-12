@@ -48,7 +48,6 @@ export function TaskRow({
 }: TaskRowProps) {
   const complete = useMutation(api.dailyTasks.complete);
   const uncomplete = useMutation(api.dailyTasks.uncomplete);
-  const dismiss = useMutation(api.dailyTasks.dismiss);
   const remove = useMutation(api.dailyTasks.remove);
   const logRep = useMutation(api.dailyTaskRepeats.logRep);
   const undoRep = useMutation(api.dailyTaskRepeats.undoRep);
@@ -57,6 +56,12 @@ export function TaskRow({
   const isRepeat = repeatTarget !== undefined;
   const remaining = useCountdown(nextRepAllowedAt);
   const gated = remaining > 0;
+
+  // dailyTasks.remove enforces what may be deleted; hiding the menu only spares
+  // the common case a guaranteed failure. It cannot be the whole test —
+  // repeatDoneToday is scoped to the viewed date, so a repeat task with reps on
+  // an earlier day still reaches the server and its rejection lands in `error`.
+  const canDelete = status === "open" && repeatDoneToday === 0;
 
   // The server re-checks the gate regardless; disabling only stops the obvious
   // case. Its rejection is surfaced, not swallowed — clock skew is when it fires.
@@ -136,13 +141,8 @@ export function TaskRow({
           </Badge>
         )}
         {status === "dismissed" && <Badge tone="neutral">Dismissed</Badge>}
-        {!readOnly && (
-          <TaskRowMenu
-            isDismissed={status === "dismissed"}
-            onRestore={() => void uncomplete({ taskId })}
-            onDismiss={() => void dismiss({ taskId })}
-            onDelete={() => void remove({ taskId })}
-          />
+        {!readOnly && canDelete && (
+          <TaskRowMenu onDelete={() => { setError(null); void remove({ taskId }).catch(fail); }} />
         )}
       </div>
     </div>

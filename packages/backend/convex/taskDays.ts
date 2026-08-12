@@ -2,7 +2,7 @@ import { addDays } from "@cadence/shared";
 import { v } from "convex/values";
 import { internalMutation, mutation } from "./_generated/server";
 import { requireUser } from "./lib/auth";
-import { computeDayStats, upsertDayStats } from "./lib/dayStats";
+import { computeDayStats, refreshExistingDayStats } from "./lib/dayStats";
 import { recordTaskDaySpan, spanDates } from "./lib/taskDay";
 
 // Day-tracking mutations for daily tasks: which day a task sits on, and which
@@ -40,18 +40,8 @@ export const rolloverOpenTasks = mutation({
     }
 
     // Those days' task plates just grew, so any score already recorded for them
-    // is now stale. Only EXISTING rows are refreshed — creating rows here would
-    // manufacture scores for days the user never interacted with, newly
-    // painting the history heatmap for days that showed nothing before.
-    for (const date of touchedDates) {
-      const existing = await ctx.db
-        .query("dayStats")
-        .withIndex("by_user_date", (q) =>
-          q.eq("userId", user._id).eq("date", date),
-        )
-        .unique();
-      if (existing) await upsertDayStats(ctx, user._id, date);
-    }
+    // is now stale. Refreshed, never created — see refreshExistingDayStats.
+    await refreshExistingDayStats(ctx, user._id, touchedDates);
   },
 });
 

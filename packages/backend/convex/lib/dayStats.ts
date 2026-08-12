@@ -84,3 +84,24 @@ export async function upsertDayStats(
     await ctx.db.insert("dayStats", payload);
   }
 }
+
+// Recomputes the rows for `dates` that ALREADY exist, and only those. Creating
+// rows here would manufacture scores for days the user never interacted with,
+// newly painting the history heatmap for days that showed nothing before.
+//
+// Shared because two different writers change days other than today: the
+// rollover grows a past day's plate, and deleting a task shrinks every plate it
+// sat on. Both need the same "refresh, never create" rule.
+export async function refreshExistingDayStats(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+  dates: Iterable<string>,
+): Promise<void> {
+  for (const date of dates) {
+    const existing = await ctx.db
+      .query("dayStats")
+      .withIndex("by_user_date", (q) => q.eq("userId", userId).eq("date", date))
+      .unique();
+    if (existing) await upsertDayStats(ctx, userId, date);
+  }
+}

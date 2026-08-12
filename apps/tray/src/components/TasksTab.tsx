@@ -13,7 +13,6 @@ export function TasksTab() {
 
   const complete = useMutation(api.dailyTasks.complete);
   const uncomplete = useMutation(api.dailyTasks.uncomplete);
-  const dismiss = useMutation(api.dailyTasks.dismiss);
   const logRep = useMutation(api.dailyTaskRepeats.logRep);
   const undoRep = useMutation(api.dailyTaskRepeats.undoRep);
 
@@ -66,13 +65,6 @@ export function TasksTab() {
                 ✓
               </button>
             )}
-            <button
-              className="task-action-btn danger"
-              title="Dismiss"
-              onClick={() => dismiss({ taskId: t.taskId })}
-            >
-              ✕
-            </button>
           </div>
         </div>
       ))}

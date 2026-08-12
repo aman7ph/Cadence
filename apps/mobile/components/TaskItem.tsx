@@ -30,7 +30,6 @@ export function TaskItem({ task, viewedDate, readOnly }: Props) {
   const c = useColors();
   const complete   = useMutation(api.dailyTasks.complete);
   const uncomplete = useMutation(api.dailyTasks.uncomplete);
-  const dismiss    = useMutation(api.dailyTasks.dismiss);
   const remove     = useMutation(api.dailyTasks.remove);
   const logRep     = useMutation(api.dailyTaskRepeats.logRep);
   const undoRep    = useMutation(api.dailyTaskRepeats.undoRep);
@@ -64,11 +63,16 @@ export function TaskItem({ task, viewedDate, readOnly }: Props) {
       : complete({ taskId: task.taskId, today: viewedDate });
   };
 
+  // dailyTasks.remove is the authority; hiding the menu only spares the common
+  // case a guaranteed failure. doneToday is scoped to the viewed date, so reps
+  // from an earlier day still reach the server — hence the .catch.
+  const canDelete = task.status === "open" && doneToday === 0;
   const menuActions = [
-    dismissed
-      ? { label: "Restore", onPress: () => { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); uncomplete({ taskId: task.taskId }); } }
-      : { label: "Dismiss", onPress: () => { void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning); dismiss({ taskId: task.taskId }); } },
-    { label: "Delete", style: "destructive" as const, onPress: () => { void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error); remove({ taskId: task.taskId }); } },
+    { label: "Delete", style: "destructive" as const, onPress: () => {
+      clearError();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      void remove({ taskId: task.taskId }).catch(fail);
+    } },
   ];
 
   const s = StyleSheet.create({
@@ -133,7 +137,7 @@ export function TaskItem({ task, viewedDate, readOnly }: Props) {
         {dismissed && (
           <View style={s.dismissBadge}><Text style={s.dismissBadgeTxt}>Dismissed</Text></View>
         )}
-        {!readOnly && (
+        {!readOnly && canDelete && (
           <TouchableOpacity onPress={() => setMenuOpen(true)} hitSlop={8}>
             <Text style={s.more}>···</Text>
           </TouchableOpacity>

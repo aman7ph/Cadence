@@ -2,10 +2,10 @@ import { validateRepeatArgs } from "@cadence/shared";
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { requireUser } from "./lib/auth";
-import { upsertDayStats } from "./lib/dayStats";
+import { refreshExistingDayStats, upsertDayStats } from "./lib/dayStats";
 import { applyGoalContribution } from "./lib/goalContribution";
 import { deleteTaskDays, recordTaskDaySpan } from "./lib/taskDay";
-import { assertPlainTask, deleteTaskCompletions } from "./lib/taskRepeat";
+import { assertPlainTask } from "./lib/taskRepeat";
 
 export const create = mutation({
   args: {
@@ -89,20 +89,11 @@ export const uncomplete = mutation({
   },
 });
 
-export const dismiss = mutation({
-  args: { taskId: v.id("dailyTasks") },
-  handler: async (ctx, { taskId }) => {
-    const user = await requireUser(ctx);
-    const task = await ctx.db.get(taskId);
-    if (!task || task.userId !== user._id) {
-      throw new Error("Task not found");
-    }
-    if (task.status === "dismissed") return;
-    await ctx.db.patch(taskId, { status: "dismissed" });
-    await upsertDayStats(ctx, user._id, task.currentDate);
-  },
-});
-
+// Deleting is for tasks nothing has happened to yet. Anything already done
+// carries history a delete would erase in silence — days it counted towards, a
+// goal contribution already applied, reps on the log — so it has to be undone
+// deliberately first. This is the only authority on that rule; the clients hide
+// the action, but a client is never what enforces it.
 export const remove = mutation({
   args: { taskId: v.id("dailyTasks") },
   handler: async (ctx, { taskId }) => {
@@ -110,6 +101,18 @@ export const remove = mutation({
     const task = await ctx.db.get(taskId);
     if (!task || task.userId !== user._id) {
       throw new Error("Task not found");
+    }
+    if (task.status === "completed") {
+      throw new Error("This task is completed. Mark it incomplete before deleting.");
+    }
+    // Any rep at all, on any day — a repeat task sitting at 2/5 has real
+    // progress even though its status is still open.
+    const rep = await ctx.db
+      .query("taskCompletions")
+      .withIndex("by_task", (q) => q.eq("taskId", taskId))
+      .first();
+    if (rep) {
+      throw new Error("This task has logged check-ins. Undo them before deleting.");
     }
     const linked = await ctx.db
       .query("reflectionTags")
@@ -120,12 +123,12 @@ export const remove = mutation({
         "This task is mentioned in a reflection. Remove the @mention first.",
       );
     }
-    const affectedDate = task.status === "completed" ? (task.completedDate ?? task.currentDate) : task.status === "dismissed" ? task.currentDate : null;
-    await deleteTaskCompletions(ctx, taskId);
-    await deleteTaskDays(ctx, taskId);
+    // Every day the task sat on loses one from its plate, so each of those days'
+    // randomTotal — and its score — moves, not just the day it currently sits
+    // on. The guard above means no taskCompletions row can exist, so the rep log
+    // needs no cleanup here.
+    const affectedDates = await deleteTaskDays(ctx, taskId);
     await ctx.db.delete(taskId);
-    if (affectedDate) {
-      await upsertDayStats(ctx, user._id, affectedDate);
-    }
+    await refreshExistingDayStats(ctx, user._id, affectedDates);
   },
 });

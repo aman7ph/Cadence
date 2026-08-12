@@ -126,13 +126,14 @@ export function carryoverOn(task: Doc<"dailyTasks">, date: string): number {
     : task.carryoverCount;
 }
 
-// Removes a task's presence log. Called when the task itself is deleted, so no
-// orphaned taskDays rows are left pointing at a missing task — the same
-// contract as deleteTaskCompletions in ./taskRepeat.ts.
+// Removes a task's presence log, so no orphaned taskDays rows are left pointing
+// at a missing task, and reports the days it covered. The caller needs those
+// days: deleting a task shrinks the plate of every one of them, which moves
+// each day's randomTotal and therefore its score.
 export async function deleteTaskDays(
   ctx: MutationCtx,
   taskId: Id<"dailyTasks">,
-): Promise<void> {
+): Promise<string[]> {
   const rows = await ctx.db
     .query("taskDays")
     .withIndex("by_task", (q) => q.eq("taskId", taskId))
@@ -140,4 +141,5 @@ export async function deleteTaskDays(
   for (const row of rows) {
     await ctx.db.delete(row._id);
   }
+  return rows.map((row) => row.date);
 }

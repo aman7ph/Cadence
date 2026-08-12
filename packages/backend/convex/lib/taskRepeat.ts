@@ -1,4 +1,4 @@
-import type { MutationCtx, QueryCtx } from "../_generated/server";
+import type { QueryCtx } from "../_generated/server";
 import type { Doc, Id } from "../_generated/dataModel";
 
 // `validateRepeatArgs` used to live here; it moved to packages/shared once
@@ -32,17 +32,7 @@ export async function countRepsByTask(
   return counts;
 }
 
-// Removes a task's rep log. Called when the task itself is deleted, so no
-// orphaned taskCompletions rows are left pointing at a missing task.
-export async function deleteTaskCompletions(
-  ctx: MutationCtx,
-  taskId: Id<"dailyTasks">,
-): Promise<void> {
-  const reps = await ctx.db
-    .query("taskCompletions")
-    .withIndex("by_task", (q) => q.eq("taskId", taskId))
-    .collect();
-  for (const rep of reps) {
-    await ctx.db.delete(rep._id);
-  }
-}
+// There is deliberately no deleteTaskCompletions here any more. dailyTasks
+// .remove now refuses to delete a task that has any rep on the log, so a
+// deleted task provably has none — the cleanup it used to do was unreachable,
+// and the guard is the stronger guarantee.

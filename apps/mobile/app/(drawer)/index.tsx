@@ -68,13 +68,12 @@ export default function Today() {
   const firstName = user?.firstName ?? user?.username ?? "friend";
   const routines = day.routines ?? [];
   const allTasks = day.randomTasks ?? [];
-  // Skipped routines are excused, dismissed tasks are not — the same
+  // Skipped routines are excused, every task on the plate counts — the same
   // denominators the backend scores with (lib/dayStatsDerive.foldDayStats), so
   // the tile agrees with the heatmap and with web.
   const countedRoutines = routines.filter((r) => r.status !== "skipped");
   const rDone  = countedRoutines.filter((r) => r.status === "completed").length;
-  const visible = allTasks.filter((t) => t.status !== "dismissed");
-  const tDone  = visible.filter((t) => t.status === "completed").length;
+  const tDone  = allTasks.filter((t) => t.status === "completed").length;
   const randomTotal = allTasks.length;
   const best = bestStreakOf(allRoutines);
   const score = productivityScore(

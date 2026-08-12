@@ -27,7 +27,6 @@ export function TasksTab() {
   const tasks = day?.randomTasks ?? [];
   const open = tasks.filter((t) => t.status === "open");
   const done = tasks.filter((t) => t.status === "completed");
-  const dismissed = tasks.filter((t) => t.status === "dismissed");
 
   if (tasks.length === 0) {
     return (
@@ -94,18 +93,6 @@ export function TasksTab() {
                   ↩
                 </button>
               </div>
-            </div>
-          ))}
-        </>
-      )}
-
-      {dismissed.length > 0 && (
-        <>
-          <div className="section-divider" />
-          {dismissed.map((t) => (
-            <div key={t.taskId} className="task-row">
-              <span className="task-dot dim" />
-              <span className="task-title dismissed">{t.title}</span>
             </div>
           ))}
         </>

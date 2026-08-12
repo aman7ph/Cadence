@@ -5,7 +5,7 @@ import { api } from "@cadence/backend/convex/_generated/api";
 import { cn } from "@/lib/utils";
 
 interface Routine { routineId: string; name: string; }
-interface Task { taskId: string; title: string; status: "open" | "completed" | "dismissed"; }
+interface Task { taskId: string; title: string; status: "open" | "completed"; }
 export interface ReflectionEditorProps {
   date: string; initialText: string; routines: Routine[]; tasks: Task[];
   hasExisting: boolean; onSaved: () => void; onCancel: () => void;
@@ -43,7 +43,7 @@ export function ReflectionEditor({ date, initialText, routines, tasks, hasExisti
 
   const options = mention
     ? [...routines.map((r) => ({ id: r.routineId, name: r.name, type: "routine" as const })),
-       ...tasks.filter((t) => t.status !== "dismissed").map((t) => ({ id: t.taskId, name: t.title, type: "task" as const }))]
+       ...tasks.map((t) => ({ id: t.taskId, name: t.title, type: "task" as const }))]
         .filter((o) => o.name.toLowerCase().includes(mention.query.toLowerCase()))
     : [];
 

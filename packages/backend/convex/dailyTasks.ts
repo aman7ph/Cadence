@@ -71,20 +71,17 @@ export const uncomplete = mutation({
     if (!task || task.userId !== user._id) {
       throw new Error("Task not found");
     }
-    // Restoring a *dismissed* repeat task is fine here; only reversing a
-    // completion must go through undoRep, which repairs the rep log too.
-    if (task.status === "completed") assertPlainTask(task);
     if (task.status === "open") return;
+    // Completion is the only thing left to reverse, and a repeat task's must go
+    // through undoRep, which repairs the rep log and the interval gate too.
+    assertPlainTask(task);
     const affectedDate = task.completedDate ?? task.currentDate;
-    const wasCompleted = task.status === "completed";
     await ctx.db.patch(taskId, {
       status: "open",
       completedAt: undefined,
       completedDate: undefined,
     });
-    if (wasCompleted) {
-      await applyGoalContribution(ctx, task.goalId, task.goalContribution, -1);
-    }
+    await applyGoalContribution(ctx, task.goalId, task.goalContribution, -1);
     await upsertDayStats(ctx, user._id, affectedDate);
   },
 });

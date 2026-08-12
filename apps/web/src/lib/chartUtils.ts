@@ -50,7 +50,7 @@ export function bucketByMonth(
     .map(([date, { sum, count }]) => ({ date, value: Math.round(sum / count) }));
 }
 
-// Bucket daily rows that carry multiple numeric fields (e.g. completed/open/dismissed).
+// Bucket daily rows that carry multiple numeric fields (e.g. completed/open).
 // Each numeric field is summed (not averaged) within each bucket — counts should be summed.
 export function bucketCountsByWeek<K extends string>(
   rows: ({ date: string } & Record<K, number>)[],

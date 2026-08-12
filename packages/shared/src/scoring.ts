@@ -24,10 +24,9 @@ export type DayScoreInputs = {
   routineCompleted: number;
   routineScheduled: number;
   randomCompleted: number;
-  // Total random tasks on the day's plate: completed + open + dismissed.
-  // Open tasks count against the score — completing or dismissing them
-  // resolves their status but the task's existence on the day is what
-  // anchors the denominator.
+  // Total random tasks on the day's plate: completed + open. Open tasks count
+  // against the score — completing one resolves its status, but the task's
+  // existence on the day is what anchors the denominator.
   randomTotal: number;
 };
 

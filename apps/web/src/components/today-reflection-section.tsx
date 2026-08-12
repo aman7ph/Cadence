@@ -10,7 +10,7 @@ interface Reflection {
 }
 
 interface Routine { routineId: string; name: string; }
-interface Task { taskId: string; title: string; status: "open" | "completed" | "dismissed"; }
+interface Task { taskId: string; title: string; status: "open" | "completed"; }
 
 interface TodayReflectionSectionProps {
   date: string;

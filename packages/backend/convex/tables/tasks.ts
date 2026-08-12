@@ -12,11 +12,7 @@ export const dailyTasks = defineTable({
   category: v.optional(v.string()),
   originalDate: v.string(),
   currentDate: v.string(),
-  status: v.union(
-    v.literal("open"),
-    v.literal("completed"),
-    v.literal("dismissed"),
-  ),
+  status: v.union(v.literal("open"), v.literal("completed")),
   carryoverCount: v.number(),
   completedAt: v.optional(v.number()),
   completedDate: v.optional(v.string()),
@@ -59,9 +55,8 @@ export const taskCompletions = defineTable({
 // same shape and with the same index set as taskCompletions above.
 //
 // Deliberately status-free. The status a task had on a given day is derived
-// (completedDate === date ⇒ completed; dismissed && currentDate === date ⇒
-// dismissed; otherwise open), because a stored second copy would drift the
-// first time uncomplete runs.
+// (completedDate === date ⇒ completed; otherwise open), because a stored
+// second copy would drift the first time uncomplete runs.
 export const taskDays = defineTable({
   userId: v.id("users"),
   taskId: v.id("dailyTasks"),

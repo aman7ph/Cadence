@@ -52,7 +52,7 @@ function GoalDetailContent({ goal: initGoal, onClose }: { goal: GoalData; onClos
     ? { bg: "rgba(107,114,128,0.14)", fg: "#9ca3af", label: "Abandoned" }
     : { bg: "rgba(99,102,241,0.14)", fg: "#818cf8", label: "Active" };
   const routines  = day?.routines ?? [];
-  const tasks     = (day?.tasks ?? []).filter((t) => t.status !== "dismissed");
+  const tasks     = day?.tasks ?? [];
 
   const s = StyleSheet.create({
     screen:   { flex: 1, backgroundColor: c.bg },

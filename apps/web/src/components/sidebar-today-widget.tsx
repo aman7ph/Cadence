@@ -21,8 +21,8 @@ export function TodayWidget({ onNavigate }: { onNavigate: (view: AppView) => voi
   if (!day) return null;
 
   // Same denominators as the Today view and the backend score: skipped routines
-  // are excused, dismissed tasks still count. Excusing skips is also what stops
-  // one skipped routine from blocking "All done ✓" for the rest of the day.
+  // are excused, every task on the plate counts. Excusing skips is also what
+  // stops one skipped routine from blocking "All done ✓" for the rest of the day.
   const countedRoutines = day.routines.filter((r) => r.status !== "skipped");
   const routinesDone = countedRoutines.filter((r) => r.status === "completed").length;
   const routinesTotal = countedRoutines.length;

@@ -20,8 +20,8 @@ export function RandomTasksByDayChart({ range, granularity }: { range: DateRange
   if (!rawRows) return <Loading />;
   if (rawRows.length === 0) return <Empty>No tasks in this window.</Empty>;
 
-  type TaskCountKeys = "completed" | "dismissed" | "open";
-  const countKeys: TaskCountKeys[] = ["completed", "dismissed", "open"];
+  type TaskCountKeys = "completed" | "open";
+  const countKeys: TaskCountKeys[] = ["completed", "open"];
 
   const rows =
     granularity === "weekly"
@@ -53,7 +53,6 @@ export function RandomTasksByDayChart({ range, granularity }: { range: DateRange
         />
         <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" iconSize={8} />
         <Bar dataKey="completed" stackId="a" fill="var(--chart-2)" name="completed" />
-        <Bar dataKey="dismissed" stackId="a" fill="var(--chart-3)" name="dismissed" />
         <Bar dataKey="open" stackId="a" fill="var(--chart-5)" radius={[4, 4, 0, 0]} name="open" />
       </BarChart>
     </ResponsiveContainer>
@@ -63,13 +62,12 @@ export function RandomTasksByDayChart({ range, granularity }: { range: DateRange
 export function RandomBreakdownChart({ range }: { range: DateRange }) {
   const stats = useQuery(api.analyticsTasks.randomStats, { from: range.from, to: range.to });
   if (!stats) return <Loading />;
-  if (stats.total === 0) return <Empty>No resolved tasks in this window.</Empty>;
+  if (stats.total === 0) return <Empty>No completed tasks in this window.</Empty>;
 
-  const total = stats.onTime + stats.afterCarryover + stats.never;
+  const total = stats.onTime + stats.afterCarryover;
   const segments = [
     { label: "On time", value: stats.onTime, color: "var(--chart-2)" },
     { label: "After carryover", value: stats.afterCarryover, color: "var(--chart-3)" },
-    { label: "Dismissed", value: stats.never, color: "var(--chart-4)" },
   ].filter((s) => s.value > 0);
 
   return (
@@ -97,7 +95,7 @@ export function RandomBreakdownChart({ range }: { range: DateRange }) {
           </div>
         ))}
         <div className="flex items-center justify-between text-[13px] border-t border-border pt-2 mt-0.5">
-          <span className="text-muted-foreground font-medium">Total resolved</span>
+          <span className="text-muted-foreground font-medium">Total completed</span>
           <span className="font-mono font-semibold text-foreground">{total}</span>
         </div>
       </div>

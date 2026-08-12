@@ -7,7 +7,6 @@ export type RandomByDayRow = {
   date: string;
   added: number;
   completed: number;
-  dismissed: number;
   open: number;
 };
 
@@ -25,13 +24,12 @@ export const randomTasksByDay = query({
       )
       .collect();
 
-    const byDay = new Map<string, { added: number; completed: number; dismissed: number; open: number }>();
+    const byDay = new Map<string, { added: number; completed: number; open: number }>();
     for (const t of tasks) {
       const day = t.originalDate;
-      const entry = byDay.get(day) ?? { added: 0, completed: 0, dismissed: 0, open: 0 };
+      const entry = byDay.get(day) ?? { added: 0, completed: 0, open: 0 };
       entry.added += 1;
       if (t.status === "completed") entry.completed += 1;
-      else if (t.status === "dismissed") entry.dismissed += 1;
       else entry.open += 1;
       byDay.set(day, entry);
     }
@@ -113,36 +111,34 @@ export const openTasksByOriginDate = query({
 export type RandomStatsResult = {
   onTime: number;
   afterCarryover: number;
-  never: number;
   total: number;
 };
 
-// Breakdown of random tasks in [from, to] by terminal fate. Open tasks excluded.
+// Breakdown of completed random tasks in [from, to] by how long they took.
+// Open tasks are excluded: an unfinished task has no fate to report yet. The
+// third bucket here used to be dismissed tasks; with that status retired,
+// completion is the only terminal state a task has.
 export const randomStats = query({
   args: { from: v.string(), to: v.string() },
   handler: async (ctx, { from, to }): Promise<RandomStatsResult> => {
     const user = await resolveUser(ctx);
-    if (!user) return { onTime: 0, afterCarryover: 0, never: 0, total: 0 };
+    if (!user) return { onTime: 0, afterCarryover: 0, total: 0 };
 
     const tasks = await ctx.db
       .query("dailyTasks")
       .withIndex("by_user_original", (q) =>
         q.eq("userId", user._id).gte("originalDate", from).lte("originalDate", to),
       )
+      .filter((q) => q.eq(q.field("status"), "completed"))
       .collect();
 
     let onTime = 0;
     let afterCarryover = 0;
-    let never = 0;
     for (const t of tasks) {
-      if (t.status === "completed") {
-        // "On time" must mean it never sat overnight — see lib/carryover.ts.
-        if (carryoverForTask(t) === 0) onTime += 1;
-        else afterCarryover += 1;
-      } else if (t.status === "dismissed") {
-        never += 1;
-      }
+      // "On time" must mean it never sat overnight — see lib/carryover.ts.
+      if (carryoverForTask(t) === 0) onTime += 1;
+      else afterCarryover += 1;
     }
-    return { onTime, afterCarryover, never, total: onTime + afterCarryover + never };
+    return { onTime, afterCarryover, total: onTime + afterCarryover };
   },
 });

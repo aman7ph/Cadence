@@ -280,7 +280,6 @@ body {
 .task-dot.blue   { background: var(--blue); }
 .task-dot.green  { background: var(--green); }
 .task-dot.amber  { background: var(--amber); }
-.task-dot.dim    { background: var(--text-dim); }
 
 .task-title {
   flex: 1;

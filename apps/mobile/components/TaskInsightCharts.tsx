@@ -18,24 +18,23 @@ export function TasksByDayChart({ range, granularity }: { range: DateRange; gran
   if (!rawRows) return <Loading />;
   if (rawRows.length === 0) return <Empty msg="No tasks in this window." />;
 
-  type TKRow = { date: string; completed: number; dismissed: number; open: number };
+  type TKRow = { date: string; completed: number; open: number };
   const rows = granularity === "weekly"
     ? bucketCountsByWeek(rawRows as unknown as TKRow[], TASK_KEYS)
     : granularity === "monthly"
     ? bucketCountsByMonth(rawRows as unknown as TKRow[], TASK_KEYS)
     : rawRows as TKRow[];
-  const maxTotal = Math.max(...rows.map((r) => (r.completed ?? 0) + (r.dismissed ?? 0) + (r.open ?? 0)), 1);
+  const maxTotal = Math.max(...rows.map((r) => (r.completed ?? 0) + (r.open ?? 0)), 1);
 
   return (
     <View>
       <View style={{ height: 130, flexDirection: "row", alignItems: "flex-end", gap: 2 }}>
         {rows.map((r, i) => {
-          const total = (r.completed ?? 0) + (r.dismissed ?? 0) + (r.open ?? 0);
+          const total = (r.completed ?? 0) + (r.open ?? 0);
           const hPct = total > 0 ? (total / maxTotal) * 100 : 0;
           return (
             <View key={i} style={{ flex: 1, height: `${hPct}%` as `${number}%`, flexDirection: "column-reverse", borderRadius: 2, overflow: "hidden" }}>
               {(r.completed ?? 0) > 0 && <View style={{ flex: r.completed, backgroundColor: TASK_COLORS.completed }} />}
-              {(r.dismissed ?? 0) > 0 && <View style={{ flex: r.dismissed, backgroundColor: TASK_COLORS.dismissed }} />}
               {(r.open ?? 0) > 0 && <View style={{ flex: r.open, backgroundColor: TASK_COLORS.open }} />}
             </View>
           );
@@ -59,13 +58,12 @@ export function TaskBreakdownChart({ range }: { range: DateRange }) {
   const stats = useQuery(api.analyticsTasks.randomStats, { from: range.from, to: range.to });
 
   if (!stats) return <Loading />;
-  if (stats.total === 0) return <Empty msg="No resolved tasks in this window." />;
+  if (stats.total === 0) return <Empty msg="No completed tasks in this window." />;
 
-  const total = stats.onTime + stats.afterCarryover + stats.never;
+  const total = stats.onTime + stats.afterCarryover;
   const segs = [
     { label: "On time",         value: stats.onTime,         color: c.chart2 },
     { label: "After carryover", value: stats.afterCarryover, color: c.chart3 },
-    { label: "Dismissed",       value: stats.never,          color: c.chart4 },
   ].filter((s) => s.value > 0);
 
   return (
@@ -87,7 +85,7 @@ export function TaskBreakdownChart({ range }: { range: DateRange }) {
         ))}
         <View style={{ height: 1, backgroundColor: c.bd1, marginTop: 2 }} />
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Text style={{ fontSize: 13, color: c.t2, fontWeight: "500" }}>Total resolved</Text>
+          <Text style={{ fontSize: 13, color: c.t2, fontWeight: "500" }}>Total completed</Text>
           <Text style={{ fontSize: 13, fontWeight: "600", color: c.t1 }}>{total}</Text>
         </View>
       </View>

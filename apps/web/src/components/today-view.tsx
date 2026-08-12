@@ -52,18 +52,15 @@ export function TodayView({ onNavigate }: { onNavigate?: (view: AppView) => void
   }
   if (day === null) return null;
 
-  // One set of denominators for the whole page: a skipped routine is excused and
-  // leaves the fraction, a dismissed task does not. These are exactly the counts
-  // the backend scores with (lib/dayStatsDerive.foldDayStats), so the tile, the
-  // heatmap and the History calendar cannot disagree about the same day.
+  // One set of denominators for the whole page: a skipped routine is excused
+  // and leaves the fraction, while every task on the plate counts. These are
+  // exactly the counts the backend scores with (lib/dayStatsDerive.foldDayStats),
+  // so the tile, the heatmap and the History calendar cannot disagree.
   const countedRoutines = day.routines.filter((r) => r.status !== "skipped");
   const routinesScheduled = countedRoutines.length;
   const routinesDone = countedRoutines.filter((r) => r.status === "completed").length;
-  const dismissedTasks = day.randomTasks.filter((t) => t.status === "dismissed");
-  const tasksDismissed = dismissedTasks.length;
-  const visibleTasks = day.randomTasks.filter((t) => t.status !== "dismissed");
-  const tasksDone = visibleTasks.filter((t) => t.status === "completed").length;
-  const tasksOpen = visibleTasks.filter((t) => t.status === "open").length;
+  const tasksDone = day.randomTasks.filter((t) => t.status === "completed").length;
+  const tasksOpen = day.randomTasks.filter((t) => t.status === "open").length;
   const randomTotal = day.randomTasks.length;
 
   const totalScheduled = routinesScheduled + randomTotal;
@@ -122,11 +119,9 @@ export function TodayView({ onNavigate }: { onNavigate?: (view: AppView) => void
             onNavigate={onNavigate}
           />
           <TodayTasksSection
-            visibleTasks={visibleTasks}
-            dismissedTasks={dismissedTasks}
+            tasks={day.randomTasks}
             tasksDone={tasksDone}
             tasksOpen={tasksOpen}
-            tasksDismissed={tasksDismissed}
             viewedDate={viewedDate}
             isPast={isPast}
           />

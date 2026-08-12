@@ -65,11 +65,10 @@ function DayModalContent({ date, today, onClose }: { date: string; today: string
 
   const routines     = day?.routines ?? [];
   const allTasks     = day?.randomTasks ?? [];
-  const visibleTasks = allTasks.filter((t) => t.status !== "dismissed");
   const counted      = routines.filter((r) => r.status !== "skipped"); // skips excused
   const rDone        = counted.filter((r) => r.status === "completed").length;
-  const tDone        = visibleTasks.filter((t) => t.status === "completed").length;
-  const isEmpty      = day !== undefined && day !== null && routines.length === 0 && visibleTasks.length === 0;
+  const tDone        = allTasks.filter((t) => t.status === "completed").length;
+  const isEmpty      = day !== undefined && day !== null && routines.length === 0 && allTasks.length === 0;
 
   const ROUTINE_DOT: Record<string, string> = { completed: c.cplt, skipped: c.carry, pending: c.bd3 };
 
@@ -115,11 +114,11 @@ function DayModalContent({ date, today, onClose }: { date: string; today: string
               {/* Tasks */}
               <View style={[s.secHdr, { marginTop: 8 }]}>
                 <Text style={s.secLbl}>Tasks</Text>
-                <Text style={s.secCnt}>{tDone}/{visibleTasks.length}</Text>
+                <Text style={s.secCnt}>{tDone}/{allTasks.length}</Text>
               </View>
-              {visibleTasks.length === 0
+              {allTasks.length === 0
                 ? <Text style={s.italic}>No tasks</Text>
-                : visibleTasks.map((t) => (
+                : allTasks.map((t) => (
                     <View key={t.taskId} style={s.item}>
                       <View style={s.iRow}>
                         <View style={[s.dot, { backgroundColor: t.status === "completed" ? "#818cf8" : c.bd3 }]} />

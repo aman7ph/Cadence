@@ -74,18 +74,6 @@ describe("productivityScore", () => {
     ).toBe(60);
   });
 
-  it("a dismissed task counts against the random rate the same as an open task", () => {
-    // Dismissed and open both contribute to randomTotal but not randomCompleted
-    expect(
-      productivityScore({
-        routineCompleted: 1,
-        routineScheduled: 1,
-        randomCompleted: 0,
-        randomTotal: 1,
-      }),
-    ).toBe(60);
-  });
-
   it("DEFAULT_ROUTINE_WEIGHT matches the implicit default", () => {
     expect(DEFAULT_ROUTINE_WEIGHT).toBe(0.6);
     const inputs = {

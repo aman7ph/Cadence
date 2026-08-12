@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { TaskItem } from "./TaskItem";
 import { AddTaskBar } from "./AddTaskBar";
 import type { Task } from "./TaskItem";
@@ -11,13 +10,12 @@ interface Props {
   isPast: boolean;
 }
 
+// Every task on the day's plate renders in one list. There is no hidden subset
+// any more — a task the user no longer wants is deleted outright, so nothing
+// can sit off-screen while still counting against the day's score.
 export function TodayTasksSection({ tasks, viewedDate, isPast }: Props) {
   const c = useColors();
-  const [showDismissed, setShowDim] = useState(false);
-
-  const visible   = tasks.filter((t) => t.status !== "dismissed");
-  const dismissed = tasks.filter((t) => t.status === "dismissed");
-  const done      = visible.filter((t) => t.status === "completed").length;
+  const done = tasks.filter((t) => t.status === "completed").length;
 
   const s = StyleSheet.create({
     section:   { marginHorizontal: 16, marginBottom: 20, gap: 6 },
@@ -29,8 +27,6 @@ export function TodayTasksSection({ tasks, viewedDate, isPast }: Props) {
     empty:     { borderWidth: 1, borderColor: c.bd1, borderStyle: "dashed",
                  borderRadius: 12, paddingVertical: 24, alignItems: "center" },
     emptyTxt:  { fontSize: 13, color: c.t3 },
-    dimToggle: { paddingVertical: 6 },
-    dimTxt:    { fontSize: 11, fontWeight: "600", color: c.t3 },
   });
 
   return (
@@ -39,26 +35,16 @@ export function TodayTasksSection({ tasks, viewedDate, isPast }: Props) {
         <Text style={s.lbl}>Tasks</Text>
         {tasks.length > 0 && <Text style={s.cnt}>{done} / {tasks.length}</Text>}
       </View>
-      {visible.length === 0 ? (
+      {tasks.length === 0 ? (
         <View style={s.empty}>
           <Text style={s.emptyTxt}>{isPast ? "No tasks on this day." : "No tasks yet."}</Text>
         </View>
       ) : (
-        visible.map((t) => (
+        tasks.map((t) => (
           <TaskItem key={t.taskId} task={t} viewedDate={viewedDate} readOnly={isPast} />
         ))
       )}
       {!isPast && <AddTaskBar today={viewedDate} />}
-      {dismissed.length > 0 && (
-        <>
-          <TouchableOpacity onPress={() => setShowDim((v) => !v)} style={s.dimToggle}>
-            <Text style={s.dimTxt}>{showDismissed ? "▼" : "▶"}{"  "}Dismissed ({dismissed.length})</Text>
-          </TouchableOpacity>
-          {showDismissed && dismissed.map((t) => (
-            <TaskItem key={t.taskId} task={t} viewedDate={viewedDate} readOnly={isPast} />
-          ))}
-        </>
-      )}
     </View>
   );
 }

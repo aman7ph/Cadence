@@ -103,13 +103,8 @@ export function statusOn(
   task: Doc<"dailyTasks">,
   date: string,
 ): Doc<"dailyTasks">["status"] {
-  if (task.status === "completed") {
-    return (task.completedDate ?? task.currentDate) === date ? "completed" : "open";
-  }
-  if (task.status === "dismissed") {
-    return task.currentDate === date ? "dismissed" : "open";
-  }
-  return "open";
+  if (task.status !== "completed") return "open";
+  return (task.completedDate ?? task.currentDate) === date ? "completed" : "open";
 }
 
 // How many times the task had been carried by `date`. The stored

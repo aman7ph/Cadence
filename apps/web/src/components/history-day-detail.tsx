@@ -43,10 +43,9 @@ export function DayDetailPanel({ date, today, onClose }: DayDetailPanelProps) {
         {day === undefined && <p className="text-[13px] text-[var(--text-secondary)]">Loading…</p>}
 
         {day !== null && day !== undefined && (() => {
-          const visibleTasks = day.randomTasks.filter((t) => t.status !== "dismissed");
           // Same denominators as the Today view and the backend score.
           const countedRoutines = day.routines.filter((r) => r.status !== "skipped");
-          const isEmpty = day.routines.length === 0 && visibleTasks.length === 0;
+          const isEmpty = day.routines.length === 0 && day.randomTasks.length === 0;
 
           if (isEmpty) return (
             <p className="text-[13px] text-[var(--text-tertiary)] text-center py-10 rounded-[12px] border border-dashed border-[var(--border-subtle)]">
@@ -77,9 +76,9 @@ export function DayDetailPanel({ date, today, onClose }: DayDetailPanelProps) {
                 <SectionHeader title="Tasks"
                   done={day.randomTasks.filter((t) => t.status === "completed").length}
                   total={day.randomTasks.length} />
-                {visibleTasks.length === 0
+                {day.randomTasks.length === 0
                   ? <p className="text-[12px] italic text-[var(--text-tertiary)] pt-1">No tasks</p>
-                  : visibleTasks.map((t) => (
+                  : day.randomTasks.map((t) => (
                       <TaskRow key={t.taskId} taskId={t.taskId} title={t.title}
                         description={t.description} status={t.status} isCarriedOver={t.isCarriedOver}
                         originalDate={t.originalDate} carryoverCount={t.carryoverCount} viewedDate={date}

@@ -6,7 +6,7 @@ import type { DateRange, Granularity } from "@cadence/shared";
 // segment with a null endpoint. Plain number[] still assigns cleanly, so the
 // momentum and open-task charts needed no change.
 export type LineSeries = { data: (number | null)[]; color: string; strokeWidth?: number; opacity?: number };
-export type TK = "completed" | "dismissed" | "open";
+export type TK = "completed" | "open";
 
 export interface RangePreset {
   label: string;
@@ -17,8 +17,8 @@ export const CC = ["#818cf8", "#4ade80", "#fbbf24", "#f87171", "#60a5fa", "#c084
 export const HEAT_DARK  = ["#20232d", "#1f3a26", "#2b6c3a", "#3aa052", "#6fd581"];
 export const HEAT_LIGHT = ["#ebedf0", "#c6e8cb", "#86cf92", "#43ae59", "#1b8a36"];
 export const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-export const TASK_KEYS: TK[] = ["completed", "dismissed", "open"];
-export const TASK_COLORS: Record<TK, string> = { completed: "#4ade80", dismissed: "#fbbf24", open: CC[0]! };
+export const TASK_KEYS: TK[] = ["completed", "open"];
+export const TASK_COLORS: Record<TK, string> = { completed: "#4ade80", open: CC[0]! };
 
 export const RANGE_PRESETS: RangePreset[] = [
   { label: "Last 7 days",   range: (t) => ({ from: addDays(t, -6),   to: t }) },

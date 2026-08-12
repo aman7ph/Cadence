@@ -15,7 +15,7 @@ interface TaskRowProps {
   taskId: Id<"dailyTasks">;
   title: string;
   description?: string;
-  status: "open" | "completed" | "dismissed";
+  status: "open" | "completed";
   isCarriedOver: boolean;
   originalDate: string;
   carryoverCount: number;
@@ -87,12 +87,7 @@ export function TaskRow({
       : "Today";
 
   return (
-    <div
-      className={cn(
-        "group flex items-center gap-3.5 rounded-[12px] border border-[var(--border-subtle)] bg-card px-4 py-3.5 shadow-[var(--shadow-sm)] transition-all duration-150",
-        status === "dismissed" ? "opacity-55" : "hover:shadow-[var(--shadow-md)] hover:-translate-y-px",
-      )}
-    >
+    <div className="group flex items-center gap-3.5 rounded-[12px] border border-[var(--border-subtle)] bg-card px-4 py-3.5 shadow-[var(--shadow-sm)] transition-all duration-150 hover:shadow-[var(--shadow-md)] hover:-translate-y-px">
       <CompletionToggle
         state={status === "completed" ? "completed" : "pending"}
         onToggle={readOnly ? () => {} : toggle}
@@ -140,7 +135,6 @@ export function TaskRow({
             ×<span className="font-mono">{carryoverCount}</span> carried
           </Badge>
         )}
-        {status === "dismissed" && <Badge tone="neutral">Dismissed</Badge>}
         {!readOnly && canDelete && (
           <TaskRowMenu onDelete={() => { setError(null); void remove({ taskId }).catch(fail); }} />
         )}

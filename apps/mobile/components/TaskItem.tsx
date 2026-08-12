@@ -38,7 +38,6 @@ export function TaskItem({ task, viewedDate, readOnly }: Props) {
     useRepeatRow(task.repeatTarget, task.nextRepAllowedAt);
 
   const done      = task.status === "completed";
-  const dismissed = task.status === "dismissed";
   const doneToday = task.repeatDoneToday ?? 0;
   const meta      = task.description?.trim()
     || (task.isCarriedOver ? `Original ${fmtShort(task.originalDate)}` : "Today");
@@ -97,13 +96,11 @@ export function TaskItem({ task, viewedDate, readOnly }: Props) {
     carryBadge:      { backgroundColor: "rgba(224,161,0,0.14)", borderRadius: 4,
                        paddingHorizontal: 6, paddingVertical: 2 },
     carryTxt:        { fontSize: 10, fontWeight: "700", color: c.carry },
-    dismissBadge:    { backgroundColor: c.active, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 },
-    dismissBadgeTxt: { fontSize: 10, color: c.t3 },
     more:            { fontSize: 16, color: c.t3, letterSpacing: 1 },
   });
 
   return (
-    <View style={[s.card, (done || dismissed) && s.dim]}>
+    <View style={[s.card, done && s.dim]}>
       <TouchableOpacity onPress={toggle} hitSlop={6} style={s.toggle} disabled={!!readOnly}>
         <View style={[s.circle, done && s.circleDone, isRepeat && gated && { opacity: 0.4 }]}>
           {done && <Text style={s.checkTxt}>✓</Text>}
@@ -131,11 +128,8 @@ export function TaskItem({ task, viewedDate, readOnly }: Props) {
             }}
           />
         )}
-        {task.isCarriedOver && !done && !dismissed && (
+        {task.isCarriedOver && !done && (
           <View style={s.carryBadge}><Text style={s.carryTxt}>×{task.carryoverCount} carried</Text></View>
-        )}
-        {dismissed && (
-          <View style={s.dismissBadge}><Text style={s.dismissBadgeTxt}>Dismissed</Text></View>
         )}
         {!readOnly && canDelete && (
           <TouchableOpacity onPress={() => setMenuOpen(true)} hitSlop={8}>

@@ -41,7 +41,7 @@ export async function computeDayStats(
   // and the status it held THAT day decides whether it counts as done.
   //
   // This replaces three reads — every completed task the user has ever had,
-  // plus open and dismissed tasks keyed on the mutable currentDate — with one
+  // plus unfinished tasks keyed on the mutable currentDate — with one
   // indexed read of the day's presence rows. It is both cheaper and correct for
   // past days: a task carried through a day used to vanish from that day's
   // plate the moment it rolled forward.

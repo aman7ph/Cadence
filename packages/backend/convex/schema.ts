@@ -94,8 +94,8 @@ export default defineSchema({
     date: v.string(),
     routineScheduled: v.number(),
     routineCompleted: v.number(),
-    // Total random tasks credited to this day: completed + open + dismissed.
-    // Open tasks count — see packages/shared/src/scoring.ts for rationale.
+    // Total random tasks credited to this day: completed + open. Open tasks
+    // count — see packages/shared/src/scoring.ts for rationale.
     randomTotal: v.number(),
     randomCompleted: v.number(),
     productivityScore: v.number(),

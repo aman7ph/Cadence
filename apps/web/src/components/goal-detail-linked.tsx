@@ -34,7 +34,7 @@ export function GoalDetailLinked({ goalId, createdAt, endDate }: Props) {
 
   const day = useQuery(api.goalLinks.getDayForGoal, { goalId, date: selectedDate });
   const routines = day?.routines ?? [];
-  const tasks = (day?.tasks ?? []).filter((t) => t.status !== "dismissed");
+  const tasks = day?.tasks ?? [];
   const isEmpty = routines.length === 0 && tasks.length === 0;
 
   function shift(dir: 1 | -1) {

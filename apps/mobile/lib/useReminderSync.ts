@@ -2,7 +2,11 @@ import { useEffect, useRef } from "react";
 import { AppState } from "react-native";
 import { useQuery } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
-import { DEFAULT_REMINDER, reminderSlotCount } from "@cadence/shared";
+import {
+  DEFAULT_REMINDER,
+  reminderSlotCount,
+  reminderValidationError,
+} from "@cadence/shared";
 import { countScheduledReminders, syncReminderNotifications } from "./reminderScheduler";
 
 // Keeps the device's scheduled notifications in step with the saved settings.
@@ -36,13 +40,19 @@ export function useReminderSync() {
     const sub = AppState.addEventListener("change", (state) => {
       if (state !== "active") return;
       void (async () => {
-        const expected = settings.enabled
-          ? reminderSlotCount(
-              settings.startMinute,
-              settings.endMinute,
-              settings.intervalMinutes,
-            )
-          : 0;
+        // Invalid settings schedule nothing (syncReminderNotifications bails),
+        // so "expected" has to agree or the counts never match and every
+        // foreground rebuilds a schedule that stays empty. Stored settings are
+        // validated on write today; this keeps the repair convergent if a bound
+        // is ever tightened under values already saved.
+        const expected =
+          settings.enabled && reminderValidationError(settings) === null
+            ? reminderSlotCount(
+                settings.startMinute,
+                settings.endMinute,
+                settings.intervalMinutes,
+              )
+            : 0;
         if ((await countScheduledReminders()) !== expected) {
           await syncReminderNotifications(settings);
         }

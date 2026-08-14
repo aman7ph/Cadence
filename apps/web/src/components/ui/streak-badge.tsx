@@ -31,7 +31,7 @@ export function StreakBadge({
         s.pad,
         cold
           ? "bg-[var(--surface-active)] text-[var(--text-tertiary)]"
-          : "bg-[var(--green-100)] text-[var(--green-700)] dark:bg-[rgba(43,168,74,0.18)] dark:text-[var(--green-500)]",
+          : "bg-[var(--surface-success)] text-[var(--text-success)]",
         className,
       )}
     >

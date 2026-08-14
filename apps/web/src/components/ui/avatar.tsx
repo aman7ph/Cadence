@@ -22,7 +22,7 @@ export function Avatar({ name = "", src, size = 36, className }: AvatarProps) {
     <span
       className={cn(
         "inline-flex shrink-0 items-center justify-center rounded-full overflow-hidden border border-border",
-        "bg-[var(--indigo-100)] text-[var(--indigo-700)] dark:bg-[rgba(91,82,232,0.18)] dark:text-[var(--indigo-400)]",
+        "bg-[var(--surface-accent)] text-[var(--text-accent)]",
         "font-display font-semibold",
         className,
       )}

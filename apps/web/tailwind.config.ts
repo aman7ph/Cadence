@@ -14,26 +14,31 @@ const config: Config = {
     },
     extend: {
       colors: {
-        slate: {
-          50: "var(--slate-50)",
-          100: "var(--slate-100)",
-          200: "var(--slate-200)",
-          300: "var(--slate-300)",
-          400: "var(--slate-400)",
-          500: "var(--slate-500)",
-          600: "var(--slate-600)",
-          700: "var(--slate-700)",
-          800: "var(--slate-800)",
-          900: "var(--slate-900)",
-          950: "var(--slate-950)",
+        // Hue-neutral scales. Roles live in src/styles/semantic.css — prefer the
+        // semantic names below (bg-card, text-primary, border-border) over these.
+        sand: {
+          50: "var(--sand-50)",
+          100: "var(--sand-100)",
+          150: "var(--sand-150)",
+          200: "var(--sand-200)",
+          300: "var(--sand-300)",
+          400: "var(--sand-400)",
+          500: "var(--sand-500)",
+          600: "var(--sand-600)",
+          700: "var(--sand-700)",
+          800: "var(--sand-800)",
+          900: "var(--sand-900)",
+          950: "var(--sand-950)",
         },
-        indigo: {
-          50: "var(--indigo-50)",
-          100: "var(--indigo-100)",
-          400: "var(--indigo-400)",
-          500: "var(--indigo-500)",
-          600: "var(--indigo-600)",
-          700: "var(--indigo-700)",
+        gold: {
+          50: "var(--gold-50)",
+          100: "var(--gold-100)",
+          200: "var(--gold-200)",
+          400: "var(--gold-400)",
+          500: "var(--gold-500)",
+          600: "var(--gold-600)",
+          700: "var(--gold-700)",
+          950: "var(--gold-950)",
         },
         green: {
           50: "var(--green-50)",
@@ -51,6 +56,7 @@ const config: Config = {
         red: {
           50: "var(--red-50)",
           100: "var(--red-100)",
+          500: "var(--red-500)",
           600: "var(--red-600)",
         },
 

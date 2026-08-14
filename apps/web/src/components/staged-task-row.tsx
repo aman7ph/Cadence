@@ -116,7 +116,7 @@ export function StagedTaskRow({ stagedTask, goalTitle }: StagedTaskRowProps) {
                 <button
                   type="button"
                   onClick={() => { void remove({ stagedTaskId: stagedTask._id }); setMenuOpen(false); }}
-                  className="w-full px-3.5 py-2.5 text-left text-[13px] font-medium text-[var(--red-600)] hover:bg-[var(--red-50)] dark:hover:bg-[rgba(220,38,38,0.10)] transition-colors"
+                  className="w-full px-3.5 py-2.5 text-left text-[13px] font-medium text-[var(--status-danger)] hover:bg-[var(--surface-danger)] transition-colors"
                 >
                   Delete
                 </button>

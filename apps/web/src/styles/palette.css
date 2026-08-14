@@ -1,0 +1,118 @@
+/* ============================================================================
+ * Cadence — base palette
+ *
+ * Raw values ONLY. Nothing here describes meaning, and nothing outside the
+ * semantic layer (semantic.css) should reference these directly.
+ *
+ * Scale names are hue-neutral on purpose: they say what the colour IS, never
+ * what it is FOR. "What it is for" lives in semantic.css, which is the only
+ * file that should change when a role is re-pointed.
+ *
+ * Anchors marked (prototype) are read from the redesign prototype and must not
+ * be nudged — they are the design's own values.
+ * ========================================================================== */
+
+:root {
+  /* ---- Sand: warm neutrals. Backgrounds, surfaces, borders, text. ---- */
+  --sand-50: #faf9f6;   /* (prototype) light bg */
+  --sand-100: #f3ecdf;  /* (prototype) dark text — warm paper */
+  --sand-150: #f1efe8;  /* (prototype) light sunken surface */
+  --sand-200: #e4e0d5;  /* (prototype) light border */
+  --sand-300: #c9c0ae;
+  --sand-400: #a89a80;  /* (prototype) dark muted text */
+  --sand-500: #7a7264;  /* (prototype) light muted text */
+  --sand-600: #4f4433;
+  --sand-700: #372e20;  /* (prototype) dark border */
+  --sand-800: #282219;  /* (prototype) dark sunken surface */
+  --sand-900: #211c15;  /* (prototype) dark card surface */
+  --sand-950: #17140f;  /* (prototype) dark bg */
+  --white: #ffffff;
+
+  /* ---- Gold: the accent. Also the brand mark's ring colours. ---- */
+  --gold-50: #fdf8ec;
+  --gold-100: #faecd0;  /* (prototype) light accent-soft */
+  --gold-200: #f3c877;  /* (mark) ring C */
+  --gold-400: #e8a13d;  /* (prototype) dark accent — and mark ring A */
+  --gold-500: #c9862a;  /* (mark) ring B */
+  --gold-600: #bd7a15;  /* (prototype) light accent */
+  --gold-700: #9a6210;
+  --gold-950: #3a2f1c;  /* (prototype) dark accent-soft */
+
+  /* ---- Green: completion and streaks. Warmed to sit on sand. ---- */
+  --green-50: #eef7ec;
+  --green-100: #dbeed7;
+  --green-500: #52a64f;
+  --green-600: #3d8a3f;
+  --green-700: #2f6d33;
+
+  /* ---- Amber: warnings only.
+   * Pushed orange-forward so it separates from gold by HUE, not just by
+   * lightness. Carryover deliberately does NOT use this — see semantic.css. ---- */
+  --amber-50: #fdf3e8;
+  --amber-100: #f8e3c6;
+  --amber-500: #d97b28;
+  --amber-600: #b8611b;
+
+  /* ---- Red: destructive and danger. Warmed off pure red. ---- */
+  --red-50: #fdeeed;
+  --red-100: #f8dcda;
+  --red-500: #dc4f48;
+  --red-600: #c9403a;
+
+  /* ---- Chart series.
+   * The prototype charts are single-accent, so a distinguishable multi-series
+   * set has to be introduced here. Hues are spaced to stay separable on a warm
+   * ground, and series 1 is the accent so single-series charts match the UI. ---- */
+  --chart-1: #bd7a15;
+  --chart-2: #3d8a3f;
+  --chart-3: #3d9b8f;
+  --chart-4: #c9504f;
+  --chart-5: #8a6fc4;
+  --chart-6: #4a89c4;
+
+  /* ---- Activity heat ramp.
+   * Gold, not green — the prototype's heatmap is gold, so "activity" and
+   * "completion" stop sharing a colour language. ---- */
+  --heat-0: #ece7dc;
+  --heat-1: #f3ddb0;
+  --heat-2: #e8bd72;
+  --heat-3: #d99a35;
+  --heat-4: #b5761a;
+}
+
+/* ============================================================================
+ * DEPRECATED ALIASES — transitional, scheduled for deletion.
+ *
+ * ~51 component call sites still reference the old cool-palette names directly
+ * (`var(--indigo-600)`, `var(--slate-400)`), bypassing the semantic layer.
+ * Rather than sweep every page in one commit, these aliases keep them working
+ * while each page migrates to SEMANTIC tokens in its own step.
+ *
+ * An alias still resolves to exactly one definition, so the
+ * change-it-in-one-place guarantee holds throughout.
+ *
+ * DO NOT add new references to anything in this block.
+ * Step 15 of the UI-redesign plan verifies this block is unreferenced and
+ * deletes it.
+ * ========================================================================== */
+
+:root {
+  --slate-50: var(--sand-50);
+  --slate-100: var(--sand-150);
+  --slate-200: var(--sand-200);
+  --slate-300: var(--sand-300);
+  --slate-400: var(--sand-400);
+  --slate-500: var(--sand-500);
+  --slate-600: var(--sand-600);
+  --slate-700: var(--sand-700);
+  --slate-800: var(--sand-800);
+  --slate-900: var(--sand-900);
+  --slate-950: var(--sand-950);
+
+  --indigo-50: var(--gold-50);
+  --indigo-100: var(--gold-100);
+  --indigo-400: var(--gold-400);
+  --indigo-500: var(--gold-500);
+  --indigo-600: var(--gold-600);
+  --indigo-700: var(--gold-700);
+}

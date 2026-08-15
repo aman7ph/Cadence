@@ -1,45 +1,39 @@
 import { useQuery } from "convex/react";
-import { X } from "lucide-react";
 import { api } from "@cadence/backend/convex/_generated/api";
 import { RoutineRow } from "./routine-row";
 import { TaskRow } from "./task-row";
 import { formatFullDate } from "./history-calendar";
+import { SectionLabel } from "./section-label";
 
 interface DayDetailPanelProps {
   date: string;
   today: string;
-  onClose: () => void;
 }
 
 function SectionHeader({ title, done, total }: { title: string; done: number; total: number }) {
   return (
     <div className="flex items-baseline justify-between pb-2 border-b border-[var(--border-subtle)]">
-      <h3 className="text-[11px] font-bold uppercase tracking-[0.10em] text-[var(--text-tertiary)]">{title}</h3>
-      <span className="text-[11px] font-mono text-[var(--text-tertiary)]">{done}/{total}</span>
+      <SectionLabel count={`${done}/${total}`}>{title}</SectionLabel>
     </div>
   );
 }
 
-export function DayDetailPanel({ date, today, onClose }: DayDetailPanelProps) {
+export function DayDetailPanel({ date, today }: DayDetailPanelProps) {
   const day = useQuery(api.days.getDay, { date });
   const isPast = date < today;
 
   return (
-    <aside className="flex flex-col rounded-[16px] border border-[var(--border-subtle)] bg-card shadow-[var(--shadow-sm)] overflow-hidden">
-      <div className="flex items-center justify-between gap-3 border-b border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-4 py-3.5">
-        <div className="min-w-0">
-          <p className="text-[10px] font-bold uppercase tracking-[0.10em] text-[var(--text-tertiary)]">
-            {date === today ? "Today" : isPast ? "Past day" : ""}
-          </p>
-          <h2 className="text-[14px] font-semibold text-foreground truncate mt-0.5">{formatFullDate(date)}</h2>
-        </div>
-        <button type="button" onClick={onClose} aria-label="Close"
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-foreground transition-all duration-150">
-          <X className="size-4" />
-        </button>
+    <section className="flex flex-col">
+      <div className="pb-4">
+        <p className="font-display text-[10px] uppercase tracking-[0.05em] text-[var(--text-tertiary)]">
+          {date === today ? "Today" : isPast ? "Past day" : ""}
+        </p>
+        <h2 className="mt-0.5 font-display text-[17px] font-semibold text-foreground">
+          {formatFullDate(date)}
+        </h2>
       </div>
 
-      <div className="overflow-y-auto p-4">
+      <div>
         {day === undefined && <p className="text-[13px] text-[var(--text-secondary)]">Loading…</p>}
 
         {day !== null && day !== undefined && (() => {
@@ -48,13 +42,13 @@ export function DayDetailPanel({ date, today, onClose }: DayDetailPanelProps) {
           const isEmpty = day.routines.length === 0 && day.randomTasks.length === 0;
 
           if (isEmpty) return (
-            <p className="text-[13px] text-[var(--text-tertiary)] text-center py-10 rounded-[12px] border border-dashed border-[var(--border-subtle)]">
+            <p className="text-[13px] text-[var(--text-tertiary)] text-center py-10 rounded-md border border-dashed border-[var(--border-subtle)]">
               {isPast ? "Nothing was tracked on this day." : "Nothing yet today."}
             </p>
           );
 
           return (
-            <div className="grid grid-cols-2 items-start gap-x-5 gap-y-3">
+            <div className="flex flex-col gap-5">
               {/* Routines column */}
               <section className="flex flex-col gap-2">
                 <SectionHeader title="Routines"
@@ -89,6 +83,6 @@ export function DayDetailPanel({ date, today, onClose }: DayDetailPanelProps) {
           );
         })()}
       </div>
-    </aside>
+    </section>
   );
 }

@@ -75,7 +75,7 @@ export function StagedTaskScheduleForm({ stagedTask, onDone }: StagedTaskSchedul
   return (
     <form
       onSubmit={submit}
-      className="flex flex-col gap-3 rounded-[12px] border border-[var(--border-subtle)] bg-card p-4 shadow-[var(--shadow-sm)]"
+      className="flex flex-col gap-3 rounded-md border border-[var(--border-subtle)] bg-card p-4"
     >
       <StagedTaskDestinationToggle value={destination} disabled={pending} onChange={setDestination} />
 
@@ -100,7 +100,7 @@ export function StagedTaskScheduleForm({ stagedTask, onDone }: StagedTaskSchedul
           onChange={(e) => setDate(e.target.value)}
           disabled={pending}
           style={{ colorScheme: "normal" }}
-          className="w-full rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-sunken)] px-3 py-2 text-[13px] text-foreground focus:border-[var(--border-accent)] focus:outline-none transition-colors disabled:opacity-50"
+          className="w-full rounded-sm border border-[var(--border-subtle)] bg-[var(--bg-sunken)] px-3 py-2 text-[13px] text-foreground focus:border-[var(--border-accent)] focus:outline-none transition-colors disabled:opacity-50"
         />
         <p className="text-[12px] text-[var(--text-tertiary)]">
           {destination === "routine"

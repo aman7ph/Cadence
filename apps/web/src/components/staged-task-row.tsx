@@ -46,7 +46,7 @@ export function StagedTaskRow({ stagedTask, goalTitle }: StagedTaskRowProps) {
   }
 
   return (
-    <div className="group flex items-center gap-3.5 rounded-[12px] border border-[var(--border-subtle)] bg-card px-4 py-3.5 shadow-[var(--shadow-sm)] transition-all duration-150 hover:shadow-[var(--shadow-md)] hover:-translate-y-px">
+    <div className="group flex items-center gap-3.5 rounded-md border border-[var(--border-subtle)] bg-card px-4 py-3.5 transition-colors duration-150 hover:border-[var(--border-default)]">
       <div className="flex-1 min-w-0">
         <div className="text-[15px] font-semibold leading-snug text-foreground">
           {stagedTask.title}
@@ -57,7 +57,7 @@ export function StagedTaskRow({ stagedTask, goalTitle }: StagedTaskRowProps) {
             : `Added ${prettyCreatedAt(stagedTask.createdAt)}`}
         </div>
         {goalTitle && (
-          <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[var(--indigo-50)] px-2 py-0.5 text-[10px] font-semibold text-[var(--indigo-600)]">
+          <span className="mt-1 inline-flex items-center gap-1 rounded-pill bg-[var(--surface-accent)] px-2 py-[2px] text-[9px] font-semibold uppercase tracking-[0.04em] text-[var(--text-accent)]">
             <Target className="size-2.5" />
             {goalTitle}
           </span>
@@ -78,7 +78,7 @@ export function StagedTaskRow({ stagedTask, goalTitle }: StagedTaskRowProps) {
           <button
             type="button"
             onClick={() => setMenuOpen((o) => !o)}
-            className="flex h-8 w-8 items-center justify-center rounded-[8px] text-muted-foreground opacity-0 group-hover:opacity-100 focus-visible:opacity-100 hover:bg-[var(--surface-hover)] hover:text-foreground transition-all duration-150"
+            className="flex h-8 w-8 items-center justify-center rounded-sm text-muted-foreground opacity-0 group-hover:opacity-100 focus-visible:opacity-100 hover:bg-[var(--surface-hover)] hover:text-foreground transition-all duration-150"
             aria-label="More options"
           >
             <MoreHorizontal className="size-4" />
@@ -86,7 +86,7 @@ export function StagedTaskRow({ stagedTask, goalTitle }: StagedTaskRowProps) {
           {menuOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-              <div className="absolute right-0 bottom-full mb-1 z-20 min-w-[150px] overflow-hidden rounded-[12px] border border-[var(--border-subtle)] bg-card shadow-[var(--shadow-md)]">
+              <div className="absolute right-0 bottom-full mb-1 z-20 min-w-[150px] overflow-hidden rounded-md border border-[var(--border-subtle)] bg-card shadow-[var(--shadow-md)]">
                 <button
                   type="button"
                   onClick={() => { setScheduling(true); setMenuOpen(false); }}

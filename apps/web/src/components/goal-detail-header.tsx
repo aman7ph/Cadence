@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { CheckCircle, Circle } from "lucide-react";
 
-const CARD = "rounded-[16px] border border-[var(--border-subtle)] bg-card shadow-[var(--shadow-sm)]";
-const IN = "w-full rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-sunken)] px-3 py-2 text-[14px] text-foreground placeholder:text-[var(--text-tertiary)] focus:border-[var(--border-accent)] focus:outline-none transition-colors";
+const CARD = "rounded-md border border-[var(--border-subtle)] bg-card";
+const IN = "w-full rounded-sm border border-[var(--border-subtle)] bg-[var(--bg-sunken)] px-3 py-2 text-[14px] text-foreground placeholder:text-[var(--text-tertiary)] focus:border-[var(--border-accent)] focus:outline-none transition-colors";
 const STATUS_CLR = {
   completed: "text-[var(--status-complete)] bg-[var(--green-50)] border-[var(--green-100)]",
   abandoned: "text-[var(--text-tertiary)] bg-[var(--bg-sunken)] border-[var(--border-subtle)]",
-  active: "text-[var(--text-accent)] bg-[var(--indigo-50)] border-[var(--indigo-100)]",
+  active: "text-[var(--text-accent)] bg-[var(--surface-accent)] border-[var(--surface-accent)]",
 } as const;
 
 interface GoalDetailHeaderProps {
@@ -53,7 +53,7 @@ export function GoalDetailHeader({ goal, onUpdate, onMarkComplete, onAbandon }: 
       <div className="flex items-center justify-end">
         {goal.status === "active" && !editing && (
           <button type="button" onClick={startEditing}
-            className="rounded-[8px] border border-[var(--border-subtle)] px-3 py-1.5 text-[12px] font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-foreground transition-colors">
+            className="rounded-sm border border-[var(--border-subtle)] px-3 py-1.5 text-[12px] font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-foreground transition-colors">
             Edit
           </button>
         )}
@@ -71,11 +71,11 @@ export function GoalDetailHeader({ goal, onUpdate, onMarkComplete, onAbandon }: 
             <input type="date" value={editDue} onChange={(e) => setEditDue(e.target.value)} style={{ colorScheme: "normal" }} className={IN} />
             <div className="flex gap-2 pt-1">
               <button type="button" onClick={() => void handleSave()} disabled={saving || !editTitle.trim()}
-                className="rounded-[8px] bg-[var(--action-primary)] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[var(--action-primary-hover)] disabled:opacity-40 transition-colors">
+                className="rounded-sm bg-[var(--action-primary)] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[var(--action-primary-hover)] disabled:opacity-40 transition-colors">
                 {saving ? "Saving…" : "Save changes"}
               </button>
               <button type="button" onClick={() => setEditing(false)}
-                className="rounded-[8px] border border-[var(--border-subtle)] px-4 py-2 text-[13px] font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors">
+                className="rounded-sm border border-[var(--border-subtle)] px-4 py-2 text-[13px] font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors">
                 Cancel
               </button>
             </div>
@@ -103,7 +103,7 @@ export function GoalDetailHeader({ goal, onUpdate, onMarkComplete, onAbandon }: 
                       {confirm === "complete" ? "Mark this goal as completed?" : "Abandon this goal?"}
                     </span>
                     <button type="button" onClick={() => void handleConfirm()}
-                      className="rounded-[8px] bg-[var(--action-primary)] px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-[var(--action-primary-hover)] transition-colors">
+                      className="rounded-sm bg-[var(--action-primary)] px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-[var(--action-primary-hover)] transition-colors">
                       Confirm
                     </button>
                     <button type="button" onClick={() => setConfirm(null)} className="text-[12px] font-semibold text-[var(--text-secondary)] hover:text-foreground transition-colors">Cancel</button>
@@ -111,11 +111,11 @@ export function GoalDetailHeader({ goal, onUpdate, onMarkComplete, onAbandon }: 
                 ) : (
                   <div className="flex items-center gap-2">
                     <button type="button" onClick={() => setConfirm("complete")}
-                      className="inline-flex items-center gap-1.5 rounded-[8px] border border-[var(--green-100)] bg-[var(--green-50)] px-3 py-1.5 text-[12px] font-semibold text-[var(--status-complete)] hover:bg-[var(--green-100)] transition-colors">
+                      className="inline-flex items-center gap-1.5 rounded-sm border border-[var(--green-100)] bg-[var(--green-50)] px-3 py-1.5 text-[12px] font-semibold text-[var(--status-complete)] hover:bg-[var(--green-100)] transition-colors">
                       <CheckCircle className="size-3.5" /> Mark complete
                     </button>
                     <button type="button" onClick={() => setConfirm("abandon")}
-                      className="inline-flex items-center gap-1.5 rounded-[8px] border border-[var(--border-subtle)] px-3 py-1.5 text-[12px] font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors">
+                      className="inline-flex items-center gap-1.5 rounded-sm border border-[var(--border-subtle)] px-3 py-1.5 text-[12px] font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors">
                       <Circle className="size-3.5" /> Abandon
                     </button>
                   </div>

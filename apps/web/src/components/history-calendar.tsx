@@ -61,7 +61,7 @@ export function CalendarGrid({ viewMonth, today, scoreByDate, selectedDate, onSe
               disabled={isFuture}
               onClick={() => onSelect(date)}
               className={cn(
-                "relative flex flex-col items-center gap-1 rounded-[8px] py-2.5 px-1 transition-all duration-150 text-center",
+                "relative flex flex-col items-center gap-1 rounded-sm py-2.5 px-1 transition-all duration-150 text-center",
                 isFuture
                   ? "cursor-default opacity-25"
                   : isSelected

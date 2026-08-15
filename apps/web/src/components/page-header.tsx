@@ -12,6 +12,8 @@ interface PageHeaderProps<T extends string> {
   tabs?: PageTab<T>[];
   active?: T;
   onTabChange?: (id: T) => void;
+  /** Primary action beside the title, e.g. "+ New goal". */
+  action?: React.ReactNode;
 }
 
 /**
@@ -28,16 +30,20 @@ export function PageHeader<T extends string>({
   tabs,
   active,
   onTabChange,
+  action,
 }: PageHeaderProps<T>) {
   return (
     <header className="flex flex-col gap-4">
-      <div>
-        <h1 className="font-display text-[23px] font-semibold leading-tight tracking-tight text-foreground">
-          {title}
-        </h1>
-        {subtitle && (
-          <p className="mt-0.5 text-[12.5px] text-[var(--text-secondary)]">{subtitle}</p>
-        )}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="font-display text-[23px] font-semibold leading-tight tracking-tight text-foreground">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="mt-0.5 text-[12.5px] text-[var(--text-secondary)]">{subtitle}</p>
+          )}
+        </div>
+        {action}
       </div>
 
       {tabs && tabs.length > 0 && (

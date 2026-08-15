@@ -22,7 +22,6 @@ export function GoalDetail({ goalId, onBack }: GoalDetailProps) {
   if (linked === null) {
     return (
       <div className="flex flex-col gap-4">
-        <button type="button" onClick={onBack} className="self-start text-[13px] text-[var(--text-tertiary)] hover:text-foreground transition-colors">‹ Goals</button>
         <p className="text-[13px] text-[var(--text-tertiary)]">Goal not found.</p>
       </div>
     );

@@ -48,15 +48,15 @@ export function GoalDetailLinked({ goalId, createdAt, endDate }: Props) {
     <div className="flex h-full flex-col gap-3">
       <div className="flex items-center gap-1.5">
         <button type="button" onClick={() => shift(-1)} disabled={selectedDate <= minDate}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-foreground disabled:opacity-30 transition-all">
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-foreground disabled:opacity-30 transition-all">
           <ChevronLeft className="size-4" />
         </button>
         <input type="date" value={selectedDate} min={minDate} max={maxDate}
           onChange={(e) => setSelectedDate(e.target.value)}
           style={{ colorScheme: "normal" }}
-          className="flex-1 rounded-[8px] border border-[var(--border-subtle)] bg-card px-2.5 py-1.5 text-[13px] text-foreground focus:border-[var(--border-accent)] focus:outline-none transition-colors" />
+          className="flex-1 rounded-sm border border-[var(--border-subtle)] bg-card px-2.5 py-1.5 text-[13px] text-foreground focus:border-[var(--border-accent)] focus:outline-none transition-colors" />
         <button type="button" onClick={() => shift(1)} disabled={selectedDate >= maxDate}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-foreground disabled:opacity-30 transition-all">
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-foreground disabled:opacity-30 transition-all">
           <ChevronRight className="size-4" />
         </button>
       </div>
@@ -64,7 +64,7 @@ export function GoalDetailLinked({ goalId, createdAt, endDate }: Props) {
       <div className="flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: "none" }}>
         {day === undefined && <p className="py-6 text-center text-[13px] text-[var(--text-tertiary)]">Loading…</p>}
         {day !== undefined && isEmpty && (
-          <p className="rounded-[12px] border border-dashed border-[var(--border-subtle)] py-10 text-center text-[13px] text-[var(--text-tertiary)]">
+          <p className="rounded-md border border-dashed border-[var(--border-subtle)] py-10 text-center text-[13px] text-[var(--text-tertiary)]">
             Nothing tracked for this goal on this day.
           </p>
         )}

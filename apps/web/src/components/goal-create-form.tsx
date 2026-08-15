@@ -9,7 +9,7 @@ interface GoalCreateFormProps {
 }
 
 const inputCls =
-  "w-full rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-sunken)] px-3 py-2 text-[13px] text-foreground placeholder:text-[var(--text-tertiary)] focus:border-[var(--border-accent)] focus:outline-none transition-colors";
+  "w-full rounded-sm border border-[var(--border-subtle)] bg-[var(--bg-sunken)] px-3 py-2 text-[13px] text-foreground placeholder:text-[var(--text-tertiary)] focus:border-[var(--border-accent)] focus:outline-none transition-colors";
 
 export function GoalCreateForm({ onCreated, onCancel }: GoalCreateFormProps) {
   const createGoal = useMutation(api.goals.create);
@@ -56,11 +56,11 @@ export function GoalCreateForm({ onCreated, onCancel }: GoalCreateFormProps) {
           style={{ colorScheme: "normal" }} className={inputCls} />
         <div className="flex gap-2 pt-0.5">
           <button type="button" onClick={() => void handleCreate()} disabled={creating || !title.trim()}
-            className="rounded-[8px] bg-[var(--action-primary)] px-3.5 py-1.5 text-[12px] font-semibold text-white hover:bg-[var(--action-primary-hover)] disabled:opacity-40 transition-colors">
+            className="rounded-sm bg-[var(--action-primary)] px-3.5 py-1.5 text-[12px] font-semibold text-white hover:bg-[var(--action-primary-hover)] disabled:opacity-40 transition-colors">
             {creating ? "Creating…" : "Create goal"}
           </button>
           <button type="button" onClick={onCancel}
-            className="rounded-[8px] border border-[var(--border-subtle)] px-3.5 py-1.5 text-[12px] font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors">
+            className="rounded-sm border border-[var(--border-subtle)] px-3.5 py-1.5 text-[12px] font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors">
             Cancel
           </button>
         </div>

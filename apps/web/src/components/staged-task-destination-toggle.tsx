@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export type StagedTaskDestination = "task" | "routine";
 
@@ -8,25 +8,22 @@ interface DestinationToggleProps {
   onChange: (d: StagedTaskDestination) => void;
 }
 
-// Pill toggle styled like ScheduleForm's schedule-type pills.
+// The prototype's bordered 20px segment control — the same one the schedule
+// chips use, so it is the shared Button variant, not a third copy (D15).
 export function StagedTaskDestinationToggle({ value, disabled, onChange }: DestinationToggleProps) {
   return (
     <div className="flex flex-wrap gap-2">
       {(["task", "routine"] as StagedTaskDestination[]).map((d) => (
-        <button
+        <Button
           key={d}
-          type="button"
+          variant="segment"
+          size="sm"
+          selected={value === d}
           onClick={() => onChange(d)}
           disabled={disabled}
-          className={cn(
-            "h-8 rounded-full border px-3.5 text-[12px] font-semibold transition-all duration-150",
-            value === d
-              ? "border-[var(--border-accent)] bg-[var(--surface-accent)] text-[var(--text-accent)]"
-              : "border-[var(--border-subtle)] bg-card text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-foreground",
-          )}
         >
           {d === "task" ? "Daily task" : "Routine"}
-        </button>
+        </Button>
       ))}
     </div>
   );

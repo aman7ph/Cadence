@@ -6,7 +6,7 @@ interface ProgressProps {
 
 function SectionCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`rounded-[16px] border border-[var(--border-subtle)] bg-card shadow-[var(--shadow-sm)] ${className}`}>
+    <div className={`rounded-md border border-[var(--border-subtle)] bg-card ${className}`}>
       {children}
     </div>
   );

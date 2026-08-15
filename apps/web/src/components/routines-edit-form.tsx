@@ -79,7 +79,7 @@ export function EditRoutineForm({
   return (
     <form
       onSubmit={submit}
-      className="flex flex-col gap-3 rounded-[12px] border border-[var(--border-accent)] bg-card p-4 shadow-[var(--shadow-sm)]"
+      className="flex flex-col gap-3 rounded-md border border-[var(--border-accent)] bg-card p-4"
     >
       <Input
         autoFocus

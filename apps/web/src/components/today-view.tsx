@@ -3,7 +3,6 @@ import { useUser } from "@clerk/clerk-react";
 import { api } from "@cadence/backend/convex/_generated/api";
 import { addDays, bestStreakOf, productivityScore, todayLocal } from "@cadence/shared";
 import { useState } from "react";
-import { AnalyticsRail } from "./analytics-rail";
 import { DayNavigator } from "./day-navigator";
 import { TodayStatCards } from "./today-stat-cards";
 import { TodayRoutinesSection } from "./today-routines-section";
@@ -80,15 +79,15 @@ export function TodayView({ onNavigate }: { onNavigate?: (view: AppView) => void
   const best = bestStreakOf(allRoutines);
 
   return (
-    <div className="flex flex-col gap-7">
+    <div className="flex flex-col gap-[22px]">
       <header className="flex items-end justify-between gap-4 flex-wrap">
         <div>
           {isPast ? (
             <Badge tone="neutral" className="mb-1.5">Viewing past day</Badge>
           ) : (
-            <p className="text-[13px] font-semibold text-[var(--text-secondary)]">{prettyDate(viewedDate)}</p>
+            <p className="text-[12px] text-[var(--text-secondary)]">{prettyDate(viewedDate)}</p>
           )}
-          <h1 className="font-display text-[32px] font-bold leading-[1.1] tracking-tight text-foreground mt-1">
+          <h1 className="font-display text-[23px] font-semibold leading-[1.2] tracking-tight text-foreground mt-0.5">
             {isPast ? prettyDate(viewedDate) : `${greeting()}, ${firstName}.`}
           </h1>
         </div>
@@ -108,26 +107,25 @@ export function TodayView({ onNavigate }: { onNavigate?: (view: AppView) => void
         routineWeight={me?.routineWeight}
       />
 
-      <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-        <div className="flex flex-col gap-7">
-          <TodayRoutinesSection
-            routines={day.routines}
-            routinesDone={routinesDone}
-            routinesScheduled={routinesScheduled}
-            viewedDate={viewedDate}
-            isPast={isPast}
-            onNavigate={onNavigate}
-          />
-          <TodayTasksSection
-            tasks={day.randomTasks}
-            tasksDone={tasksDone}
-            tasksOpen={tasksOpen}
-            viewedDate={viewedDate}
-            isPast={isPast}
-          />
-        </div>
-        <AnalyticsRail />
-      </div>
+      {/* Single column. The right rail is gone: its trend chart, activity
+          heatmap and routine-consistency card move to Insights, and Recent
+          Reflections is dropped outright — History is where reflections are
+          read. See D12 of the redesign plan. */}
+      <TodayRoutinesSection
+        routines={day.routines}
+        routinesDone={routinesDone}
+        routinesScheduled={routinesScheduled}
+        viewedDate={viewedDate}
+        isPast={isPast}
+        onNavigate={onNavigate}
+      />
+      <TodayTasksSection
+        tasks={day.randomTasks}
+        tasksDone={tasksDone}
+        tasksOpen={tasksOpen}
+        viewedDate={viewedDate}
+        isPast={isPast}
+      />
 
       <TodayReflectionSection
         key={viewedDate}

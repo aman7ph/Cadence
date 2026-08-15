@@ -1,0 +1,48 @@
+/* ============================================================================
+ * Cadence — data-visualisation palette
+ *
+ * Raw values ONLY, like palette.css. Split out because chart and heat ramps are
+ * a separate concern from UI surfaces: they need per-ground variants (a hue
+ * readable on cream is not readable on near-black), which doubles the entries.
+ *
+ * semantic.css maps these onto --chart-N / --heat-N per theme. Nothing outside
+ * semantic.css should reference a --viz-* or --heat-*-ramp value directly.
+ * ========================================================================== */
+
+:root {
+  /* ---- Chart series, light ground.
+   * Series 1 is the accent so single-series charts match the UI. Remaining
+   * hues are spaced around the wheel to stay separable for the colour-blind
+   * and in greyscale, not merely "different colours". ---- */
+  --viz-1: #bd7a15;  /* gold — accent */
+  --viz-2: #3d8a3f;  /* green */
+  --viz-3: #3d9b8f;  /* teal */
+  --viz-4: #c9504f;  /* rose */
+  --viz-5: #8a6fc4;  /* violet */
+  --viz-6: #4a89c4;  /* blue */
+
+  /* ---- Chart series, dark ground — same hues, lifted for contrast. ---- */
+  --viz-1-lift: #e8a13d;
+  --viz-2-lift: #6cbf68;
+  --viz-3-lift: #52b8aa;
+  --viz-4-lift: #e07370;
+  --viz-5-lift: #a992e0;
+  --viz-6-lift: #6aa9e0;
+
+  /* ---- Activity heat ramp, light ground.
+   * Gold, not green — the prototype's heatmap is gold, so "activity" and
+   * "completion" stop sharing a colour language. Step 0 is a neutral, so an
+   * empty cell reads as absence rather than as the lowest value. ---- */
+  --heat-light-0: #ece7dc;
+  --heat-light-1: #f3ddb0;
+  --heat-light-2: #e8bd72;
+  --heat-light-3: #d99a35;
+  --heat-light-4: #b5761a;
+
+  /* ---- Activity heat ramp, dark ground. ---- */
+  --heat-dark-0: #282219;  /* = --sand-800, the sunken surface */
+  --heat-dark-1: #4a3a1e;
+  --heat-dark-2: #7a5c24;
+  --heat-dark-3: #b5862c;
+  --heat-dark-4: #e8a13d;
+}

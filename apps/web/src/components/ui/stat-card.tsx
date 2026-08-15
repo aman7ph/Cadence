@@ -27,17 +27,17 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "rounded-[16px] flex flex-col gap-3 border shadow-[var(--shadow-sm)]",
+        "rounded-md flex flex-col gap-1.5 border shadow-[var(--shadow-xs)]",
         accent
-          ? "bg-[var(--bg-inverse)] border-transparent text-white px-5 py-[18px]"
-          : "bg-card border-[var(--border-subtle)] px-5 py-[18px]",
+          ? "bg-[var(--bg-inverse)] border-transparent text-white px-3.5 py-3.5"
+          : "bg-card border-[var(--border-subtle)] px-3.5 py-3.5",
         className,
       )}
     >
       <div className="flex items-center justify-between">
         <span
           className={cn(
-            "text-[11px] font-bold uppercase tracking-[0.08em]",
+            "font-display text-[10px] uppercase tracking-[0.05em]",
             accent ? "text-white/55" : "text-[var(--text-tertiary)]",
           )}
         >
@@ -54,7 +54,7 @@ export function StatCard({
         <span
           className={cn(
             "font-display font-bold tracking-tight tabular-nums",
-            accent ? "text-[40px] leading-none text-white" : "text-[36px] leading-none",
+            accent ? "text-[26px] leading-none text-white" : "text-[24px] leading-none",
             !accent && (muted ? "text-[var(--text-tertiary)]" : "text-foreground"),
           )}
         >
@@ -63,7 +63,7 @@ export function StatCard({
         {unit && (
           <span
             className={cn(
-              "font-display font-semibold text-[18px]",
+              "font-display font-normal text-[13px]",
               accent ? "text-white/65" : "text-[var(--text-secondary)]",
             )}
           >
@@ -75,7 +75,7 @@ export function StatCard({
       {delta && (
         <span
           className={cn(
-            "inline-flex items-center gap-1 text-[11px] font-semibold",
+            "inline-flex items-center gap-1 text-[11px]",
             accent
               ? "text-white/70"
               : deltaDir === "up"
@@ -85,7 +85,6 @@ export function StatCard({
                   : "text-[var(--text-tertiary)]",
           )}
         >
-          {deltaDir === "up" ? "▲" : deltaDir === "down" ? "▼" : "·"}{" "}
           {delta}
         </span>
       )}

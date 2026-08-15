@@ -48,11 +48,11 @@ export function ActiveRoutineRow({ routine, today }: ActiveRoutineRowProps) {
   }
 
   return (
-    <div className="group flex items-center gap-3 rounded-[12px] border border-[var(--border-subtle)] bg-card px-4 py-3.5 shadow-[var(--shadow-sm)] transition-all duration-150 hover:shadow-[var(--shadow-md)] hover:-translate-y-px">
+    <div className="group flex items-start gap-3 rounded-md border border-[var(--border-subtle)] bg-card px-3.5 py-3 transition-colors duration-150 hover:border-[var(--border-default)]">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[14px] font-semibold text-foreground leading-snug">{routine.name}</span>
-          <span className="text-[11px] font-medium text-[var(--text-tertiary)] border border-[var(--border-subtle)] rounded-full px-2 py-0.5">
+          <span className="text-[13.5px] font-semibold leading-snug text-foreground">{routine.name}</span>
+          <span className="rounded-pill bg-[var(--bg-sunken)] px-2 py-[3px] text-[10px] text-[var(--text-tertiary)]">
             {scheduleLabel(routine.scheduleType, routine.customDays)}
           </span>
         </div>
@@ -61,8 +61,8 @@ export function ActiveRoutineRow({ routine, today }: ActiveRoutineRowProps) {
         )}
         {routine.currentStreak > 0 && (
           <div className="flex items-center gap-1 mt-1.5">
-            <Flame className="size-3 text-orange-500" />
-            <span className="text-[11px] font-semibold text-[var(--text-secondary)]">
+            <Flame className="size-3 text-[var(--action-primary)]" />
+            <span className="text-[10.5px] font-semibold text-[var(--text-secondary)]">
               {routine.currentStreak} day streak
             </span>
             {routine.longestStreak > routine.currentStreak && (
@@ -72,7 +72,7 @@ export function ActiveRoutineRow({ routine, today }: ActiveRoutineRowProps) {
         )}
         {routine.goalTitle && (
           <div className="flex items-center gap-1 mt-1.5">
-            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--indigo-50)] px-2 py-0.5 text-[10px] font-semibold text-[var(--indigo-600)]">
+            <span className="inline-flex items-center gap-1 rounded-pill bg-[var(--surface-accent)] px-2 py-[2px] text-[9px] font-semibold uppercase tracking-[0.04em] text-[var(--text-accent)]">
               <Target className="size-2.5" />
               {routine.goalTitle}
               {routine.goalContribution !== undefined && (
@@ -87,7 +87,7 @@ export function ActiveRoutineRow({ routine, today }: ActiveRoutineRowProps) {
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="flex h-8 w-8 items-center justify-center rounded-[8px] text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-foreground transition-all duration-150"
+          className="flex h-8 w-8 items-center justify-center rounded-sm text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-foreground transition-colors duration-150"
           title="Edit routine"
         >
           <Pencil className="size-3.5" />

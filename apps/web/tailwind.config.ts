@@ -27,6 +27,7 @@ const config: Config = {
           600: "var(--sand-600)",
           700: "var(--sand-700)",
           800: "var(--sand-800)",
+          850: "var(--sand-850)",
           900: "var(--sand-900)",
           950: "var(--sand-950)",
         },
@@ -39,6 +40,7 @@ const config: Config = {
           600: "var(--gold-600)",
           700: "var(--gold-700)",
           950: "var(--gold-950)",
+          975: "var(--gold-975)",
         },
         green: {
           50: "var(--green-50)",
@@ -46,6 +48,7 @@ const config: Config = {
           500: "var(--green-500)",
           600: "var(--green-600)",
           700: "var(--green-700)",
+          950: "var(--green-950)",
         },
         amber: {
           50: "var(--amber-50)",
@@ -58,6 +61,7 @@ const config: Config = {
           100: "var(--red-100)",
           500: "var(--red-500)",
           600: "var(--red-600)",
+          950: "var(--red-950)",
         },
 
         background: "var(--bg-app)",
@@ -94,24 +98,29 @@ const config: Config = {
         input: "var(--border-default)",
         ring: "var(--focus-ring)",
       },
+      /* Four steps, and only four. The prototype hand-authored ~8 distinct
+       * radii (8/7/12/20/10/16/9/14) as inline styles, which is drift rather
+       * than intent — its own handoff notes demand consistency and forbid
+       * introducing new radii. These are the clusters that drift falls into. */
       borderRadius: {
-        lg: "16px",
-        md: "10px",
-        sm: "8px",
+        sm: "9px",    // controls: buttons, inputs, outlined actions
+        md: "12px",   // blocks: ghost add-rows, menus, popovers
+        lg: "16px",   // cards and panels
+        pill: "20px", // segmented controls and chips
       },
       fontFamily: {
+        // Body: no webfont — the prototype uses the platform UI face.
         sans: [
-          "Plus Jakarta Sans",
-          "ui-sans-serif",
           "system-ui",
+          "-apple-system",
+          "Segoe UI",
+          "Roboto",
+          "Helvetica Neue",
+          "Arial",
           "sans-serif",
         ],
-        display: [
-          "Space Grotesk",
-          "Plus Jakarta Sans",
-          "ui-sans-serif",
-          "sans-serif",
-        ],
+        // Display: headings, nav, section labels and stat numerals.
+        display: ["Lora", "Georgia", "Cambria", "Times New Roman", "serif"],
         mono: [
           "JetBrains Mono",
           "ui-monospace",

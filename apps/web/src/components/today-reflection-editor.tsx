@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useMutation } from "convex/react";
 import { PenLine } from "lucide-react";
 import { api } from "@cadence/backend/convex/_generated/api";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface Routine { routineId: string; name: string; }
@@ -93,8 +94,8 @@ export function ReflectionEditor({ date, initialText, routines, tasks, hasExisti
   }
 
   return (
-    <div className="overflow-hidden rounded-[16px] border border-[var(--border-subtle)] bg-card shadow-[var(--shadow-md)] transition-all duration-200 focus-within:border-[var(--border-accent)] focus-within:shadow-[var(--shadow-accent)]">
-      <div className="flex items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-5 py-3">
+    <div className="rounded-lg border border-[var(--border-subtle)] bg-card shadow-[var(--shadow-sm)] transition-all duration-200 focus-within:border-[var(--border-accent)]">
+      <div className="flex items-center justify-between rounded-t-lg border-b border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-5 py-3">
         <div className="flex items-center gap-2">
           <PenLine className="size-3.5 text-[var(--text-accent)]" strokeWidth={2.5} />
           <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-[var(--text-accent)]">Reflection</span>
@@ -107,12 +108,12 @@ export function ReflectionEditor({ date, initialText, routines, tasks, hasExisti
           placeholder={"What's on your mind today?\nReflect on wins, challenges, or anything worth remembering…\n\nType @ to tag a task or routine."}
           className="w-full resize-none overflow-hidden bg-transparent text-[15px] font-[450] leading-[1.75] text-foreground placeholder:text-[var(--text-tertiary)] placeholder:text-[14px] placeholder:leading-[1.8] focus:outline-none" />
         {mention && options.length > 0 && (
-          <div className="absolute left-5 top-full z-20 mt-1 max-h-[200px] min-w-[220px] overflow-y-auto rounded-[12px] border border-[var(--border-subtle)] bg-card shadow-[var(--shadow-md)]">
+          <div className="absolute bottom-full left-5 z-30 mb-2 max-h-[220px] w-[min(320px,calc(100%-2.5rem))] overflow-y-auto rounded-md border border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-[var(--shadow-md)]">
             {options.map((opt, i) => (
               <button key={opt.id} type="button" onMouseDown={(e) => { e.preventDefault(); insertMention(opt.id, opt.name); }}
                 className={cn("flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-[13px] transition-colors",
                   i === mentionIdx ? "bg-[var(--surface-accent)] text-[var(--text-accent)]" : "text-foreground hover:bg-[var(--surface-hover)]")}>
-                <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", opt.type === "routine" ? "bg-[var(--indigo-500)]" : "bg-[var(--amber-500)]")} />
+                <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", opt.type === "routine" ? "bg-[var(--text-accent)]" : "bg-[var(--chart-3)]")} />
                 <span className="flex-1 truncate font-medium">{opt.name}</span>
                 <span className="shrink-0 text-[11px] text-[var(--text-tertiary)]">{opt.type}</span>
               </button>
@@ -121,22 +122,20 @@ export function ReflectionEditor({ date, initialText, routines, tasks, hasExisti
         )}
       </div>
 
-      <div className="flex items-center justify-between border-t border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-5 py-2.5">
+      <div className="flex items-center justify-between rounded-b-lg border-t border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-5 py-2.5">
         <div className="flex items-center gap-3 text-[11px] text-[var(--text-tertiary)]">
           <span>⌘↵ save</span><span className="opacity-40">·</span><span>@ mention</span>
           {wordCount > 0 && <><span className="opacity-40">·</span><span>{wordCount} {wordCount === 1 ? "word" : "words"}</span></>}
         </div>
         <div className="flex items-center gap-2">
           {hasExisting && (
-            <button type="button" onClick={onCancel}
-              className="rounded-[8px] px-3 py-1.5 text-[12px] font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors">
+            <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
               Cancel
-            </button>
+            </Button>
           )}
-          <button type="button" onClick={() => void save()} disabled={saving || !text.trim()}
-            className="rounded-[8px] bg-[var(--action-primary)] px-4 py-1.5 text-[12px] font-semibold text-white shadow-[var(--shadow-accent)] hover:bg-[var(--action-primary-hover)] disabled:opacity-40 disabled:shadow-none transition-all">
+          <Button type="button" size="sm" onClick={() => void save()} disabled={saving || !text.trim()}>
             {saving ? "Saving…" : "Save reflection"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

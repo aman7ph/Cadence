@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export type ScheduleType = "daily" | "weekdays" | "custom";
@@ -28,20 +29,17 @@ export function ScheduleForm({
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap gap-2">
         {(["daily", "weekdays", "custom"] as ScheduleType[]).map((s) => (
-          <button
+          <Button
             key={s}
-            type="button"
+            variant="segment"
+            size="sm"
+            selected={scheduleType === s}
             onClick={() => onChange(s)}
             disabled={disabled}
-            className={cn(
-              "h-8 rounded-full border px-3.5 text-[12px] font-semibold capitalize transition-all duration-150",
-              scheduleType === s
-                ? "border-[var(--border-accent)] bg-[var(--surface-accent)] text-[var(--text-accent)]"
-                : "border-[var(--border-subtle)] bg-card text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-foreground",
-            )}
+            className="capitalize"
           >
             {s}
-          </button>
+          </Button>
         ))}
       </div>
       {scheduleType === "custom" && (
@@ -57,7 +55,7 @@ export function ScheduleForm({
                 className={cn(
                   "h-8 w-8 rounded-full border text-[11px] font-bold transition-all duration-150",
                   active
-                    ? "border-[var(--border-accent)] bg-[var(--indigo-600)] text-white"
+                    ? "border-[var(--border-accent)] bg-[var(--action-primary)] text-[var(--text-on-accent)]"
                     : "border-[var(--border-subtle)] bg-card text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]",
                 )}
                 aria-label={`Toggle ${WEEKDAY_FULL[idx]}`}

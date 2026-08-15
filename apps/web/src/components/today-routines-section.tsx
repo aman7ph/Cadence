@@ -1,5 +1,6 @@
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import { RoutineRow } from "./routine-row";
+import { SectionLabel } from "./section-label";
 import type { AppView } from "@/App";
 
 interface Routine {
@@ -35,21 +36,16 @@ export function TodayRoutinesSection({
   onNavigate,
 }: TodayRoutinesSectionProps) {
   return (
-    <section className="flex flex-col gap-3">
-      <div className="flex items-baseline justify-between">
-        <h2 className="text-[11px] font-bold uppercase tracking-[0.10em] text-[var(--text-tertiary)]">Routines</h2>
-        {routinesScheduled > 0 && (
-          <span className="text-[11px] text-[var(--text-tertiary)] font-mono">
-            {routinesDone} / {routinesScheduled} done
-          </span>
-        )}
-      </div>
+    <section className="flex flex-col gap-2.5">
+      <SectionLabel count={routinesScheduled > 0 ? `${routinesDone}/${routinesScheduled}` : undefined}>
+        Routines
+      </SectionLabel>
       {routines.length === 0 ? (
-        <p className="text-[13px] text-[var(--text-tertiary)] rounded-[12px] border border-dashed border-[var(--border-subtle)] bg-card px-4 py-8 text-center">
+        <p className="text-[13px] text-[var(--text-tertiary)] rounded-md border border-dashed border-[var(--border-subtle)] bg-card px-4 py-8 text-center">
           {isPast ? "Nothing was scheduled this day." : "Nothing scheduled today."}
         </p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="flex flex-col gap-1.5">
           {routines.map((r) => (
             <RoutineRow
               key={r.routineId}

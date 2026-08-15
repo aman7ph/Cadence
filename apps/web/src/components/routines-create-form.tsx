@@ -64,21 +64,17 @@ export function CreateRoutineForm() {
 
   if (!expanded) {
     return (
-      <button
-        type="button"
-        onClick={() => setExpanded(true)}
-        className="flex items-center gap-2 self-start rounded-[10px] px-3.5 py-2 text-[13px] font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-foreground transition-all duration-150"
-      >
+      <Button variant="block" size="lg" onClick={() => setExpanded(true)}>
         <Plus className="size-4" />
         New routine
-      </button>
+      </Button>
     );
   }
 
   return (
     <form
       onSubmit={submit}
-      className="flex flex-col gap-3 rounded-[12px] border border-[var(--border-subtle)] bg-card p-4 shadow-[var(--shadow-sm)]"
+      className="flex flex-col gap-3 rounded-md border border-[var(--border-subtle)] bg-card p-4"
     >
       <Input
         autoFocus

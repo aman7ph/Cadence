@@ -2,21 +2,27 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
+/**
+ * Tones are props on one Badge. Every colour resolves through the semantic
+ * layer — no component reaches into the raw palette (see styles/palette.css).
+ */
 const badgeVariants = cva(
-  "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium leading-tight whitespace-nowrap",
+  "inline-flex items-center gap-1 rounded-pill border px-2.5 py-0.5 text-xs font-medium leading-tight whitespace-nowrap",
   {
     variants: {
       tone: {
         neutral:
-          "bg-[var(--surface-active)] text-[var(--text-secondary)] border border-border",
+          "border-[var(--border-subtle)] bg-[var(--surface-active)] text-[var(--text-secondary)]",
         accent:
-          "bg-[var(--surface-accent)] text-[var(--text-accent)] border border-[var(--indigo-100)]",
+          "border-[var(--border-accent)] bg-[var(--surface-accent)] text-[var(--text-accent)]",
         success:
-          "bg-[var(--green-50)] text-[var(--green-700)] border border-[var(--green-100)]",
+          "border-[var(--status-complete)] bg-[var(--surface-success)] text-[var(--text-success)]",
+        // Neutral by design: a carried task should read as quiet, not as a
+        // warning, and amber would collide with the gold accent. See Step 2.
         carryover:
-          "bg-[var(--amber-50)] text-[var(--amber-600)] border border-[var(--amber-100)]",
+          "border-transparent bg-[var(--surface-accent)] text-[var(--status-carryover)]",
         danger:
-          "bg-[var(--red-50)] text-[var(--red-600)] border border-[var(--red-100)]",
+          "border-[var(--status-danger)] bg-[var(--surface-danger)] text-[var(--status-danger)]",
       },
     },
     defaultVariants: { tone: "neutral" },

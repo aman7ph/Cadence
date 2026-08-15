@@ -21,7 +21,7 @@
   --surface-active: var(--sand-150);
   --surface-accent: var(--gold-100);
 
-  --text-primary: #221f1a;          /* (prototype) light text */
+  --text-primary: var(--sand-850);
   --text-secondary: var(--sand-500);
   --text-tertiary: var(--sand-400);
   --text-inverse: var(--sand-100);
@@ -52,6 +52,19 @@
   --text-success: var(--green-700);
   --surface-danger: var(--red-50);
 
+  --chart-1: var(--viz-1);
+  --chart-2: var(--viz-2);
+  --chart-3: var(--viz-3);
+  --chart-4: var(--viz-4);
+  --chart-5: var(--viz-5);
+  --chart-6: var(--viz-6);
+
+  --heat-0: var(--heat-light-0);
+  --heat-1: var(--heat-light-1);
+  --heat-2: var(--heat-light-2);
+  --heat-3: var(--heat-light-3);
+  --heat-4: var(--heat-light-4);
+
   --focus-ring: var(--gold-600);
 
   --shadow-xs: 0 1px 1px rgba(23, 20, 15, 0.04);
@@ -78,7 +91,7 @@
   --text-tertiary: var(--sand-500);
   --text-inverse: var(--sand-950);
   --text-accent: var(--gold-400);
-  --text-on-accent: #1c1305;        /* (prototype) dark accent-text */
+  --text-on-accent: var(--gold-975);
 
   --border-subtle: var(--sand-700);
   --border-default: var(--sand-600);
@@ -96,27 +109,25 @@
    * out-contrast the borders rather than sit below them. */
   --status-pending: var(--sand-500);
 
-  --surface-success: #1e3a24;
+  --surface-success: var(--green-950);
   --text-success: var(--green-500);
-  --surface-danger: #3a1f1e;
+  --surface-danger: var(--red-950);
 
   --focus-ring: var(--gold-400);
 
   /* Chart series lifted for contrast against the dark ground. */
-  --chart-1: #e8a13d;
-  --chart-2: #6cbf68;
-  --chart-3: #52b8aa;
-  --chart-4: #e07370;
-  --chart-5: #a992e0;
-  --chart-6: #6aa9e0;
+  --chart-1: var(--viz-1-lift);
+  --chart-2: var(--viz-2-lift);
+  --chart-3: var(--viz-3-lift);
+  --chart-4: var(--viz-4-lift);
+  --chart-5: var(--viz-5-lift);
+  --chart-6: var(--viz-6-lift);
 
-  /* Heat ramp rebalanced: starts at the sunken surface so empty cells read as
-   * absence rather than as a value. */
-  --heat-0: var(--sand-800);
-  --heat-1: #4a3a1e;
-  --heat-2: #7a5c24;
-  --heat-3: #b5862c;
-  --heat-4: #e8a13d;
+  --heat-0: var(--heat-dark-0);
+  --heat-1: var(--heat-dark-1);
+  --heat-2: var(--heat-dark-2);
+  --heat-3: var(--heat-dark-3);
+  --heat-4: var(--heat-dark-4);
 
   --shadow-xs: 0 1px 1px rgba(0, 0, 0, 0.35);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.40), 0 1px 1px rgba(0, 0, 0, 0.35);

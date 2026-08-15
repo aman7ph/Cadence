@@ -6,7 +6,10 @@ const Label = React.forwardRef<HTMLLabelElement, React.LabelHTMLAttributes<HTMLL
     <label
       ref={ref}
       className={cn(
-        "text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground",
+        // Measured from the prototype's section labels: Lora, 10px, regular
+        // weight, 0.05em tracking. The handoff prose says 700 weight; the
+        // rendered design says 400, and the design wins (D0).
+        "font-display text-[10px] font-normal uppercase tracking-[0.05em] text-muted-foreground",
         className,
       )}
       {...props}

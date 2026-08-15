@@ -1,5 +1,8 @@
+import { useMutation } from "convex/react";
+import { api } from "@cadence/backend/convex/_generated/api";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
-import { AddTaskForm } from "./add-task-form";
+import { TaskComposer } from "./task-composer";
+import { SectionLabel } from "./section-label";
 import { TaskRow } from "./task-row";
 
 interface Task {
@@ -34,22 +37,18 @@ export function TodayTasksSection({
   viewedDate,
   isPast,
 }: TodayTasksSectionProps) {
+  const create = useMutation(api.dailyTasks.create);
   return (
-    <section className="flex flex-col gap-3">
-      <div className="flex items-baseline justify-between">
-        <h2 className="text-[11px] font-bold uppercase tracking-[0.10em] text-[var(--text-tertiary)]">Tasks</h2>
-        {tasksDone + tasksOpen > 0 && (
-          <span className="text-[11px] text-[var(--text-tertiary)] font-mono">
-            {tasksDone} / {tasksDone + tasksOpen} done
-          </span>
-        )}
-      </div>
+    <section className="flex flex-col gap-2.5">
+      <SectionLabel count={tasksDone + tasksOpen > 0 ? `${tasksDone}/${tasksDone + tasksOpen}` : undefined}>
+        Tasks
+      </SectionLabel>
       {tasks.length === 0 ? (
-        <p className="text-[13px] text-[var(--text-tertiary)] rounded-[12px] border border-dashed border-[var(--border-subtle)] bg-card px-4 py-8 text-center">
+        <p className="text-[13px] text-[var(--text-tertiary)] rounded-md border border-dashed border-[var(--border-subtle)] bg-card px-4 py-8 text-center">
           {isPast ? "No tasks on this day." : "No tasks yet. Add one below."}
         </p>
       ) : (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="flex flex-col gap-1.5">
           {tasks.map((t) => (
             <TaskRow
               key={t.taskId}
@@ -70,7 +69,21 @@ export function TodayTasksSection({
           ))}
         </div>
       )}
-      {!isPast && <AddTaskForm />}
+      {!isPast && (
+        <TaskComposer
+          placeholder="Add a task for today"
+          onSubmit={async (v) => {
+            await create({
+              title: v.title,
+              today: viewedDate,
+              goalId: v.goalId,
+              goalContribution: v.goalContribution,
+              repeatTarget: v.repeatTarget,
+              repeatIntervalMinutes: v.repeatIntervalMinutes,
+            });
+          }}
+        />
+      )}
     </section>
   );
 }

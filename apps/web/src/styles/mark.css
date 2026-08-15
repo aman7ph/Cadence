@@ -1,0 +1,142 @@
+/* ============================================================================
+ * Cadence — the gyroscope mark
+ *
+ * Three rings, always correcting: a nod to the Apollo gyroscope holding
+ * trajectory through thousands of tiny adjustments. Off course 90% of the time,
+ * on course by the end.
+ *
+ * The `cad-correct` wobble is NOT decoration — it is the idea. A version that
+ * spins the rings but never corrects ships the picture without the meaning.
+ *
+ * Geometry, durations and proportions are measured from the design prototype;
+ * see .agent/design/handoff/gyroscope-mark.md. Colours resolve through the
+ * semantic layer, so the mark re-themes with the app.
+ *
+ * Everything scales from a single `--mark-size` set by the component.
+ * ========================================================================== */
+
+.cad-mark {
+  position: relative;
+  width: var(--mark-size);
+  height: var(--mark-size);
+  flex: none;
+}
+
+.cad-mark--spin {
+  animation: cad-correct 7s ease-in-out infinite;
+}
+
+.cad-mark__stage {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.cad-mark--spin .cad-mark__stage {
+  animation: cad-ring-fade 1.2s ease-out both;
+}
+
+/* 6px border on a 155px mark. */
+.cad-mark__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: calc(var(--mark-size) * 0.039) solid;
+}
+
+/* Three durations, deliberately non-resonant, so the rings never resynchronise
+ * into a repeating pose. */
+.cad-mark__ring--a {
+  border-color: var(--action-primary);
+  transform: rotateX(68deg);
+}
+.cad-mark__ring--b {
+  border-color: var(--gold-500);
+  transform: rotateY(68deg);
+}
+.cad-mark__ring--c {
+  border-color: var(--gold-200);
+  transform: rotateX(68deg) rotateY(68deg);
+}
+
+.cad-mark--spin .cad-mark__ring--a { animation: cad-spin-a 4.5s linear infinite; }
+.cad-mark--spin .cad-mark__ring--b { animation: cad-spin-b 3.6s linear infinite; }
+.cad-mark--spin .cad-mark__ring--c { animation: cad-spin-c 5.4s linear infinite; }
+
+/* 15px dot on a 155px mark. */
+.cad-mark__dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--mark-size) * 0.097);
+  height: calc(var(--mark-size) * 0.097);
+  margin: calc(var(--mark-size) * -0.0485) 0 0 calc(var(--mark-size) * -0.0485);
+  border-radius: 50%;
+  background: var(--text-primary);
+}
+
+.cad-mark--spin .cad-mark__dot {
+  animation: cad-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes cad-spin-a {
+  0%   { transform: rotateX(68deg) rotateZ(0deg); }
+  100% { transform: rotateX(68deg) rotateZ(360deg); }
+}
+@keyframes cad-spin-b {
+  0%   { transform: rotateY(68deg) rotateZ(0deg); }
+  100% { transform: rotateY(68deg) rotateZ(-360deg); }
+}
+@keyframes cad-spin-c {
+  0%   { transform: rotateX(68deg) rotateY(68deg) rotateZ(0deg); }
+  100% { transform: rotateX(68deg) rotateY(68deg) rotateZ(360deg); }
+}
+
+/* The philosophy, literally: it never settles still. */
+@keyframes cad-correct {
+  0%   { transform: rotate(0deg); }
+  18%  { transform: rotate(-3.5deg); }
+  36%  { transform: rotate(2deg); }
+  54%  { transform: rotate(-1.2deg); }
+  72%  { transform: rotate(1.8deg); }
+  86%  { transform: rotate(-0.6deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes cad-pulse {
+  0%, 100% { transform: scale(1);    opacity: 1; }
+  50%      { transform: scale(1.25); opacity: 0.75; }
+}
+
+@keyframes cad-ring-fade {
+  0%   { opacity: 0; }
+  10%  { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+/* The wordmark breathes in and out beneath the mark. */
+@keyframes cad-word-fade {
+  0%   { opacity: 0; transform: translateY(6px); }
+  15%  { opacity: 1; transform: translateY(0); }
+  75%  { opacity: 1; transform: translateY(0); }
+  92%  { opacity: 0; transform: translateY(-4px); }
+  100% { opacity: 0; }
+}
+
+.cad-word {
+  animation: cad-word-fade 6s ease-in-out infinite;
+}
+
+/* Every animation here is decorative and infinite, so the media query is
+ * honoured with a static, legible pose rather than a frozen mid-spin frame.
+ * The prototype does not address this; an app has to. */
+@media (prefers-reduced-motion: reduce) {
+  .cad-mark--spin,
+  .cad-mark--spin .cad-mark__stage,
+  .cad-mark--spin .cad-mark__ring,
+  .cad-mark--spin .cad-mark__dot,
+  .cad-word {
+    animation: none;
+    opacity: 1;
+  }
+}

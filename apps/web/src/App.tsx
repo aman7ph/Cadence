@@ -25,6 +25,11 @@ import { SettingsPage } from "@/components/settings-page";
 import { GoalsPage } from "@/components/goals-page";
 import { StagingPage } from "@/components/staging-page";
 import { Logo } from "@/components/ui/logo";
+import { DevPrimitives } from "@/components/dev-primitives";
+import { AppLoader } from "@/components/app-loader";
+import { DevShell } from "@/components/dev-shell";
+import { MobileNav } from "@/components/mobile-nav";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export type AppView = "today" | "routines" | "staging" | "history" | "insights" | "settings" | "goals";
 
@@ -93,11 +98,24 @@ function SignedOutLayout() {
 
 function SignedInLayout() {
   const [view, setView] = useState<AppView>("today");
+  const [navOpen, setNavOpen] = useState(false);
   return (
     <div className="flex h-screen w-full overflow-hidden">
       <Sidebar view={view} onNavigate={setView} />
-      <main className="flex-1 min-w-0 overflow-y-auto px-6 py-8 md:px-8 md:py-9">
+      <main className="flex-1 min-w-0 overflow-y-auto px-5 py-6 md:px-8 md:py-9">
         <div className="w-full">
+          {/* Shell-level controls: the burger (mobile only) and the theme
+              toggle, which the prototype puts in the page header rather than
+              the sidebar. Rendered once here, not repeated by seven pages. */}
+          <div className="mb-4 flex items-center justify-between gap-3 md:mb-0 md:h-0 md:justify-end">
+            <MobileNav
+              view={view}
+              onNavigate={setView}
+              open={navOpen}
+              onOpenChange={setNavOpen}
+            />
+            <ThemeToggle />
+          </div>
           <EnsureProvisioned />
           <RolloverOnForeground />
           {view === "today" && <TodayView onNavigate={setView} />}
@@ -114,6 +132,17 @@ function SignedInLayout() {
 }
 
 export default function App() {
+  // Dev-only style guide. The real pages sit behind auth, so this is how a
+  // change to a shared primitive gets seen. Stripped from production builds:
+  // import.meta.env.DEV is statically false there, so the import is shaken out.
+  if (import.meta.env.DEV && window.location.pathname === "/preview") {
+    // ?loader renders the full-screen opening state, which is otherwise only
+    // visible during the brief AuthLoading window.
+    const q = window.location.search;
+    if (q.includes("loader")) return <AppLoader />;
+    if (q.includes("shell")) return <DevShell />;
+    return <DevPrimitives />;
+  }
   if (window.location.pathname === "/sso-callback") {
     return <AuthenticateWithRedirectCallback />;
   }
@@ -130,9 +159,7 @@ export default function App() {
   return (
     <>
       <AuthLoading>
-        <div className="min-h-screen w-full grid place-items-center">
-          <p className="text-sm text-muted-foreground">Loading session…</p>
-        </div>
+        <AppLoader />
       </AuthLoading>
 
       <Unauthenticated>

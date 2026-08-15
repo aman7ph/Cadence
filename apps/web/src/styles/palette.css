@@ -24,6 +24,7 @@
   --sand-600: #4f4433;
   --sand-700: #372e20;  /* (prototype) dark border */
   --sand-800: #282219;  /* (prototype) dark sunken surface */
+  --sand-850: #221f1a;  /* (prototype) light ink — the light theme's text */
   --sand-900: #211c15;  /* (prototype) dark card surface */
   --sand-950: #17140f;  /* (prototype) dark bg */
   --white: #ffffff;
@@ -37,6 +38,7 @@
   --gold-600: #bd7a15;  /* (prototype) light accent */
   --gold-700: #9a6210;
   --gold-950: #3a2f1c;  /* (prototype) dark accent-soft */
+  --gold-975: #1c1305;  /* (prototype) ink ON gold — dark theme's accent text */
 
   /* ---- Green: completion and streaks. Warmed to sit on sand. ---- */
   --green-50: #eef7ec;
@@ -44,6 +46,7 @@
   --green-500: #52a64f;
   --green-600: #3d8a3f;
   --green-700: #2f6d33;
+  --green-950: #1e3a24;  /* dark-ground success tint */
 
   /* ---- Amber: warnings only.
    * Pushed orange-forward so it separates from gold by HUE, not just by
@@ -58,26 +61,9 @@
   --red-100: #f8dcda;
   --red-500: #dc4f48;
   --red-600: #c9403a;
+  --red-950: #3a1f1e;    /* dark-ground danger tint */
 
-  /* ---- Chart series.
-   * The prototype charts are single-accent, so a distinguishable multi-series
-   * set has to be introduced here. Hues are spaced to stay separable on a warm
-   * ground, and series 1 is the accent so single-series charts match the UI. ---- */
-  --chart-1: #bd7a15;
-  --chart-2: #3d8a3f;
-  --chart-3: #3d9b8f;
-  --chart-4: #c9504f;
-  --chart-5: #8a6fc4;
-  --chart-6: #4a89c4;
 
-  /* ---- Activity heat ramp.
-   * Gold, not green — the prototype's heatmap is gold, so "activity" and
-   * "completion" stop sharing a colour language. ---- */
-  --heat-0: #ece7dc;
-  --heat-1: #f3ddb0;
-  --heat-2: #e8bd72;
-  --heat-3: #d99a35;
-  --heat-4: #b5761a;
 }
 
 /* ============================================================================

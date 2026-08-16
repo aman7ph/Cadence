@@ -29,15 +29,15 @@ const CompletionToggle = React.forwardRef<HTMLButtonElement, CompletionTogglePro
           isComplete
             ? "border-[var(--status-complete)] bg-[var(--status-complete)] text-white shadow-[var(--shadow-success)]"
             : isSkipped
-              ? "border-[var(--slate-300)] bg-[var(--slate-100)] text-muted-foreground"
-              : "border-[var(--slate-300)] bg-card hover:border-[var(--green-500)] hover:bg-[var(--green-50)]",
+              ? "border-[var(--border-default)] bg-[var(--surface-active)] text-muted-foreground"
+              : "border-[var(--border-default)] bg-card hover:border-[var(--status-complete)] hover:bg-[var(--surface-success)]",
           className,
         )}
         {...props}
       >
         {isComplete && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
         {isSkipped && (
-          <span className="block h-0.5 w-2.5 rounded-full bg-[var(--slate-400)]" />
+          <span className="block h-0.5 w-2.5 rounded-full bg-[var(--text-tertiary)]" />
         )}
       </button>
     );

@@ -87,21 +87,6 @@ export const upsert = mutation({
   },
 });
 
-export const getByDate = query({
-  args: { date: v.string() },
-  handler: async (ctx, { date }) => {
-    const user = await resolveUser(ctx);
-    if (!user) return null;
-    const doc = await ctx.db
-      .query("dailyReflections")
-      .withIndex("by_user_date", (q) =>
-        q.eq("userId", user._id).eq("date", date),
-      )
-      .unique();
-    if (!doc) return null;
-    return loadTags(ctx, doc);
-  },
-});
 
 export const getRange = query({
   args: { from: v.string(), to: v.string() },
@@ -119,16 +104,3 @@ export const getRange = query({
   },
 });
 
-export const getRecent = query({
-  args: { limit: v.optional(v.number()) },
-  handler: async (ctx, { limit }) => {
-    const user = await resolveUser(ctx);
-    if (!user) return [];
-    const docs = await ctx.db
-      .query("dailyReflections")
-      .withIndex("by_user_date", (q) => q.eq("userId", user._id))
-      .order("desc")
-      .take(limit ?? 5);
-    return Promise.all(docs.map((doc) => loadTags(ctx, doc)));
-  },
-});

@@ -8,7 +8,9 @@
  * @module
  */
 
+import type * as analyticsGoals from "../analyticsGoals.js";
 import type * as analyticsProductivity from "../analyticsProductivity.js";
+import type * as analyticsRepeats from "../analyticsRepeats.js";
 import type * as analyticsRoutines from "../analyticsRoutines.js";
 import type * as analyticsTasks from "../analyticsTasks.js";
 import type * as dailyTaskRepeats from "../dailyTaskRepeats.js";
@@ -24,6 +26,7 @@ import type * as lib_dayStats from "../lib/dayStats.js";
 import type * as lib_dayStatsDerive from "../lib/dayStatsDerive.js";
 import type * as lib_dayTypes from "../lib/dayTypes.js";
 import type * as lib_goalContribution from "../lib/goalContribution.js";
+import type * as lib_goalCredits from "../lib/goalCredits.js";
 import type * as lib_promoteStagedTask from "../lib/promoteStagedTask.js";
 import type * as lib_resolveUser from "../lib/resolveUser.js";
 import type * as lib_routineCompletions from "../lib/routineCompletions.js";
@@ -51,7 +54,9 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  analyticsGoals: typeof analyticsGoals;
   analyticsProductivity: typeof analyticsProductivity;
+  analyticsRepeats: typeof analyticsRepeats;
   analyticsRoutines: typeof analyticsRoutines;
   analyticsTasks: typeof analyticsTasks;
   dailyTaskRepeats: typeof dailyTaskRepeats;
@@ -67,6 +72,7 @@ declare const fullApi: ApiFromModules<{
   "lib/dayStatsDerive": typeof lib_dayStatsDerive;
   "lib/dayTypes": typeof lib_dayTypes;
   "lib/goalContribution": typeof lib_goalContribution;
+  "lib/goalCredits": typeof lib_goalCredits;
   "lib/promoteStagedTask": typeof lib_promoteStagedTask;
   "lib/resolveUser": typeof lib_resolveUser;
   "lib/routineCompletions": typeof lib_routineCompletions;

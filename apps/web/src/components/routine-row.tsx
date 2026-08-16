@@ -106,7 +106,7 @@ export function RoutineRow({
           className={cn(
             "text-[15px] font-semibold leading-snug text-foreground",
             status === "completed" &&
-              "line-through decoration-[var(--slate-300)] dark:decoration-[var(--slate-600)]",
+              "line-through decoration-[var(--border-strong)]",
           )}
         >
           {name}
@@ -114,7 +114,7 @@ export function RoutineRow({
         <div className="mt-[3px] text-[12px] text-[var(--text-tertiary)] truncate">{meta}</div>
         {error && <div className="mt-[3px] text-[12px] text-[var(--red-600)]">{error}</div>}
         {goalTitle && (
-          <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[var(--indigo-50)] px-2 py-0.5 text-[10px] font-semibold text-[var(--indigo-600)]">
+          <span className="mt-1 inline-flex items-center gap-1 rounded-pill bg-[var(--surface-accent)] px-2 py-[2px] text-[9px] font-semibold uppercase tracking-[0.04em] text-[var(--text-accent)]">
             <Target className="size-2.5" />{goalTitle}
           </span>
         )}

@@ -3,22 +3,31 @@ import { todayLocal } from "@cadence/shared";
 import type { DateRange } from "@cadence/shared";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { getGranularity } from "@/lib/chartUtils";
-import { granularityLabel, rollingWindowLabel } from "@cadence/shared";
+import { ContributionHeatmap } from "./contribution-heatmap";
 import { ChartCard } from "./insights-chart-card";
-import { MomentumChart } from "./insights-momentum-chart";
-import { DowHeatmap, RoutineComparisonChart } from "./insights-routine-charts";
-import { RoutineCompletionLines } from "./insights-timeline-chart";
-import { RandomTasksByDayChart, RandomBreakdownChart } from "./insights-task-charts";
-import { AvgCarryoverCard, NeverDoneTrendChart } from "./insights-carryover-charts";
+import { MomentumHero } from "./insights-momentum-hero";
+import { RandomTasksByDayChart } from "./insights-task-charts";
+import { TaskResolutionCard } from "./insights-task-resolution";
+import { GoalMixPanel, GoalProgressPanel } from "./insights-patterns-goals";
+import { CheckinTimingPanel, ReflectionCadencePanel } from "./insights-patterns-habits";
+import {
+  RoutineLeaderboardPanel,
+  StreakLongevityPanel,
+  WeekRhythmPanel,
+} from "./insights-patterns-routines";
+import { PageHeader } from "./page-header";
+import { SectionLabel } from "./section-label";
 
 export function InsightsPage() {
   const today = todayLocal();
   const [range, setRange] = useState<DateRange>(() => {
-    const d = new Date(Date.UTC(
-      Number(today.slice(0, 4)),
-      Number(today.slice(5, 7)) - 1,
-      Number(today.slice(8, 10)) - 29,
-    ));
+    const d = new Date(
+      Date.UTC(
+        Number(today.slice(0, 4)),
+        Number(today.slice(5, 7)) - 1,
+        Number(today.slice(8, 10)) - 29,
+      ),
+    );
     const yy = d.getUTCFullYear();
     const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
     const dd = String(d.getUTCDate()).padStart(2, "0");
@@ -28,59 +37,60 @@ export function InsightsPage() {
 
   const granularity = getGranularity(range.from, range.to);
 
-  const handleRangeChange = (r: DateRange, label: string) => {
-    setRange(r);
-    setRangeLabel(label);
-  };
-
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="font-display text-[22px] font-bold tracking-tight text-foreground">Insights</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Patterns and trends across your routines and tasks</p>
+    <div className="flex flex-col gap-[22px]">
+      <PageHeader
+        title="Insights"
+        subtitle="Patterns and trends across your routines and tasks."
+        action={
+          <DateRangePicker
+            value={range}
+            label={rangeLabel}
+            today={today}
+            onChange={(r, label) => {
+              setRange(r);
+              setRangeLabel(label);
+            }}
+          />
+        }
+      />
+
+      {/* ── Range-driven. Everything here follows the picker above. ── */}
+      <MomentumHero range={range} granularity={granularity} />
+
+      <TaskResolutionCard range={range}>
+        <RandomTasksByDayChart range={range} granularity={granularity} />
+      </TaskResolutionCard>
+
+      <ChartCard title="Activity heatmap" label="365 days">
+        <div className="overflow-x-auto">
+          <ContributionHeatmap />
         </div>
-        <DateRangePicker
-          value={range}
-          label={rangeLabel}
-          today={today}
-          onChange={handleRangeChange}
-        />
-      </div>
-
-      <ChartCard title="Productivity momentum" label={granularity === "daily" ? "7-day EMA" : granularityLabel(granularity)}>
-        <MomentumChart range={range} granularity={granularity} />
       </ChartCard>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ChartCard title="Day-of-week consistency">
-          <DowHeatmap range={range} today={today} />
-        </ChartCard>
-        <ChartCard title="Routine comparison" label="completion %">
-          <RoutineComparisonChart range={range} today={today} />
-        </ChartCard>
+      {/*
+        ── Range-INDEPENDENT. The prototype states this boundary in its own
+        section heading, and wiring the picker to these panels would be the
+        easy mistake: they answer "what is my rhythm", not "what happened in
+        this window". Each panel owns its own fixed lookback.
+      */}
+      <SectionLabel className="pt-2">
+        Recurring patterns — not tied to the date range above
+      </SectionLabel>
+
+      <GoalProgressPanel />
+      <StreakLongevityPanel />
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <CheckinTimingPanel />
+        <ReflectionCadencePanel />
       </div>
 
-      <ChartCard title="Routine completion rate" label={rollingWindowLabel(granularity)}>
-        <RoutineCompletionLines range={range} granularity={granularity} today={today} />
-      </ChartCard>
+      <GoalMixPanel />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ChartCard title="Tasks added per day" label={granularityLabel(granularity)}>
-          <RandomTasksByDayChart range={range} granularity={granularity} />
-        </ChartCard>
-        <ChartCard title="Task resolution breakdown">
-          <RandomBreakdownChart range={range} />
-        </ChartCard>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ChartCard title="Carryover distribution" label="completed tasks">
-          <AvgCarryoverCard range={range} />
-        </ChartCard>
-        <ChartCard title="Tasks still open, by creation date" label={granularityLabel(granularity)}>
-          <NeverDoneTrendChart range={range} granularity={granularity} />
-        </ChartCard>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <WeekRhythmPanel />
+        <RoutineLeaderboardPanel />
       </div>
     </div>
   );

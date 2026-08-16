@@ -34,7 +34,7 @@ export { granularityLabel } from "@cadence/shared";
 export const tooltipStyle = {
   backgroundColor: "var(--card)",
   border: "1px solid var(--border-subtle)",
-  borderRadius: "10px",
+  borderRadius: "12px",
   boxShadow: "var(--shadow-md)",
   fontSize: "12px",
   color: "var(--foreground)",
@@ -44,21 +44,28 @@ export const axisStyle = { fill: "var(--text-tertiary)", fontSize: 11 } as const
 
 export function ChartCard({
   title,
+  subtitle,
   label,
   children,
   className = "",
 }: {
   title: string;
+  subtitle?: string;
   label?: string;
   children: ReactNode;
   className?: string;
 }) {
   return (
-    <section className={`flex flex-col gap-3 rounded-[16px] border border-[var(--border-subtle)] bg-card p-5 shadow-[var(--shadow-sm)] ${className}`}>
-      <div className="flex items-center justify-between">
-        <h3 className="text-[15px] font-semibold tracking-tight text-foreground">{title}</h3>
+    <section className={`flex flex-col gap-3 rounded-lg border border-[var(--border-subtle)] bg-card p-5 ${className}`}>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h3 className="font-display text-[13.5px] font-semibold tracking-tight text-foreground">{title}</h3>
+          {subtitle && (
+            <p className="mt-0.5 text-[11px] text-[var(--text-tertiary)]">{subtitle}</p>
+          )}
+        </div>
         {label && (
-          <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--text-tertiary)]">{label}</span>
+          <span className="font-display text-[10px] uppercase tracking-[0.05em] text-[var(--text-tertiary)]">{label}</span>
         )}
       </div>
       {children}

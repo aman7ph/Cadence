@@ -104,8 +104,9 @@ export function HistoryPage() {
         open={selectedDate !== null}
         onOpenChange={(o) => !o && setSelectedDate(null)}
         label="Day detail"
+        size="wide"
         closeLabel="Close"
-        className="w-[513px] max-w-full gap-5 px-7 py-6"
+        className="gap-5 px-7 pb-6 pt-14"
       >
         {selectedDate && (
           <>

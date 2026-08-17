@@ -8,13 +8,13 @@ import { GoalDetailLinked } from "./goal-detail-linked";
 interface GoalDetailProps {
   goalId: Id<"goals">;
   onBack: () => void;
+  onEdit: () => void;
+  onRequestComplete: () => void;
+  onRequestAbandon: () => void;
 }
 
-export function GoalDetail({ goalId, onBack }: GoalDetailProps) {
+export function GoalDetail({ goalId, onBack, onEdit, onRequestComplete, onRequestAbandon }: GoalDetailProps) {
   const linked = useQuery(api.goalLinks.getLinkedItems, { goalId });
-  const updateGoal = useMutation(api.goals.update);
-  const completeGoal = useMutation(api.goals.complete);
-  const abandonGoal = useMutation(api.goals.abandon);
 
   if (linked === undefined) {
     return <div className="flex items-center justify-center py-16"><p className="text-[13px] text-[var(--text-tertiary)]">Loading…</p></div>;
@@ -36,9 +36,9 @@ export function GoalDetail({ goalId, onBack }: GoalDetailProps) {
     <div className="flex h-full flex-col gap-6">
       <GoalDetailHeader
         goal={goal}
-        onUpdate={async (data) => { await updateGoal({ goalId, ...data }); }}
-        onMarkComplete={async () => { await completeGoal({ goalId }); onBack(); }}
-        onAbandon={async () => { await abandonGoal({ goalId }); onBack(); }}
+        onEdit={onEdit}
+        onRequestComplete={onRequestComplete}
+        onRequestAbandon={onRequestAbandon}
       />
       {goal.targetValue && (
         <GoalDetailProgress

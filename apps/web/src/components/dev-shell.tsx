@@ -4,10 +4,12 @@ import { MobileNav } from "@/components/mobile-nav";
 import { Sidebar } from "@/components/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { PageHeader } from "@/components/page-header";
+import { GoalDetailHeader } from "@/components/goal-detail-header";
 import { Button } from "@/components/ui/button";
 import { Drawer } from "@/components/ui/drawer";
 import { ListGrid } from "@/components/ui/list-grid";
 import { FormDrawer } from "@/components/ui/form-drawer";
+import { ConfirmDrawer } from "@/components/ui/confirm-drawer";
 import { Input } from "@/components/ui/input";
 import {
   EMPTY_ITEM_OPTIONS,
@@ -85,19 +87,19 @@ export function DevShell() {
           <ItemOptionsFields value={opts} onChange={setOpts} />
         </FormDrawer>
 
-        <FormDrawer
+        {/* The real ConfirmDrawer, not FormDrawer with confirm-ish props —
+            previewing an approximation is how the size bug hid. */}
+        <ConfirmDrawer
           open={confirmOpen}
           onOpenChange={setConfirmOpen}
           title="Delete this task?"
           description="This cannot be undone."
-          submitLabel="Delete"
+          confirmLabel="Delete task"
           tone="danger"
-          onSubmit={async () => {}}
+          onConfirm={async () => {}}
         >
-          <p className="text-[13px] text-[var(--text-secondary)]">
-            Carryover smoke test 2
-          </p>
-        </FormDrawer>
+          <p className="text-[13px] text-foreground">Carryover smoke test 2</p>
+        </ConfirmDrawer>
 
         <div className="mt-6 max-w-[540px]">
           <LayoutSection />
@@ -126,19 +128,24 @@ export function DevShell() {
           open={drawer}
           onOpenChange={setDrawer}
           label="Detail drawer"
+          size="wide"
           closeLabel="Close"
-          className="w-[513px] max-w-full px-7 py-6"
+          className="px-7 pb-6 pt-14"
         >
-          <h2 className="font-display text-[20px] font-semibold text-foreground">
-            Finish Think and Grow Rich
-          </h2>
-          <p className="mt-1 text-[12px] text-[var(--text-secondary)]">
-            Active · Started Jul 14, 2026
-          </p>
-          <div className="mt-4 flex gap-2">
-            <Button variant="outline" tone="success" size="sm">✓ Mark complete</Button>
-            <Button variant="outline" size="sm">○ Abandon</Button>
-          </div>
+          <GoalDetailHeader
+            goal={{
+              title: "Finish Think and Grow Rich",
+              description: "Read it properly this time.",
+              status: "active",
+              createdAt: Date.parse("2026-06-29"),
+              dueDate: "2026-06-30",
+              targetValue: 1000,
+              unit: "pages",
+            }}
+            onEdit={() => {}}
+            onRequestComplete={() => {}}
+            onRequestAbandon={() => {}}
+          />
         </Drawer>
       </main>
     </div>

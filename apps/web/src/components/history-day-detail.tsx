@@ -47,8 +47,14 @@ export function DayDetailPanel({ date, today }: DayDetailPanelProps) {
             </p>
           );
 
+          // Two columns once there is room for them. NOTE: this breakpoint is
+          // coupled to DRAWER_SIZE.wide in ui/drawer.tsx — that size is 50vw at
+          // `xl`, so `xl` is the first width where the drawer (~640px, less
+          // 56px padding) gives each column ~290px. Tailwind 3 has no container
+          // queries here, so the viewport is the only lever available; if
+          // `wide` changes, revisit this.
           return (
-            <div className="flex flex-col gap-5">
+            <div className="grid grid-cols-1 gap-5 xl:grid-cols-2 xl:items-start">
               {/* Routines column */}
               <section className="flex flex-col gap-2">
                 <SectionHeader title="Routines"

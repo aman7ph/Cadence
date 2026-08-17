@@ -102,7 +102,7 @@ export function DateRangePickerPanel({
             />
           </label>
         </div>
-        {customError && <p className="text-xs text-red-500">{customError}</p>}
+        {customError && <p className="text-xs text-[var(--status-danger)]">{customError}</p>}
         <button
           type="button"
           onClick={handleApply}

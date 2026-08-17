@@ -10,6 +10,8 @@ import { CompletionToggle } from "@/components/ui/completion-toggle";
 import { StreakBadge } from "@/components/ui/streak-badge";
 import { RepeatControl } from "@/components/repeat-control";
 import { RoutineRowMenu } from "@/components/routine-row-menu";
+import { ConfirmDrawer } from "@/components/ui/confirm-drawer";
+import { useRoutineArchive } from "@/lib/use-routine-archive";
 import { scheduleLabel } from "./routines-schedule-form";
 import { useCountdown } from "@/lib/use-countdown";
 import { cn } from "@/lib/utils";
@@ -47,7 +49,7 @@ export function RoutineRow({
   const complete = useMutation(api.routines.complete);
   const uncomplete = useMutation(api.routines.uncomplete);
   const skip = useMutation(api.routines.skip);
-  const archive = useMutation(api.routineManagement.archive);
+  const archiveAction = useRoutineArchive(routineId, todayLocal());
   const logRep = useMutation(api.routineRepeats.logRep);
   const undoRep = useMutation(api.routineRepeats.undoRep);
   const [error, setError] = useState<string | null>(null);
@@ -112,7 +114,7 @@ export function RoutineRow({
           {name}
         </div>
         <div className="mt-[3px] text-[12px] text-[var(--text-tertiary)] truncate">{meta}</div>
-        {error && <div className="mt-[3px] text-[12px] text-[var(--red-600)]">{error}</div>}
+        {error && <div className="mt-[3px] text-[12px] text-[var(--status-danger)]">{error}</div>}
         {goalTitle && (
           <span className="mt-1 inline-flex items-center gap-1 rounded-pill bg-[var(--surface-accent)] px-2 py-[2px] text-[9px] font-semibold uppercase tracking-[0.04em] text-[var(--text-accent)]">
             <Target className="size-2.5" />{goalTitle}
@@ -141,10 +143,12 @@ export function RoutineRow({
           <RoutineRowMenu
             isSkipped={status === "skipped"}
             onSkipToggle={handleSkip}
-            onArchive={() => void archive({ routineId, today: todayLocal() })}
+            onArchive={archiveAction.request}
           />
         )}
       </div>
+
+      <ConfirmDrawer {...archiveAction.drawerProps} />
     </div>
   );
 }

@@ -2,48 +2,31 @@ import { useState } from "react";
 import { useMutation } from "convex/react";
 import { MoreHorizontal, Target } from "lucide-react";
 import { api } from "@cadence/backend/convex/_generated/api";
+import { ConfirmDrawer } from "@/components/ui/confirm-drawer";
 import type { Doc } from "@cadence/backend/convex/_generated/dataModel";
 import { formatDateShort } from "@cadence/shared";
 
 import { Badge } from "@/components/ui/badge";
 import { scheduleLabel } from "./routines-schedule-form";
-import { StagedTaskEditForm } from "./staged-task-edit-form";
-import { StagedTaskScheduleForm } from "./staged-task-schedule-form";
 
 interface StagedTaskRowProps {
   stagedTask: Doc<"stagedTasks">;
   goalTitle?: string;
+  onEdit: () => void;
+  onSchedule: () => void;
 }
 
 function prettyCreatedAt(ts: number): string {
   return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-export function StagedTaskRow({ stagedTask, goalTitle }: StagedTaskRowProps) {
+export function StagedTaskRow({ stagedTask, goalTitle, onEdit, onSchedule }: StagedTaskRowProps) {
   const unschedule = useMutation(api.stagedTaskScheduling.unschedule);
   const remove = useMutation(api.stagedTasks.remove);
+  const [confirm, setConfirm] = useState<"delete" | "unschedule" | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [editing, setEditing] = useState(false);
-  const [scheduling, setScheduling] = useState(false);
 
   const isScheduled = stagedTask.scheduledDate !== undefined;
-
-  if (scheduling) {
-    return (
-      <StagedTaskScheduleForm stagedTask={stagedTask} onDone={() => setScheduling(false)} />
-    );
-  }
-
-  if (editing) {
-    return (
-      <StagedTaskEditForm
-        stagedTaskId={stagedTask._id}
-        initialTitle={stagedTask.title}
-        initialDescription={stagedTask.description}
-        onDone={() => setEditing(false)}
-      />
-    );
-  }
 
   return (
     <div className="group flex items-center gap-3.5 rounded-md border border-[var(--border-subtle)] bg-card px-4 py-3.5 transition-colors duration-150 hover:border-[var(--border-default)]">
@@ -89,7 +72,7 @@ export function StagedTaskRow({ stagedTask, goalTitle }: StagedTaskRowProps) {
               <div className="absolute right-0 bottom-full mb-1 z-20 min-w-[150px] overflow-hidden rounded-md border border-[var(--border-subtle)] bg-card shadow-[var(--shadow-md)]">
                 <button
                   type="button"
-                  onClick={() => { setScheduling(true); setMenuOpen(false); }}
+                  onClick={() => { onSchedule(); setMenuOpen(false); }}
                   className="w-full px-3.5 py-2.5 text-left text-[13px] font-medium text-foreground hover:bg-[var(--surface-hover)] transition-colors"
                 >
                   {isScheduled ? "Edit schedule…" : "Schedule…"}
@@ -98,7 +81,7 @@ export function StagedTaskRow({ stagedTask, goalTitle }: StagedTaskRowProps) {
                 {isScheduled ? (
                   <button
                     type="button"
-                    onClick={() => { void unschedule({ stagedTaskId: stagedTask._id }); setMenuOpen(false); }}
+                    onClick={() => { setConfirm("unschedule"); setMenuOpen(false); }}
                     className="w-full px-3.5 py-2.5 text-left text-[13px] font-medium text-foreground hover:bg-[var(--surface-hover)] transition-colors"
                   >
                     Unschedule
@@ -106,7 +89,7 @@ export function StagedTaskRow({ stagedTask, goalTitle }: StagedTaskRowProps) {
                 ) : (
                   <button
                     type="button"
-                    onClick={() => { setEditing(true); setMenuOpen(false); }}
+                    onClick={() => { onEdit(); setMenuOpen(false); }}
                     className="w-full px-3.5 py-2.5 text-left text-[13px] font-medium text-foreground hover:bg-[var(--surface-hover)] transition-colors"
                   >
                     Edit
@@ -115,7 +98,7 @@ export function StagedTaskRow({ stagedTask, goalTitle }: StagedTaskRowProps) {
                 <div className="mx-3 h-px bg-[var(--border-subtle)]" />
                 <button
                   type="button"
-                  onClick={() => { void remove({ stagedTaskId: stagedTask._id }); setMenuOpen(false); }}
+                  onClick={() => { setConfirm("delete"); setMenuOpen(false); }}
                   className="w-full px-3.5 py-2.5 text-left text-[13px] font-medium text-[var(--status-danger)] hover:bg-[var(--surface-danger)] transition-colors"
                 >
                   Delete
@@ -125,6 +108,33 @@ export function StagedTaskRow({ stagedTask, goalTitle }: StagedTaskRowProps) {
           )}
         </div>
       </div>
+
+      {/* Delete is irreversible, unschedule is not — the tone carries that. */}
+      <ConfirmDrawer
+        open={confirm === "delete"}
+        onOpenChange={(o) => !o && setConfirm(null)}
+        title="Delete this staged task?"
+        description="This cannot be undone."
+        confirmLabel="Delete task"
+        tone="danger"
+        onConfirm={async () => {
+          await remove({ stagedTaskId: stagedTask._id });
+        }}
+      >
+        <p className="text-[13px] text-foreground">{stagedTask.title}</p>
+      </ConfirmDrawer>
+
+      <ConfirmDrawer
+        open={confirm === "unschedule"}
+        onOpenChange={(o) => !o && setConfirm(null)}
+        title="Unschedule this task?"
+        description="It returns to Unscheduled and keeps its details. You can schedule it again at any time."
+        confirmLabel="Unschedule"
+        tone="accent"
+        onConfirm={async () => {
+          await unschedule({ stagedTaskId: stagedTask._id });
+        }}
+      />
     </div>
   );
 }

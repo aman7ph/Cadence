@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { CompletionToggle } from "@/components/ui/completion-toggle";
 import { RepeatControl } from "@/components/repeat-control";
 import { TaskRowMenu } from "@/components/task-row-menu";
+import { ConfirmDrawer } from "@/components/ui/confirm-drawer";
 import { useCountdown } from "@/lib/use-countdown";
 import { cn } from "@/lib/utils";
 
@@ -49,6 +50,7 @@ export function TaskRow({
   const complete = useMutation(api.dailyTasks.complete);
   const uncomplete = useMutation(api.dailyTasks.uncomplete);
   const remove = useMutation(api.dailyTasks.remove);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const logRep = useMutation(api.dailyTaskRepeats.logRep);
   const undoRep = useMutation(api.dailyTaskRepeats.undoRep);
   const [error, setError] = useState<string | null>(null);
@@ -110,7 +112,7 @@ export function TaskRow({
           {title}
         </div>
         <div className="mt-[3px] text-[12px] text-[var(--text-tertiary)] truncate">{meta}</div>
-        {error && <div className="mt-[3px] text-[12px] text-[var(--red-600)]">{error}</div>}
+        {error && <div className="mt-[3px] text-[12px] text-[var(--status-danger)]">{error}</div>}
         {goalTitle && (
           <span className="mt-1 inline-flex items-center gap-1 rounded-pill bg-[var(--surface-accent)] px-2 py-[2px] text-[9px] font-semibold uppercase tracking-[0.04em] text-[var(--text-accent)]">
             <Target className="size-2.5" />{goalTitle}
@@ -136,9 +138,24 @@ export function TaskRow({
           </Badge>
         )}
         {!readOnly && canDelete && (
-          <TaskRowMenu onDelete={() => { setError(null); void remove({ taskId }).catch(fail); }} />
+          <TaskRowMenu onDelete={() => setConfirmDelete(true)} />
         )}
       </div>
+
+      <ConfirmDrawer
+        open={confirmDelete}
+        onOpenChange={setConfirmDelete}
+        title="Delete this task?"
+        description="This cannot be undone. Its completion history goes with it."
+        confirmLabel="Delete task"
+        tone="danger"
+        onConfirm={async () => {
+          setError(null);
+          await remove({ taskId }).catch(fail);
+        }}
+      >
+        <p className="text-[13px] text-foreground">{title}</p>
+      </ConfirmDrawer>
     </div>
   );
 }

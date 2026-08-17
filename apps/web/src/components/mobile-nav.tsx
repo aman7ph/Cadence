@@ -39,7 +39,8 @@ export function MobileNav({ view, onNavigate, open, onOpenChange }: MobileNavPro
             onOpenChange={onOpenChange}
             side="left"
             label="Navigation"
-            className="w-[250px] max-w-[80%] bg-[var(--bg-elevated)] px-3.5 py-5"
+            size="nav"
+            className="bg-[var(--bg-elevated)] px-3.5 py-5"
           >
             <SidebarNav
               view={view}

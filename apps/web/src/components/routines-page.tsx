@@ -6,7 +6,9 @@ import { useState } from "react";
 import type { ScheduleType } from "./routines-schedule-form";
 import { ActiveRoutineRow } from "./routines-active-row";
 import { ArchivedRoutineRow } from "./routines-archived-row";
-import { CreateRoutineForm } from "./routines-create-form";
+import { RoutineFormDrawer, type RoutineFormValues } from "./routine-form-drawer";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { PageHeader } from "./page-header";
 import { ListGrid } from "@/components/ui/list-grid";
 import { useListColumns } from "@/lib/use-list-columns";
@@ -19,6 +21,8 @@ export function RoutinesPage() {
   const activeGoals = useQuery(api.goals.list, {});
   const [tab, setTab] = useState<Tab>("active");
   const { columns } = useListColumns();
+  // null = closed; { routine: undefined } = create; { routine } = edit.
+  const [form, setForm] = useState<{ routine?: RoutineFormValues } | null>(null);
 
   const goalTitleById = new Map((activeGoals ?? []).map((g) => [g._id, g.title]));
 
@@ -36,6 +40,11 @@ export function RoutinesPage() {
         ]}
         active={tab}
         onTabChange={setTab}
+        action={
+          <Button onClick={() => setForm({})}>
+            <Plus className="size-3.5" /> New routine
+          </Button>
+        }
       />
 
       {allRoutines === undefined && (
@@ -73,11 +82,25 @@ export function RoutinesPage() {
                     repeatIntervalMinutes: r.repeatIntervalMinutes,
                   }}
                   today={today}
+                  onEdit={() =>
+                    setForm({
+                      routine: {
+                        _id: r._id,
+                        name: r.name,
+                        description: r.description,
+                        scheduleType: r.scheduleType as ScheduleType,
+                        customDays: r.customDays,
+                        goalId: r.goalId as Id<"goals"> | undefined,
+                        goalContribution: r.goalContribution,
+                        repeatTarget: r.repeatTarget,
+                        repeatIntervalMinutes: r.repeatIntervalMinutes,
+                      },
+                    })
+                  }
                 />
               ))}
             </ListGrid>
           )}
-          <CreateRoutineForm />
         </section>
       )}
 
@@ -105,6 +128,10 @@ export function RoutinesPage() {
             </ListGrid>
           )}
         </section>
+      )}
+
+      {form && (
+        <RoutineFormDrawer routine={form.routine} onClose={() => setForm(null)} />
       )}
     </div>
   );

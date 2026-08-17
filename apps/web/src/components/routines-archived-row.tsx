@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
-import { RotateCcw, Trash2, X } from "lucide-react";
+import { RotateCcw, Trash2 } from "lucide-react";
 import { api } from "@cadence/backend/convex/_generated/api";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
+import { ConfirmDrawer } from "@/components/ui/confirm-drawer";
 import { scheduleLabel } from "./routines-schedule-form";
 import type { ScheduleType } from "./routines-schedule-form";
 
@@ -56,35 +57,34 @@ export function ArchivedRoutineRow({ routine }: ArchivedRoutineRowProps) {
           Restore
         </button>
 
-        {!confirmDelete ? (
           <button
             type="button"
             onClick={() => setConfirmDelete(true)}
-            className="flex h-8 w-8 items-center justify-center rounded-sm text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-[var(--status-danger)] transition-all duration-150"
+            aria-label="Delete permanently"
+            className="flex h-8 w-8 items-center justify-center rounded-sm text-[var(--text-tertiary)] transition-colors duration-150 hover:bg-[var(--surface-hover)] hover:text-[var(--status-danger)]"
           >
             <Trash2 className="size-3.5" />
           </button>
-        ) : (
-          <div className="flex items-center gap-1 rounded-sm border border-red-500/40 bg-red-500/5 px-2.5 py-1.5">
-            <span className="text-[11px] text-[var(--status-danger)] font-semibold">Delete forever?</span>
-            <button
-              type="button"
-              disabled={pending}
-              onClick={async () => {
-                setPending(true);
-                try { await permanentDelete({ routineId: routine._id }); }
-                finally { setPending(false); setConfirmDelete(false); }
-              }}
-              className="text-[11px] font-bold text-[var(--status-danger)] hover:underline disabled:opacity-50 ml-1"
-            >
-              Yes
-            </button>
-            <button type="button" onClick={() => setConfirmDelete(false)} className="ml-1 text-[var(--text-tertiary)] hover:text-foreground">
-              <X className="size-3" />
-            </button>
-          </div>
-        )}
       </div>
+
+      <ConfirmDrawer
+        open={confirmDelete}
+        onOpenChange={setConfirmDelete}
+        title="Delete this routine forever?"
+        description="This cannot be undone. Its completion history and streaks are removed with it."
+        confirmLabel="Delete forever"
+        tone="danger"
+        onConfirm={async () => {
+          setPending(true);
+          try {
+            await permanentDelete({ routineId: routine._id });
+          } finally {
+            setPending(false);
+          }
+        }}
+      >
+        <p className="text-[13px] text-foreground">{routine.name}</p>
+      </ConfirmDrawer>
     </div>
   );
 }

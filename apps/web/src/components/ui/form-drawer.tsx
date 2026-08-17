@@ -1,6 +1,6 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { Drawer } from "@/components/ui/drawer";
+import { Drawer, type DrawerSize } from "@/components/ui/drawer";
 
 interface FormDrawerProps {
   open: boolean;
@@ -11,6 +11,8 @@ interface FormDrawerProps {
   /** `danger` for destructive confirms — same chrome, different CTA tone. */
   tone?: "accent" | "danger";
   submitDisabled?: boolean;
+  /** Defaults to `form`; confirms pass `confirm`. */
+  size?: DrawerSize;
   onSubmit: () => void | Promise<void>;
   children: ReactNode;
 }
@@ -32,6 +34,7 @@ export function FormDrawer({
   submitLabel,
   tone = "accent",
   submitDisabled,
+  size,
   onSubmit,
   children,
 }: FormDrawerProps) {
@@ -54,7 +57,7 @@ export function FormDrawer({
       open={open}
       onOpenChange={onOpenChange}
       label={title}
-      className="w-[513px] max-w-full"
+      size={size}
     >
       <form onSubmit={submit} className="flex min-h-full flex-col">
         <div className="px-7 pb-4 pt-6">

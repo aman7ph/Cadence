@@ -3,9 +3,10 @@ import { useMutation } from "convex/react";
 import { Archive, Flame, Pencil, Target } from "lucide-react";
 import { api } from "@cadence/backend/convex/_generated/api";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
+import { ConfirmDrawer } from "@/components/ui/confirm-drawer";
+import { useRoutineArchive } from "@/lib/use-routine-archive";
 import { scheduleLabel } from "./routines-schedule-form";
 import type { ScheduleType } from "./routines-schedule-form";
-import { EditRoutineForm } from "./routines-edit-form";
 
 interface ActiveRoutineRowProps {
   routine: {
@@ -23,29 +24,11 @@ interface ActiveRoutineRowProps {
     repeatIntervalMinutes?: number;
   };
   today: string;
+  onEdit: () => void;
 }
 
-export function ActiveRoutineRow({ routine, today }: ActiveRoutineRowProps) {
-  const archiveMutation = useMutation(api.routineManagement.archive);
-  const [editing, setEditing] = useState(false);
-  const [archiving, setArchiving] = useState(false);
-
-  if (editing) {
-    return (
-      <EditRoutineForm
-        routineId={routine._id}
-        initialName={routine.name}
-        initialDescription={routine.description}
-        initialScheduleType={routine.scheduleType}
-        initialCustomDays={routine.customDays}
-        initialGoalId={routine.goalId}
-        initialGoalContribution={routine.goalContribution}
-        initialRepeatTarget={routine.repeatTarget}
-        initialRepeatIntervalMinutes={routine.repeatIntervalMinutes}
-        onDone={() => setEditing(false)}
-      />
-    );
-  }
+export function ActiveRoutineRow({ routine, today, onEdit }: ActiveRoutineRowProps) {
+  const archiveAction = useRoutineArchive(routine._id, today);
 
   return (
     <div className="group flex items-start gap-3 rounded-md border border-[var(--border-subtle)] bg-card px-3.5 py-3 transition-colors duration-150 hover:border-[var(--border-default)]">
@@ -86,7 +69,7 @@ export function ActiveRoutineRow({ routine, today }: ActiveRoutineRowProps) {
       <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           type="button"
-          onClick={() => setEditing(true)}
+          onClick={onEdit}
           className="flex h-8 w-8 items-center justify-center rounded-sm text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-foreground transition-colors duration-150"
           title="Edit routine"
         >
@@ -94,18 +77,15 @@ export function ActiveRoutineRow({ routine, today }: ActiveRoutineRowProps) {
         </button>
         <button
           type="button"
-          disabled={archiving}
-          onClick={async () => {
-            setArchiving(true);
-            try { await archiveMutation({ routineId: routine._id, today }); }
-            finally { setArchiving(false); }
-          }}
-          className="flex h-8 w-8 items-center justify-center rounded-[8px] text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-amber-600 transition-all duration-150 disabled:opacity-50"
+          onClick={archiveAction.request}
+          className="flex h-8 w-8 items-center justify-center rounded-sm text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-accent)] transition-colors duration-150 disabled:opacity-50"
           title="Archive routine"
         >
           <Archive className="size-3.5" />
         </button>
       </div>
+
+      <ConfirmDrawer {...archiveAction.drawerProps} />
     </div>
   );
 }

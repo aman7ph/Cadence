@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -36,18 +36,34 @@ export function Stepper({
   className,
 }: StepperProps) {
   const [draft, setDraft] = useState(String(value));
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // Follow external changes (the +/- buttons, or a reset) without fighting typing.
+  // Follow external changes — the +/- buttons, or a reset — but never while the
+  // field has focus. Re-syncing mid-keystroke made the box fight the typist:
+  // typing "12" into a field showing "2" briefly reads "212", clamps to the
+  // maximum, and the caret lands after a number nobody typed.
   useEffect(() => {
-    setDraft((d) => (Number(d) === value ? d : String(value)));
+    if (document.activeElement === inputRef.current) return;
+    setDraft(String(value));
   }, [value]);
 
   const clamp = (n: number) => Math.min(max, Math.max(min, n));
 
+  // While typing, the draft is the user's; only in-range values are published.
+  // Out-of-range input is left visible and settled on blur, so the number never
+  // changes under the caret.
   const commit = (raw: string) => {
     setDraft(raw);
     const n = Number(raw);
-    if (raw.trim() !== "" && Number.isFinite(n)) onChange(clamp(Math.round(n)));
+    if (raw.trim() === "" || !Number.isFinite(n)) return;
+    if (n >= min && n <= max) onChange(Math.round(n));
+  };
+
+  const settle = () => {
+    const n = Number(draft);
+    const next = draft.trim() === "" || !Number.isFinite(n) ? value : clamp(Math.round(n));
+    onChange(next);
+    setDraft(String(next));
   };
 
   const btn =
@@ -73,8 +89,9 @@ export function Stepper({
             inputMode="numeric"
             aria-label={label}
             value={draft}
+            ref={inputRef}
             onChange={(e) => commit(e.target.value.replace(/[^\d]/g, ""))}
-            onBlur={() => setDraft(String(value))}
+            onBlur={settle}
             className="w-[3.5ch] bg-transparent text-right font-mono text-[11.5px] font-semibold tabular-nums text-foreground outline-none"
           />
           {suffix ? (

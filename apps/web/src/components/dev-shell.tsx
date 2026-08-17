@@ -7,6 +7,13 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Drawer } from "@/components/ui/drawer";
 import { ListGrid } from "@/components/ui/list-grid";
+import { FormDrawer } from "@/components/ui/form-drawer";
+import { Input } from "@/components/ui/input";
+import {
+  EMPTY_ITEM_OPTIONS,
+  ItemOptionsFields,
+  type ItemOptions,
+} from "@/components/item-options-fields";
 import { Label } from "@/components/ui/label";
 import { LayoutSection } from "@/components/settings-layout-section";
 
@@ -23,6 +30,9 @@ export function DevShell() {
   const [navOpen, setNavOpen] = useState(false);
   const [tab, setTab] = useState<"active" | "archived">("active");
   const [drawer, setDrawer] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [opts, setOpts] = useState<ItemOptions>(EMPTY_ITEM_OPTIONS);
   return (
     <div className="flex h-screen w-full overflow-hidden">
       <Sidebar view={view} onNavigate={setView} />
@@ -53,9 +63,41 @@ export function DevShell() {
         <p className="mt-4 text-[13px] text-[var(--text-secondary)]">
           Shell preview ({view}) — resize below 768px for the burger drawer.
         </p>
-        <Button className="mt-4" onClick={() => setDrawer(true)}>
-          Open detail drawer
-        </Button>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button onClick={() => setDrawer(true)}>Open detail drawer</Button>
+          <Button variant="outline" onClick={() => setFormOpen(true)}>
+            Open form drawer
+          </Button>
+          <Button variant="outline" tone="danger" onClick={() => setConfirmOpen(true)}>
+            Open delete confirm
+          </Button>
+        </div>
+
+        <FormDrawer
+          open={formOpen}
+          onOpenChange={setFormOpen}
+          title="New routine"
+          description="Name it, choose when it runs, and optionally link a goal."
+          submitLabel="Create routine"
+          onSubmit={async () => {}}
+        >
+          <Input placeholder="Routine name" />
+          <ItemOptionsFields value={opts} onChange={setOpts} />
+        </FormDrawer>
+
+        <FormDrawer
+          open={confirmOpen}
+          onOpenChange={setConfirmOpen}
+          title="Delete this task?"
+          description="This cannot be undone."
+          submitLabel="Delete"
+          tone="danger"
+          onSubmit={async () => {}}
+        >
+          <p className="text-[13px] text-[var(--text-secondary)]">
+            Carryover smoke test 2
+          </p>
+        </FormDrawer>
 
         <div className="mt-6 max-w-[540px]">
           <LayoutSection />

@@ -1,7 +1,4 @@
-import { useMutation } from "convex/react";
-import { api } from "@cadence/backend/convex/_generated/api";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
-import { TaskComposer } from "./task-composer";
 import { SectionLabel } from "./section-label";
 import { ListGrid } from "@/components/ui/list-grid";
 import { useListColumns } from "@/lib/use-list-columns";
@@ -39,7 +36,6 @@ export function TodayTasksSection({
   viewedDate,
   isPast,
 }: TodayTasksSectionProps) {
-  const create = useMutation(api.dailyTasks.create);
   const { columns } = useListColumns();
   return (
     <section className="flex flex-col gap-2.5">
@@ -71,21 +67,6 @@ export function TodayTasksSection({
             />
           ))}
         </ListGrid>
-      )}
-      {!isPast && (
-        <TaskComposer
-          placeholder="Add a task for today"
-          onSubmit={async (v) => {
-            await create({
-              title: v.title,
-              today: viewedDate,
-              goalId: v.goalId,
-              goalContribution: v.goalContribution,
-              repeatTarget: v.repeatTarget,
-              repeatIntervalMinutes: v.repeatIntervalMinutes,
-            });
-          }}
-        />
       )}
     </section>
   );

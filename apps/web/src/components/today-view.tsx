@@ -7,6 +7,7 @@ import { DayNavigator } from "./day-navigator";
 import { TodayStatCards } from "./today-stat-cards";
 import { TodayRoutinesSection } from "./today-routines-section";
 import { TodayTasksSection } from "./today-tasks-section";
+import { TodayAddTask } from "./today-add-task";
 import { TodayReflectionSection } from "./today-reflection-section";
 import { Badge } from "@/components/ui/badge";
 
@@ -117,6 +118,7 @@ export function TodayView() {
         viewedDate={viewedDate}
         isPast={isPast}
       />
+      {!isPast && <TodayAddTask viewedDate={viewedDate} />}
       <TodayTasksSection
         tasks={day.randomTasks}
         tasksDone={tasksDone}

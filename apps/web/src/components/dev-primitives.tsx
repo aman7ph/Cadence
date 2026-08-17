@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/ui/logo";
-import { TaskComposer } from "@/components/task-composer";
 import { ReflectionEditor } from "@/components/today-reflection-editor";
 import { useTheme } from "@/lib/theme";
 
@@ -97,14 +96,6 @@ export function DevPrimitives() {
           <Logo size={48} />
           <Logo size={96} animated />
         </Row>
-
-        <div className="flex flex-col gap-2">
-          <Label>composer — click the gear</Label>
-          <TaskComposer
-            placeholder="Add a task for today"
-            onSubmit={async () => {}}
-          />
-        </div>
 
         <div className="flex flex-col gap-2">
           <Label>reflection — type @ to check the mention list</Label>

@@ -4,6 +4,8 @@ import { api } from "@cadence/backend/convex/_generated/api";
 import { AddStagedTaskForm } from "./add-staged-task-form";
 import { StagedTaskRow } from "./staged-task-row";
 import { PageHeader } from "./page-header";
+import { ListGrid } from "@/components/ui/list-grid";
+import { useListColumns } from "@/lib/use-list-columns";
 
 type Tab = "unscheduled" | "scheduled";
 
@@ -11,6 +13,7 @@ export function StagingPage() {
   const stagedTasks = useQuery(api.stagedTasks.list, {});
   const activeGoals = useQuery(api.goals.list, {});
   const [tab, setTab] = useState<Tab>("unscheduled");
+  const { columns } = useListColumns();
 
   const goalTitleById = new Map((activeGoals ?? []).map((g) => [g._id, g.title]));
 
@@ -44,7 +47,7 @@ export function StagingPage() {
           </p>
         )}
 
-        <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+        <ListGrid columns={columns.staging}>
           {shown.map((t) => (
             <StagedTaskRow
               key={t._id}
@@ -52,7 +55,7 @@ export function StagingPage() {
               goalTitle={t.goalId ? goalTitleById.get(t.goalId) : undefined}
             />
           ))}
-        </div>
+        </ListGrid>
 
         {tab === "unscheduled" && <AddStagedTaskForm />}
       </section>

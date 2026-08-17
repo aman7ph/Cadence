@@ -3,6 +3,7 @@ import { api } from "@cadence/backend/convex/_generated/api";
 import { DEFAULT_ROUTINE_WEIGHT } from "@cadence/shared";
 import { Button } from "@/components/ui/button";
 import { AccountSection, AppearanceSection, DataSection, Section } from "./settings-sections";
+import { LayoutSection } from "./settings-layout-section";
 import { PageHeader } from "./page-header";
 
 function ProductivitySection() {
@@ -75,6 +76,7 @@ export function SettingsPage() {
         <div className="flex flex-col gap-4">
           <AccountSection />
           <AppearanceSection />
+          <LayoutSection />
         </div>
         <div className="flex flex-col gap-4">
           <ProductivitySection />

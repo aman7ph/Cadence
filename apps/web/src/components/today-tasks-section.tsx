@@ -3,6 +3,8 @@ import { api } from "@cadence/backend/convex/_generated/api";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import { TaskComposer } from "./task-composer";
 import { SectionLabel } from "./section-label";
+import { ListGrid } from "@/components/ui/list-grid";
+import { useListColumns } from "@/lib/use-list-columns";
 import { TaskRow } from "./task-row";
 
 interface Task {
@@ -38,6 +40,7 @@ export function TodayTasksSection({
   isPast,
 }: TodayTasksSectionProps) {
   const create = useMutation(api.dailyTasks.create);
+  const { columns } = useListColumns();
   return (
     <section className="flex flex-col gap-2.5">
       <SectionLabel count={tasksDone + tasksOpen > 0 ? `${tasksDone}/${tasksDone + tasksOpen}` : undefined}>
@@ -48,7 +51,7 @@ export function TodayTasksSection({
           {isPast ? "No tasks on this day." : "No tasks yet. Add one below."}
         </p>
       ) : (
-        <div className="flex flex-col gap-1.5">
+        <ListGrid columns={columns.today} className="gap-1.5">
           {tasks.map((t) => (
             <TaskRow
               key={t.taskId}
@@ -67,7 +70,7 @@ export function TodayTasksSection({
               readOnly={isPast}
             />
           ))}
-        </div>
+        </ListGrid>
       )}
       {!isPast && (
         <TaskComposer

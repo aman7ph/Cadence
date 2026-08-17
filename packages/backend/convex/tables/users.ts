@@ -23,6 +23,18 @@ export const reminderValidator = v.object({
   ),
 });
 
+// Exported for the same reason as reminderValidator: users.setListColumns
+// validates its argument with the same definition the table declares, so the
+// accepted shape and the stored shape cannot drift. Bounds are NOT expressed
+// here — Convex validators check types, and the 1..5 range lives in
+// packages/shared/src/listColumns.ts so the server and the form share it.
+export const listColumnsValidator = v.object({
+  today: v.number(),
+  routines: v.number(),
+  staging: v.number(),
+  goals: v.number(),
+});
+
 export const users = defineTable({
   tokenIdentifier: v.string(),
   email: v.string(),
@@ -34,4 +46,8 @@ export const users = defineTable({
   // The nudge reminder (mobile only). Absent ⇒ never configured; clients fall
   // back to DEFAULT_REMINDER, which is disabled, so absence means no reminder.
   reminder: v.optional(reminderValidator),
+  // Columns per list page (web only). Absent ⇒ never configured; clients fall
+  // back to DEFAULT_LIST_COLUMNS, which reproduces the pre-feature layout, so
+  // absence renders exactly as before.
+  listColumns: v.optional(listColumnsValidator),
 }).index("by_token", ["tokenIdentifier"]);

@@ -1,8 +1,8 @@
 import { v } from "convex/values";
-import { validateReminder } from "@cadence/shared";
+import { validateListColumns, validateReminder } from "@cadence/shared";
 import { query, mutation } from "./_generated/server";
 import { requireUser } from "./lib/auth";
-import { reminderValidator } from "./tables/users";
+import { listColumnsValidator, reminderValidator } from "./tables/users";
 
 export const getMe = query({
   args: {},
@@ -47,5 +47,20 @@ export const setReminder = mutation({
     validateReminder(reminder);
     const user = await requireUser(ctx);
     await ctx.db.patch(user._id, { reminder });
+  },
+});
+
+// Columns per list page (web only — see D16 of
+// .agent/ui-redesign-implementation-plan.md). Validation is the shared helper
+// rather than a local copy, so the server rejects exactly what the settings
+// form rejects. The whole object is saved at once, like setReminder, because
+// the form persists on change and a per-page mutation would multiply round
+// trips for no benefit.
+export const setListColumns = mutation({
+  args: { listColumns: listColumnsValidator },
+  handler: async (ctx, { listColumns }) => {
+    validateListColumns(listColumns);
+    const user = await requireUser(ctx);
+    await ctx.db.patch(user._id, { listColumns });
   },
 });

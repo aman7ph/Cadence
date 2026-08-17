@@ -8,6 +8,8 @@ import { ActiveRoutineRow } from "./routines-active-row";
 import { ArchivedRoutineRow } from "./routines-archived-row";
 import { CreateRoutineForm } from "./routines-create-form";
 import { PageHeader } from "./page-header";
+import { ListGrid } from "@/components/ui/list-grid";
+import { useListColumns } from "@/lib/use-list-columns";
 
 type Tab = "active" | "archived";
 
@@ -16,6 +18,7 @@ export function RoutinesPage() {
   const allRoutines = useQuery(api.routines.list, { includeArchived: true, today });
   const activeGoals = useQuery(api.goals.list, {});
   const [tab, setTab] = useState<Tab>("active");
+  const { columns } = useListColumns();
 
   const goalTitleById = new Map((activeGoals ?? []).map((g) => [g._id, g.title]));
 
@@ -46,7 +49,7 @@ export function RoutinesPage() {
               No active routines. Add one below to get started.
             </p>
           ) : (
-            <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+            <ListGrid columns={columns.routines}>
               {active.map((r) => (
                 <ActiveRoutineRow
                   key={r._id}
@@ -72,7 +75,7 @@ export function RoutinesPage() {
                   today={today}
                 />
               ))}
-            </div>
+            </ListGrid>
           )}
           <CreateRoutineForm />
         </section>
@@ -85,7 +88,7 @@ export function RoutinesPage() {
               Nothing archived yet.
             </p>
           ) : (
-            <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+            <ListGrid columns={columns.routines}>
               {archived.map((r) => (
                 <ArchivedRoutineRow
                   key={r._id}
@@ -99,7 +102,7 @@ export function RoutinesPage() {
                   }}
                 />
               ))}
-            </div>
+            </ListGrid>
           )}
         </section>
       )}

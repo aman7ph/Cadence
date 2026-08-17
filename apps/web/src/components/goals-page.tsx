@@ -9,6 +9,8 @@ import { GoalDetail } from "./goal-detail";
 import { GoalCreateForm } from "./goal-create-form";
 import { GoalRow } from "./goal-row";
 import { PageHeader } from "./page-header";
+import { ListGrid } from "@/components/ui/list-grid";
+import { useListColumns } from "@/lib/use-list-columns";
 
 type Tab = "active" | "completed" | "abandoned";
 
@@ -19,6 +21,7 @@ export function GoalsPage() {
   const [tab, setTab] = useState<Tab>("active");
   const [openGoalId, setOpenGoalId] = useState<Id<"goals"> | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const { columns } = useListColumns();
 
   const active = goalsWithCounts ?? [];
   const completed = (allGoals ?? []).filter((g) => g.status === "completed");
@@ -83,7 +86,7 @@ export function GoalsPage() {
         </p>
       )}
 
-      <div className="flex flex-col gap-2">
+      <ListGrid columns={columns.goals}>
         {rows.map(({ goal, routineCount, taskCount }) => (
           <GoalRow
             key={goal._id}
@@ -93,7 +96,7 @@ export function GoalsPage() {
             onOpen={() => setOpenGoalId(goal._id)}
           />
         ))}
-      </div>
+      </ListGrid>
 
       <Drawer
         open={openGoalId !== null}

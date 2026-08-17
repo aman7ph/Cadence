@@ -1,6 +1,8 @@
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import { RoutineRow } from "./routine-row";
 import { SectionLabel } from "./section-label";
+import { ListGrid } from "@/components/ui/list-grid";
+import { useListColumns } from "@/lib/use-list-columns";
 import type { AppView } from "@/App";
 
 interface Routine {
@@ -35,6 +37,7 @@ export function TodayRoutinesSection({
   isPast,
   onNavigate,
 }: TodayRoutinesSectionProps) {
+  const { columns } = useListColumns();
   return (
     <section className="flex flex-col gap-2.5">
       <SectionLabel count={routinesScheduled > 0 ? `${routinesDone}/${routinesScheduled}` : undefined}>
@@ -45,7 +48,7 @@ export function TodayRoutinesSection({
           {isPast ? "Nothing was scheduled this day." : "Nothing scheduled today."}
         </p>
       ) : (
-        <div className="flex flex-col gap-1.5">
+        <ListGrid columns={columns.today} className="gap-1.5">
           {routines.map((r) => (
             <RoutineRow
               key={r.routineId}
@@ -64,7 +67,7 @@ export function TodayRoutinesSection({
               readOnly={isPast}
             />
           ))}
-        </div>
+        </ListGrid>
       )}
       {!isPast && (
         <button

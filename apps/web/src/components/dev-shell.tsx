@@ -6,6 +6,9 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Drawer } from "@/components/ui/drawer";
+import { ListGrid } from "@/components/ui/list-grid";
+import { Label } from "@/components/ui/label";
+import { LayoutSection } from "@/components/settings-layout-section";
 
 /**
  * Dev-only shell preview at /preview?shell.
@@ -49,6 +52,30 @@ export function DevShell() {
         <Button className="mt-4" onClick={() => setDrawer(true)}>
           Open detail drawer
         </Button>
+
+        <div className="mt-6 max-w-[540px]">
+          <LayoutSection />
+        </div>
+
+        {/* Column counts 1-5. Resize the window: every count collapses to one
+            column below sm and at most two until lg. */}
+        <div className="mt-6 flex flex-col gap-5">
+          {[1, 2, 3, 4, 5].map((n) => (
+            <div key={n} className="flex flex-col gap-1.5">
+              <Label>{`ListGrid — ${n} column${n === 1 ? "" : "s"}`}</Label>
+              <ListGrid columns={n}>
+                {Array.from({ length: n }, (_, i) => (
+                  <div
+                    key={i}
+                    className="rounded-sm border border-[var(--border-subtle)] bg-card px-3 py-2.5 text-[13px] text-foreground"
+                  >
+                    Item {i + 1}
+                  </div>
+                ))}
+              </ListGrid>
+            </div>
+          ))}
+        </div>
         <Drawer
           open={drawer}
           onOpenChange={setDrawer}

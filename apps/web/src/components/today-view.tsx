@@ -9,7 +9,6 @@ import { TodayRoutinesSection } from "./today-routines-section";
 import { TodayTasksSection } from "./today-tasks-section";
 import { TodayReflectionSection } from "./today-reflection-section";
 import { Badge } from "@/components/ui/badge";
-import type { AppView } from "@/App";
 
 const THIRTY_DAY_WINDOW = 30;
 
@@ -26,7 +25,7 @@ function prettyDate(date: string): string {
   return d.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
 }
 
-export function TodayView({ onNavigate }: { onNavigate?: (view: AppView) => void }) {
+export function TodayView() {
   const today = todayLocal();
   const [viewedDate, setViewedDate] = useState(today);
   const isPast = viewedDate < today;
@@ -117,7 +116,6 @@ export function TodayView({ onNavigate }: { onNavigate?: (view: AppView) => void
         routinesScheduled={routinesScheduled}
         viewedDate={viewedDate}
         isPast={isPast}
-        onNavigate={onNavigate}
       />
       <TodayTasksSection
         tasks={day.randomTasks}

@@ -46,7 +46,7 @@ export function ComposerGoalPanel({
           No active goals to contribute to.
         </p>
       ) : (
-        <div className="flex max-h-[188px] flex-col gap-1.5 overflow-y-auto pr-0.5">
+        <div className="no-scrollbar flex max-h-[188px] flex-col gap-1.5 overflow-y-auto">
           {goals.map((g) => {
             const active = g._id === goalId;
             const target = g.targetValue ?? 0;

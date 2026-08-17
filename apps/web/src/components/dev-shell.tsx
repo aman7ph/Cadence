@@ -34,7 +34,11 @@ export function DevShell() {
             open={navOpen}
             onOpenChange={setNavOpen}
           />
-          <ThemeToggle />
+          {/* Mirrors App.tsx: desktop shows it in the sidebar brand row, so
+              the header copy is mobile-only. */}
+          <span className="md:hidden">
+            <ThemeToggle />
+          </span>
         </div>
         <PageHeader
           title="Routines"

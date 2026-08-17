@@ -13,6 +13,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  /* Scrolling stays, the native bar goes. Used where a small floating surface
+     scrolls (the mention menu, the composer's goal list) and a chunky OS
+     scrollbar reads as a rendering artefact rather than a control. */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;

@@ -3,7 +3,6 @@ import { RoutineRow } from "./routine-row";
 import { SectionLabel } from "./section-label";
 import { ListGrid } from "@/components/ui/list-grid";
 import { useListColumns } from "@/lib/use-list-columns";
-import type { AppView } from "@/App";
 
 interface Routine {
   routineId: string;
@@ -26,7 +25,6 @@ interface TodayRoutinesSectionProps {
   routinesScheduled: number;
   viewedDate: string;
   isPast: boolean;
-  onNavigate?: (view: AppView) => void;
 }
 
 export function TodayRoutinesSection({
@@ -35,7 +33,6 @@ export function TodayRoutinesSection({
   routinesScheduled,
   viewedDate,
   isPast,
-  onNavigate,
 }: TodayRoutinesSectionProps) {
   const { columns } = useListColumns();
   return (
@@ -68,15 +65,6 @@ export function TodayRoutinesSection({
             />
           ))}
         </ListGrid>
-      )}
-      {!isPast && (
-        <button
-          type="button"
-          onClick={() => onNavigate?.("routines")}
-          className="self-start text-[12px] font-medium text-[var(--text-tertiary)] hover:text-foreground underline underline-offset-2 transition-colors"
-        >
-          Manage routines →
-        </button>
       )}
     </section>
   );

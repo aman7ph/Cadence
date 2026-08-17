@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { Logo } from "@/components/ui/logo";
+import { ThemeToggle } from "./theme-toggle";
 import type { AppView } from "@/App";
 import { NavItem } from "./sidebar-nav-item";
 
@@ -31,9 +32,12 @@ export const NAV_ITEMS: { view: AppView; label: string; icon: React.ReactNode }[
 interface SidebarNavProps {
   view: AppView;
   onNavigate: (view: AppView) => void;
+  /** Show the theme toggle in the brand row. Off inside the mobile drawer,
+   *  whose own close button already occupies that corner. */
+  showThemeToggle?: boolean;
 }
 
-export function SidebarNav({ view, onNavigate }: SidebarNavProps) {
+export function SidebarNav({ view, onNavigate, showThemeToggle }: SidebarNavProps) {
   const { user } = useUser();
   const { signOut } = useClerk();
 
@@ -45,11 +49,14 @@ export function SidebarNav({ view, onNavigate }: SidebarNavProps) {
 
   return (
     <>
-      <div className="flex items-center gap-2.5 px-2 pb-5">
-        <Logo size={26} />
-        <span className="font-display text-[19px] font-semibold tracking-tight text-foreground">
-          Cadence
+      <div className="flex items-center justify-between gap-2 px-2 pb-5">
+        <span className="flex min-w-0 items-center gap-2.5">
+          <Logo size={26} />
+          <span className="truncate font-display text-[19px] font-semibold tracking-tight text-foreground">
+            Cadence
+          </span>
         </span>
+        {showThemeToggle && <ThemeToggle />}
       </div>
 
       <nav className="flex flex-col gap-0.5">

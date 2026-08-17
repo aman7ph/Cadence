@@ -114,11 +114,15 @@ function SignedInLayout() {
               open={navOpen}
               onOpenChange={setNavOpen}
             />
-            <ThemeToggle />
+            {/* Desktop shows it in the sidebar brand row; this is the
+                mobile placement, beside the burger. */}
+            <span className="md:hidden">
+              <ThemeToggle />
+            </span>
           </div>
           <EnsureProvisioned />
           <RolloverOnForeground />
-          {view === "today" && <TodayView onNavigate={setView} />}
+          {view === "today" && <TodayView />}
           {view === "routines" && <RoutinesPage />}
           {view === "staging" && <StagingPage />}
           {view === "history" && <HistoryPage />}

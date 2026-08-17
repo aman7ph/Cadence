@@ -111,14 +111,12 @@ export function DevPrimitives() {
           <ReflectionEditor
             date="2026-08-15"
             initialText=""
-            routines={[
-              { routineId: "r1", name: "Morning run" },
-              { routineId: "r2", name: "Read 10 pages a day" },
-            ]}
-            tasks={[
-              { taskId: "t1", title: "Check email for the reply", status: "open" },
-              { taskId: "t2", title: "Stretch break", status: "open" },
-            ]}
+            routines={["Morning run", "Read 10 pages a day", "30 push-ups", "No breakfast", "One GitHub push"].map(
+              (name, i) => ({ routineId: `r${i}`, name }),
+            )}
+            tasks={["Check email for the reply", "Stretch break", "Plan the week", "Call the bank"].map(
+              (title, i) => ({ taskId: `t${i}`, title, status: "open" as const }),
+            )}
             hasExisting={false}
             onSaved={() => {}}
             onCancel={() => {}}

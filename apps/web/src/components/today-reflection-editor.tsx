@@ -108,7 +108,7 @@ export function ReflectionEditor({ date, initialText, routines, tasks, hasExisti
           placeholder={"What's on your mind today?\nReflect on wins, challenges, or anything worth remembering…\n\nType @ to tag a task or routine."}
           className="w-full resize-none overflow-hidden bg-transparent text-[15px] font-[450] leading-[1.75] text-foreground placeholder:text-[var(--text-tertiary)] placeholder:text-[14px] placeholder:leading-[1.8] focus:outline-none" />
         {mention && options.length > 0 && (
-          <div className="absolute bottom-full left-5 z-30 mb-2 max-h-[220px] w-[min(320px,calc(100%-2.5rem))] overflow-y-auto rounded-md border border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-[var(--shadow-md)]">
+          <div className="no-scrollbar absolute bottom-full left-5 z-30 mb-2 max-h-[220px] w-[min(320px,calc(100%-2.5rem))] overflow-y-auto rounded-md border border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-[var(--shadow-md)]">
             {options.map((opt, i) => (
               <button key={opt.id} type="button" onMouseDown={(e) => { e.preventDefault(); insertMention(opt.id, opt.name); }}
                 className={cn("flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-[13px] transition-colors",

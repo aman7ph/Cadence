@@ -1,5 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 import { useReminderSettings } from "../lib/useReminderSettings";
 import { ReminderFields } from "./ReminderFields";
 
@@ -21,7 +22,7 @@ export function ReminderSection() {
                 justifyContent: "space-between" },
     lbl:      { fontSize: 14, fontWeight: "500", color: c.t1 },
     hint:     { fontSize: 12, color: c.t3, marginTop: 2 },
-    toggle:   { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 999,
+    toggle:   { paddingHorizontal: 14, paddingVertical: 6, borderRadius: radii.full,
                 borderWidth: 1, borderColor: c.bd2 },
     toggleOn: { borderColor: c.prim, backgroundColor: c.accBg },
     toggleTxt:   { fontSize: 12, fontWeight: "600", color: c.t2 },

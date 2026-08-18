@@ -2,16 +2,19 @@ import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
 import { Animated, Text, View } from "react-native";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
+import { display } from "../lib/fonts";
+import { SectionLabel } from "./ui/SectionLabel";
 import type { Granularity } from "../lib/insightUtils";
 import { fmtXLabel, pickLabelIndices } from "../lib/insightUtils";
 
 export function ChartCard({ title, label, children }: { title: string; label?: string; children: ReactNode }) {
   const c = useColors();
   return (
-    <View style={{ backgroundColor: c.card, borderWidth: 1, borderColor: c.bd1, borderRadius: 16, padding: 16, marginBottom: 14 }}>
+    <View style={{ backgroundColor: c.card, borderWidth: 1, borderColor: c.bd1, borderRadius: radii.lg, padding: 16, marginBottom: 14 }}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-        <Text style={{ fontSize: 15, fontWeight: "600", color: c.t1, letterSpacing: -0.3 }}>{title}</Text>
-        {label ? <Text style={{ fontSize: 10, fontWeight: "700", textTransform: "uppercase", letterSpacing: 1, color: c.t3 }}>{label}</Text> : null}
+        <Text style={{ ...display("semibold"), fontSize: 13, color: c.t1 }}>{title}</Text>
+        {label ? <SectionLabel>{label}</SectionLabel> : null}
       </View>
       {children}
     </View>
@@ -31,8 +34,8 @@ export function Loading() {
   }, [opacity]);
   return (
     <View style={{ gap: 10, paddingVertical: 6 }}>
-      <Animated.View style={{ height: 120, borderRadius: 10, backgroundColor: c.active, opacity }} />
-      <Animated.View style={{ height: 16, borderRadius: 6, backgroundColor: c.active, opacity, width: "60%" }} />
+      <Animated.View style={{ height: 120, borderRadius: radii.sm, backgroundColor: c.active, opacity }} />
+      <Animated.View style={{ height: 16, borderRadius: radii.sm, backgroundColor: c.active, opacity, width: "60%" }} />
     </View>
   );
 }
@@ -53,7 +56,7 @@ export function XLabels({ dates, granularity }: { dates: string[]; granularity: 
   return (
     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 6 }}>
       {indices.map((idx) => (
-        <Text key={idx} style={{ fontSize: 10, color: c.t3 }}>{fmtXLabel(dates[idx]!, granularity)}</Text>
+        <Text key={idx} style={{ fontSize: 10, color: c.t2 }}>{fmtXLabel(dates[idx]!, granularity)}</Text>
       ))}
     </View>
   );

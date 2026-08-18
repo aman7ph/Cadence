@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import type { DateRange } from "@cadence/shared";
 import { DatePickerModal } from "./DatePickerModal";
+import { Sheet } from "./ui/Sheet";
 import { useColors } from "../lib/theme";
 import { radii } from "../lib/radii";
 import { RANGE_PRESETS, fmtShort } from "../lib/insightUtils";
@@ -34,16 +35,11 @@ export function RangePickerSheet({ visible, range, label, today, onChange, onClo
   };
 
   const s = StyleSheet.create({
-    overlay:    { flex: 1, backgroundColor: c.scrim, justifyContent: "flex-end" },
-    sheet:      { backgroundColor: c.bgE, borderTopLeftRadius: radii.sheet, borderTopRightRadius: radii.sheet,
-                  paddingBottom: 32, maxHeight: "90%" as const },
-    handle:     { width: 36, height: 4, backgroundColor: c.bd3, borderRadius: 2,
-                  alignSelf: "center", marginTop: 10, marginBottom: 4 },
     sheetHdr:   { flexDirection: "row", alignItems: "center", justifyContent: "space-between",
                   paddingHorizontal: 20, paddingVertical: 14,
                   borderBottomWidth: 1, borderBottomColor: c.bd1 },
     sheetTitle: { fontSize: 16, fontWeight: "700", color: c.t1 },
-    closeBtn:   { width: 32, height: 32, borderRadius: 16, backgroundColor: c.card,
+    closeBtn:   { width: 32, height: 32, borderRadius: radii.full, backgroundColor: c.card,
                   borderWidth: 1, borderColor: c.bd2, alignItems: "center", justifyContent: "center" },
     secLbl:     { fontSize: 10, fontWeight: "700", textTransform: "uppercase", letterSpacing: 1,
                   color: c.t3, paddingHorizontal: 20, paddingTop: 16, paddingBottom: 6 },
@@ -56,20 +52,17 @@ export function RangePickerSheet({ visible, range, label, today, onChange, onClo
                   paddingVertical: 10, gap: 12 },
     customLbl:  { width: 36, fontSize: 13, color: c.t3, fontWeight: "500" },
     dateBtn:    { flex: 1, paddingHorizontal: 14, paddingVertical: 9, backgroundColor: c.card,
-                  borderWidth: 1, borderColor: c.bd2, borderRadius: 10, alignItems: "center" },
+                  borderWidth: 1, borderColor: c.bd2, borderRadius: radii.sm, alignItems: "center" },
     dateTxt:    { fontSize: 13, color: c.t1, fontWeight: "500" },
     errTxt:     { fontSize: 12, color: c.chart4, paddingHorizontal: 20, paddingTop: 4 },
     applyBtn:   { marginHorizontal: 20, marginTop: 12, paddingVertical: 12, backgroundColor: c.prim,
-                  borderRadius: 12, alignItems: "center" },
+                  borderRadius: radii.md, alignItems: "center" },
     applyTxt:   { fontSize: 14, fontWeight: "700", color: c.onPrim },
   });
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
-      <TouchableOpacity style={s.overlay} activeOpacity={1} onPress={onClose}>
-        <TouchableOpacity activeOpacity={1} onPress={() => {}}>
-          <View style={s.sheet}>
-            <View style={s.handle} />
+    <>
+    <Sheet visible={visible} onClose={onClose}>
             <View style={s.sheetHdr}>
               <Text style={s.sheetTitle}>Date Range</Text>
               <TouchableOpacity style={s.closeBtn} onPress={onClose} activeOpacity={0.7}>
@@ -106,15 +99,13 @@ export function RangePickerSheet({ visible, range, label, today, onChange, onClo
                 <Text style={s.applyTxt}>Apply custom range</Text>
               </TouchableOpacity>
             </ScrollView>
-          </View>
-        </TouchableOpacity>
-      </TouchableOpacity>
+      </Sheet>
       <DatePickerModal visible={fromOpen} value={customFrom} max={customTo}
         onChange={(v) => { setCustomFrom(v); setFromOpen(false); setErr(null); }}
         onClose={() => setFromOpen(false)} />
       <DatePickerModal visible={toOpen} value={customTo} min={customFrom} max={today}
         onChange={(v) => { setCustomTo(v); setToOpen(false); setErr(null); }}
         onClose={() => setToOpen(false)} />
-    </Modal>
+    </>
   );
 }

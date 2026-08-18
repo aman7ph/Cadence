@@ -1,5 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 
 interface Props {
   title: string; status: "active" | "completed" | "abandoned";
@@ -11,18 +12,22 @@ interface Props {
 export function GoalCard({ title, description, targetValue, currentValue, unit, dueDate, taskCount, routineCount, onPress }: Props) {
   const c = useColors();
   const pct = targetValue ? Math.min(100, Math.round(((currentValue ?? 0) / targetValue) * 100)) : null;
-  const barColor = pct === 100 ? c.success : c.prim;
 
   const s = StyleSheet.create({
-    card:    { backgroundColor: c.card, borderWidth: 1, borderColor: c.bd1, borderRadius: 14, padding: 14, marginHorizontal: 16, marginBottom: 8 },
-    title:   { fontSize: 15, fontWeight: "600", color: c.t1, marginBottom: 4 },
-    desc:    { fontSize: 12, color: c.t2, lineHeight: 18, marginBottom: 8 },
+    card:    { backgroundColor: c.card, borderWidth: 1, borderColor: c.bd1,
+               borderRadius: radii.md, padding: 14 },
+    title:   { fontSize: 13.5, fontWeight: "600", color: c.t1, marginBottom: 4 },
+    desc:    { fontSize: 11, color: c.t2, lineHeight: 17, marginBottom: 8 },
     pRow:    { flexDirection: "row", justifyContent: "space-between", marginBottom: 5 },
-    pTxt:    { fontSize: 11, color: c.t3 },
-    track:   { height: 3, backgroundColor: c.active, borderRadius: 2, overflow: "hidden", marginBottom: 8 },
+    pTxt:    { fontSize: 11, color: c.t2 },
+    pPct:    { fontSize: 11.5, fontWeight: "600" },
+    track:   { height: 3, backgroundColor: c.bgS, borderRadius: radii.full, overflow: "hidden", marginBottom: 8 },
     row:     { flexDirection: "row", alignItems: "center", gap: 6 },
-    pill:    { borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
-    pillTxt: { fontSize: 11, fontWeight: "600" },
+    // One badge treatment, gold on the accent surface — the prototype shows
+    // both counts that way. They were two different chart hues, which read as
+    // a data series rather than as tags.
+    pill:    { backgroundColor: c.accBg, borderRadius: radii.pill, paddingHorizontal: 8, paddingVertical: 2 },
+    pillTxt: { fontSize: 10, fontWeight: "600", color: c.tacc },
     due:     { fontSize: 11, color: c.t3, marginLeft: "auto" },
   });
 
@@ -34,22 +39,22 @@ export function GoalCard({ title, description, targetValue, currentValue, unit, 
         <>
           <View style={s.pRow}>
             <Text style={s.pTxt}>{currentValue ?? 0}{unit ? ` ${unit}` : ""} / {targetValue}{unit ? ` ${unit}` : ""}</Text>
-            <Text style={[s.pTxt, { color: barColor }]}>{pct}%</Text>
+            <Text style={[s.pPct, { color: c.prim }]}>{pct}%</Text>
           </View>
           <View style={s.track}>
-            <View style={{ height: "100%", borderRadius: 2, width: `${pct}%`, backgroundColor: barColor }} />
+            <View style={{ height: "100%", borderRadius: radii.full, width: `${pct}%`, backgroundColor: c.prim }} />
           </View>
         </>
       )}
       <View style={s.row}>
         {taskCount > 0 && (
-          <View style={[s.pill, { backgroundColor: c.bgS }]}>
-            <Text style={[s.pillTxt, { color: c.chart5 }]}>{taskCount} task{taskCount !== 1 ? "s" : ""}</Text>
+          <View style={s.pill}>
+            <Text style={s.pillTxt}>{taskCount} task{taskCount !== 1 ? "s" : ""}</Text>
           </View>
         )}
         {routineCount > 0 && (
-          <View style={[s.pill, { backgroundColor: c.bgS }]}>
-            <Text style={[s.pillTxt, { color: c.chart2 }]}>{routineCount} routine{routineCount !== 1 ? "s" : ""}</Text>
+          <View style={s.pill}>
+            <Text style={s.pillTxt}>{routineCount} routine{routineCount !== 1 ? "s" : ""}</Text>
           </View>
         )}
         {dueDate && <Text style={s.due}>Due {dueDate}</Text>}

@@ -11,11 +11,13 @@ import {
   View,
 } from "react-native";
 import { AppBar } from "../../components/AppBar";
+import { Button } from "../../components/ui/Button";
 import { GoalCard } from "../../components/GoalCard";
 import { GoalFormModal } from "../../components/GoalFormModal";
 import { GoalDetailModal } from "../../components/GoalDetailModal";
 import type { GoalData } from "../../components/GoalDetailModal";
 import { useColors } from "../../lib/theme";
+import { radii } from "../../lib/radii";
 
 const TABS = ["Active", "Completed", "Abandoned"] as const;
 type Tab = (typeof TABS)[number];
@@ -52,51 +54,19 @@ export default function GoalsScreen() {
       paddingBottom: 6,
       gap: 8,
     },
-    tab: {
-      paddingHorizontal: 14,
-      paddingVertical: 7,
-      borderRadius: 20,
-      borderWidth: 1,
-      borderColor: c.bd2,
-    },
-    tabOn: { backgroundColor: c.prim, borderColor: c.prim },
-    tabTxt: { fontSize: 13, fontWeight: "500", color: c.t2 },
-    tabTxtOn: { color: c.onPrim, fontWeight: "600" },
-    content: { paddingTop: 8, paddingBottom: 100 },
+    content: { paddingTop: 8, paddingBottom: 100, paddingHorizontal: 16, gap: 10 },
     center: { flex: 1, alignItems: "center", justifyContent: "center" },
     empty: {
       margin: 24,
       borderWidth: 1,
       borderStyle: "dashed",
       borderColor: c.bd1,
-      borderRadius: 14,
+      borderRadius: radii.md,
       paddingVertical: 40,
       alignItems: "center",
     },
     emptyTxt: { fontSize: 13, color: c.t3 },
-    fab: {
-      position: "absolute",
-      bottom: 28,
-      right: 18,
-      width: 50,
-      height: 50,
-      borderRadius: 25,
-      backgroundColor: c.prim,
-      justifyContent: "center",
-      alignItems: "center",
-      shadowColor: c.prim,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.5,
-      shadowRadius: 12,
-      elevation: 8,
-    },
-    fabTxt: {
-      color: c.onPrim,
-      fontSize: 26,
-      fontWeight: "300",
-      lineHeight: 28,
-      includeFontPadding: false,
-    },
+    fab: { position: "absolute", bottom: 28, right: 18 },
   });
 
   return (
@@ -104,14 +74,7 @@ export default function GoalsScreen() {
       <AppBar title="Goals" />
       <View style={s.tabs}>
         {TABS.map((t) => (
-          <TouchableOpacity
-            key={t}
-            style={[s.tab, tab === t && s.tabOn]}
-            onPress={() => setTab(t)}
-            activeOpacity={0.8}
-          >
-            <Text style={[s.tabTxt, tab === t && s.tabTxtOn]}>{t}</Text>
-          </TouchableOpacity>
+          <Button key={t} variant="tab" selected={tab === t} title={t} onPress={() => setTab(t)} />
         ))}
       </View>
       {allGoals === undefined ? (
@@ -147,16 +110,16 @@ export default function GoalsScreen() {
         </ScrollView>
       )}
       {tab === "Active" && (
-        <TouchableOpacity
+        <Button
+          variant="fab"
+          title="+"
           style={s.fab}
+          accessibilityLabel="New goal"
           onPress={() => {
             setFormKey((k) => k + 1);
             setFormVisible(true);
           }}
-          activeOpacity={0.85}
-        >
-          <Text style={s.fabTxt}>+</Text>
-        </TouchableOpacity>
+        />
       )}
       <GoalFormModal
         key={formKey}

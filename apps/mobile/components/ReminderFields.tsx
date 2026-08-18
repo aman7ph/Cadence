@@ -6,6 +6,7 @@ import {
   reminderSlotCount,
 } from "@cadence/shared";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 import type { useReminderSettings } from "../lib/useReminderSettings";
 
 // Half-hour steps. A nudge window does not need minute precision, and steppers
@@ -35,22 +36,22 @@ export function ReminderFields({
 
   const s = StyleSheet.create({
     panel:   { backgroundColor: c.bgE, borderWidth: 1, borderColor: c.bd1,
-               borderRadius: 10, padding: 10, gap: 10, marginTop: 10 },
+               borderRadius: radii.sm, padding: 10, gap: 10, marginTop: 10 },
     row:     { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
     lbl:     { fontSize: 12, color: c.t2 },
     num:     { width: 70, backgroundColor: c.card, borderWidth: 1, borderColor: c.bd2,
-               borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8,
+               borderRadius: radii.sm, paddingHorizontal: 10, paddingVertical: 8,
                fontSize: 13, color: c.t1 },
     echo:    { fontSize: 11, color: c.t3, backgroundColor: c.active,
-               borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
+               borderRadius: radii.full, paddingHorizontal: 8, paddingVertical: 2 },
     stepper: { flexDirection: "row", alignItems: "center", gap: 6 },
-    adjBtn:  { width: 26, height: 26, borderRadius: 8, borderWidth: 1,
+    adjBtn:  { width: 26, height: 26, borderRadius: radii.sm, borderWidth: 1,
                borderColor: c.bd2, justifyContent: "center", alignItems: "center" },
     adjTxt:  { fontSize: 15, color: c.t2, lineHeight: 18, includeFontPadding: false },
     timeVal: { fontSize: 13, fontWeight: "600", color: c.t1, minWidth: 46,
                textAlign: "center" },
     modeRow: { flexDirection: "row", gap: 8 },
-    modeBtn: { flex: 1, paddingVertical: 8, borderRadius: 8, borderWidth: 1,
+    modeBtn: { flex: 1, paddingVertical: 8, borderRadius: radii.sm, borderWidth: 1,
                borderColor: c.bd2, alignItems: "center" },
     modeOn:  { borderColor: c.prim, backgroundColor: c.accBg },
     modeTxt: { fontSize: 12, fontWeight: "600", color: c.t2 },

@@ -23,6 +23,8 @@ import {
 import { AppBar } from "../../components/AppBar";
 import { HistoryDayModal } from "../../components/HistoryDayModal";
 import { useColors } from "../../lib/theme";
+import { display } from "../../lib/fonts";
+import { radii } from "../../lib/radii";
 
 const DOW = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 
@@ -68,14 +70,8 @@ export default function HistoryScreen() {
   const s = StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
     content: { paddingHorizontal: 16, paddingBottom: 40 },
-    hdr: { paddingTop: 6, paddingBottom: 14 },
-    hTitle: {
-      fontSize: 22,
-      fontWeight: "700",
-      color: c.t1,
-      letterSpacing: -0.4,
-    },
-    hSub: { fontSize: 13, color: c.t2, marginTop: 3 },
+    hdr: { paddingTop: 8, paddingBottom: 14 },
+    hSub: { fontSize: 11.5, color: c.t2, marginTop: 3 },
     navRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -83,18 +79,19 @@ export default function HistoryScreen() {
       marginBottom: 12,
     },
     navBtn: {
-      width: 34,
-      height: 34,
-      borderRadius: 10,
+      width: 28,
+      height: 28,
+      borderRadius: radii.sm,
       borderWidth: 1,
-      borderColor: c.bd2,
+      borderColor: c.bd1,
+      backgroundColor: c.card,
       alignItems: "center",
       justifyContent: "center",
     },
-    navTxt: { fontSize: 16, color: c.t1, fontWeight: "500" },
+    navTxt: { fontSize: 15, color: c.t1, fontWeight: "500" },
     monthTxt: {
       flex: 1,
-      fontSize: 15,
+      fontSize: 14,
       fontWeight: "600",
       color: c.t1,
       textAlign: "center",
@@ -112,29 +109,29 @@ export default function HistoryScreen() {
       gap: 5,
       marginBottom: 14,
     },
-    legendTxt: { fontSize: 11, color: c.t3 },
-    legendDot: { width: 12, height: 12, borderRadius: 3 },
+    legendTxt: { fontSize: 10, color: c.t2 },
+    legendDot: { width: 10, height: 10, borderRadius: radii.full },
     dowRow: { flexDirection: "row", marginBottom: 2 },
     dowCell: { flex: 1, alignItems: "center", paddingVertical: 4 },
     dowTxt: {
       fontSize: 10,
-      fontWeight: "700",
+      fontWeight: "600",
       textTransform: "uppercase",
       letterSpacing: 0.5,
-      color: c.t3,
+      color: c.t2,
     },
     calRow: { flexDirection: "row" },
     cell: {
       flex: 1,
       alignItems: "center",
       paddingVertical: 8,
-      borderRadius: 8,
+      borderRadius: radii.sm,
       position: "relative",
     },
     cellSel: { backgroundColor: c.accBg },
-    cellNum: { fontSize: 13, fontWeight: "600", color: c.t1 },
+    cellNum: { fontSize: 13, fontWeight: "700", color: c.t1 },
     cellNumAcc: { color: c.tacc },
-    cellDot: { width: 7, height: 7, borderRadius: 3.5, marginTop: 3 },
+    cellDot: { width: 6, height: 6, borderRadius: radii.full, marginTop: 3 },
     todayBar: {
       position: "absolute",
       bottom: 3,
@@ -150,7 +147,6 @@ export default function HistoryScreen() {
       <AppBar title="History" />
       <ScrollView contentContainerStyle={s.content}>
         <View style={s.hdr}>
-          <Text style={s.hTitle}>History</Text>
           <Text style={s.hSub}>Tap any day to see its routines and tasks</Text>
         </View>
 

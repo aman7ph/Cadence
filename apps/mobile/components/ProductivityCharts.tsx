@@ -4,6 +4,7 @@ import { MIN_ACTIVE_BAND, NO_ACTIVITY_BAND, scoreToHeatBand } from "@cadence/sha
 import type { DateRange } from "@cadence/shared";
 import { Text, View } from "react-native";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 import type { Granularity, LineSeries } from "../lib/insightUtils";
 import { computeEMA, bucketByWeek, bucketByMonth, DOW } from "../lib/insightUtils";
 import { SimpleLineChart } from "./SimpleLineChart";
@@ -66,7 +67,7 @@ export function DowHeatmap({ range, today }: { range: DateRange; today: string }
           ? NO_ACTIVITY_BAND : Math.max(MIN_ACTIVE_BAND, scoreToHeatBand(rate));
         return (
           <View key={s.weekday} style={{ flex: 1, alignItems: "center", gap: 5 }}>
-            <View style={{ width: "100%", aspectRatio: 1, borderRadius: 8, backgroundColor: heat[lvl] }} />
+            <View style={{ width: "100%", aspectRatio: 1, borderRadius: radii.sm, backgroundColor: heat[lvl] }} />
             <Text style={{ fontSize: 10, color: c.t3, fontWeight: "500" }}>{DOW[s.weekday]}</Text>
             <Text style={{ fontSize: 11, fontWeight: "600", color: c.t1 }}>{s.rate !== null ? `${s.rate}%` : "—"}</Text>
           </View>

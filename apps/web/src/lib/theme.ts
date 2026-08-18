@@ -74,12 +74,15 @@ export function useTheme() {
     applyTheme(resolved);
   }, []);
 
-  // Cycles: light → dark → system → light
+  // Binary, and driven by the RESOLVED theme rather than the preference.
+  // Cycling light → dark → system meant that from dark the first click landed
+  // on "system", which on a dark OS resolves back to dark — nothing visibly
+  // changed, so it took two clicks to reach light. Flipping the resolved theme
+  // always changes what you see, on the first click.
+  // "system" stays available in Settings, where it is an explicit choice.
   const toggle = useCallback(() => {
-    const next: ThemePreference =
-      preference === "light" ? "dark" : preference === "dark" ? "system" : "light";
-    setTheme(next);
-  }, [preference, setTheme]);
+    setTheme(theme === "dark" ? "light" : "dark");
+  }, [theme, setTheme]);
 
   return { theme, preference, setTheme, toggle };
 }

@@ -26,6 +26,8 @@ import { ChartCard } from "../../components/InsightShared";
 import { getGranularity } from "../../lib/insightUtils";
 import { granularityLabel, rollingWindowLabel } from "@cadence/shared";
 import { useColors } from "../../lib/theme";
+import { display } from "../../lib/fonts";
+import { radii } from "../../lib/radii";
 
 export default function InsightsScreen() {
   const c = useColors();
@@ -42,13 +44,7 @@ export default function InsightsScreen() {
     screen: { flex: 1, backgroundColor: c.bg },
     content: { paddingHorizontal: 16, paddingBottom: 48 },
     hdr: { paddingTop: 6, paddingBottom: 14 },
-    hTitle: {
-      fontSize: 22,
-      fontWeight: "700",
-      color: c.t1,
-      letterSpacing: -0.4,
-    },
-    hSub: { fontSize: 13, color: c.t2, marginTop: 3 },
+    hSub: { fontSize: 11.5, color: c.t2, marginTop: 3 },
     rangeRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -64,7 +60,7 @@ export default function InsightsScreen() {
       backgroundColor: c.card,
       borderWidth: 1,
       borderColor: c.bd2,
-      borderRadius: 10,
+      borderRadius: radii.sm,
     },
     rangeTxt: { fontSize: 13, fontWeight: "600", color: c.t1 },
     rangeArrow: { fontSize: 11, color: c.t3 },
@@ -78,7 +74,6 @@ export default function InsightsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={s.hdr}>
-          <Text style={s.hTitle}>Insights</Text>
           <Text style={s.hSub}>
             Patterns and trends across your routines and tasks
           </Text>

@@ -8,9 +8,6 @@ import {
   itemOptionsToArgs,
 } from "@cadence/shared";
 import {
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -23,6 +20,7 @@ import { display } from "../lib/fonts";
 import { radii } from "../lib/radii";
 import { ItemOptionsFields } from "./ItemOptionsFields";
 import { FormFooter } from "./ui/FormFooter";
+import { Sheet } from "./ui/Sheet";
 
 interface Props {
   visible: boolean;
@@ -81,27 +79,6 @@ export function TodayAddTaskModal({ visible, today, onDone }: Props) {
   };
 
   const s = StyleSheet.create({
-    overlay: { flex: 1, justifyContent: "flex-end", backgroundColor: c.scrim },
-    backdrop: { flex: 1 },
-    sheet: {
-      backgroundColor: c.bgE,
-      borderTopLeftRadius: radii.sheet,
-      borderTopRightRadius: radii.sheet,
-      borderWidth: 1,
-      borderBottomWidth: 0,
-      borderColor: c.bd2,
-      maxHeight: "85%",
-      paddingBottom: 32,
-    },
-    handle: {
-      width: 38,
-      height: 4,
-      borderRadius: 2,
-      backgroundColor: c.bd3,
-      alignSelf: "center",
-      marginTop: 10,
-      marginBottom: 4,
-    },
     title: {
       ...display("semibold"),
       fontSize: 17,
@@ -124,14 +101,7 @@ export function TodayAddTaskModal({ visible, today, onDone }: Props) {
   });
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={close}>
-      <KeyboardAvoidingView
-        style={s.overlay}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
-        <TouchableOpacity style={s.backdrop} activeOpacity={1} onPress={close} />
-        <View style={s.sheet}>
-          <View style={s.handle} />
+    <Sheet visible={visible} onClose={close} avoidKeyboard maxHeight="85%">
           <Text style={s.title}>New task</Text>
           <Text style={s.desc}>
             One-off work for today. Link it to a goal or spread it across the day.
@@ -156,8 +126,6 @@ export function TodayAddTaskModal({ visible, today, onDone }: Props) {
             pending={pending}
             invalid={invalid}
           />
-        </View>
-      </KeyboardAvoidingView>
-    </Modal>
+        </Sheet>
   );
 }

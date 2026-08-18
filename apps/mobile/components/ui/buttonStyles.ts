@@ -85,7 +85,11 @@ export function buttonStyles(
       return {
         box: {
           ...base,
-          borderRadius: radii.pill,
+          // `sm`, not the pill web uses. The prototype differs by platform
+          // here: its desktop segmented controls measure r=20, its PHONE frame
+          // measures 9 (alert mode) and 11 (theme picker). Mobile follows its
+          // own frame, as it does for the FAB and the Today composer.
+          borderRadius: radii.sm,
           borderWidth: 1,
           borderColor: selected ? c.bdAcc : c.bd1,
           backgroundColor: selected ? c.accBg : "transparent",

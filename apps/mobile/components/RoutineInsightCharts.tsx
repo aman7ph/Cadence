@@ -5,6 +5,7 @@ import type { DateRange, RoutineChartDay } from "@cadence/shared";
 import { countsTowardRate, rollingCompletionRate, startOfWeek } from "@cadence/shared";
 import { Text, View } from "react-native";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 import type { Granularity, LineSeries } from "../lib/insightUtils";
 import { seriesColors } from "../lib/insightUtils";
 import { SimpleLineChart } from "./SimpleLineChart";
@@ -78,8 +79,8 @@ export function RoutineComparisonChart({ range, today }: { range: DateRange; tod
             </Text>
             <Text style={{ fontSize: 12, fontWeight: "600", color: c.t2 }}>{row.rate}%</Text>
           </View>
-          <View style={{ height: 8, backgroundColor: c.active, borderRadius: 4, overflow: "hidden" }}>
-            <View style={{ height: "100%", width: `${row.rate}%` as `${number}%`, backgroundColor: row.color, borderRadius: 4 }} />
+          <View style={{ height: 8, backgroundColor: c.active, borderRadius: radii.full, overflow: "hidden" }}>
+            <View style={{ height: "100%", width: `${row.rate}%` as `${number}%`, backgroundColor: row.color, borderRadius: radii.full }} />
           </View>
         </View>
       ))}
@@ -107,7 +108,7 @@ export function RoutineCompletionLines({ range, granularity, today }: { range: D
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 10 }}>
         {series.map((s, i) => (
           <View key={s.id} style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: SC[i % SC.length] }} />
+            <View style={{ width: 8, height: 8, borderRadius: radii.full, backgroundColor: SC[i % SC.length] }} />
             <Text style={{ fontSize: 11, color: c.t3 }} numberOfLines={1}>{s.name}</Text>
           </View>
         ))}

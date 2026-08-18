@@ -4,7 +4,6 @@ import { api } from "@cadence/backend/convex/_generated/api";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import { todayLocal } from "@cadence/shared";
 import {
-  KeyboardAvoidingView, Modal, Platform,
   ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from "react-native";
 import { ItemOptionsFields } from "./ItemOptionsFields";
@@ -13,6 +12,7 @@ import type { ScheduleType } from "./SchedulePicker";
 import { useColors } from "../lib/theme";
 import { radii } from "../lib/radii";
 import { FormFooter } from "./ui/FormFooter";
+import { Sheet } from "./ui/Sheet";
 import {
   type ItemOptions,
   itemOptionsFrom,
@@ -63,13 +63,6 @@ export function RoutineFormModal({ visible, routine, onDone }: Props) {
   };
 
   const s = StyleSheet.create({
-    overlay:     { flex: 1, justifyContent: "flex-end", backgroundColor: c.scrim },
-    backdrop:    { flex: 1 },
-    sheet:       { backgroundColor: c.bgE, borderTopLeftRadius: radii.sheet, borderTopRightRadius: radii.sheet,
-                   borderWidth: 1, borderBottomWidth: 0, borderColor: c.bd2,
-                   maxHeight: "85%", paddingBottom: 32 },
-    handle:      { width: 38, height: 4, borderRadius: 2, backgroundColor: c.bd3,
-                   alignSelf: "center", marginTop: 10, marginBottom: 4 },
     title:       { fontSize: 16, fontWeight: "700", color: c.t1,
                    paddingHorizontal: 20, paddingTop: 4, paddingBottom: 14 },
     scroll:      { flexGrow: 0 },
@@ -86,11 +79,7 @@ export function RoutineFormModal({ visible, routine, onDone }: Props) {
   });
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onDone}>
-      <KeyboardAvoidingView style={s.overlay} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-        <TouchableOpacity style={s.backdrop} activeOpacity={1} onPress={onDone} />
-        <View style={s.sheet}>
-          <View style={s.handle} />
+    <Sheet visible={visible} onClose={onDone} avoidKeyboard maxHeight="85%">
           <Text style={s.title}>{routine ? "Edit routine" : "New routine"}</Text>
           <ScrollView style={s.scroll} contentContainerStyle={s.scrollContent} keyboardShouldPersistTaps="handled">
             <TextInput style={s.input} value={name} onChangeText={setName}
@@ -109,8 +98,6 @@ export function RoutineFormModal({ visible, routine, onDone }: Props) {
           <FormFooter onCancel={onDone} onSubmit={submit}
                       submitLabel={routine ? "Save changes" : "Add routine"}
                       pending={pending} invalid={invalid} />
-        </View>
-      </KeyboardAvoidingView>
-    </Modal>
+        </Sheet>
   );
 }

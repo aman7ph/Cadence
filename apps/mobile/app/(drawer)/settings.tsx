@@ -13,6 +13,9 @@ import { AppBar } from "../../components/AppBar";
 import { ReminderSection } from "../../components/ReminderSection";
 import { useColors, useTheme } from "../../lib/theme";
 import { display } from "../../lib/fonts";
+import { radii } from "../../lib/radii";
+import { Button } from "../../components/ui/Button";
+import { SectionLabel } from "../../components/ui/SectionLabel";
 import type { ThemePreference } from "../../lib/theme";
 
 const THEME_OPTS: { label: string; value: ThemePreference }[] = [
@@ -51,7 +54,7 @@ export default function Settings() {
       alignItems: "center",
       gap: 12,
       backgroundColor: c.card,
-      borderRadius: 14,
+      borderRadius: radii.lg,
       padding: 14,
       marginBottom: 24,
       borderWidth: 1,
@@ -60,7 +63,7 @@ export default function Settings() {
     avatar: {
       width: 44,
       height: 44,
-      borderRadius: 22,
+      borderRadius: radii.full,
       backgroundColor: c.prim,
       justifyContent: "center",
       alignItems: "center",
@@ -69,35 +72,16 @@ export default function Settings() {
     acctInfo: { flex: 1 },
     acctName: { fontSize: 15, fontWeight: "600", color: c.t1 },
     acctEmail: { fontSize: 12, color: c.t3 },
-    secLbl: {
-      fontSize: 11,
-      fontWeight: "700",
-      textTransform: "uppercase",
-      letterSpacing: 0.8,
-      color: c.t3,
-      marginBottom: 6,
-      marginLeft: 4,
-    },
+    secLblWrap: { marginBottom: 6, marginLeft: 4 },
     sec: {
       backgroundColor: c.card,
-      borderRadius: 14,
+      borderRadius: radii.lg,
       borderWidth: 1,
       borderColor: c.bd1,
       overflow: "hidden",
       marginBottom: 20,
     },
     themeRow: { flexDirection: "row", gap: 8, padding: 14 },
-    themeBtn: {
-      flex: 1,
-      paddingVertical: 8,
-      borderRadius: 8,
-      borderWidth: 1,
-      borderColor: c.bd2,
-      alignItems: "center",
-    },
-    themeBtnOn: { borderColor: c.prim, backgroundColor: c.accBg },
-    themeTxt: { fontSize: 12, fontWeight: "600", color: c.t2 },
-    themeTxtOn: { color: c.tacc },
     wtRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -109,7 +93,7 @@ export default function Settings() {
     adjBtn: {
       width: 28,
       height: 28,
-      borderRadius: 8,
+      borderRadius: radii.sm,
       borderWidth: 1,
       borderColor: c.bd2,
       justifyContent: "center",
@@ -151,26 +135,23 @@ export default function Settings() {
           </View>
         </View>
 
-        <Text style={s.secLbl}>Appearance</Text>
+        <View style={s.secLblWrap}><SectionLabel>Appearance</SectionLabel></View>
         <View style={s.sec}>
           <View style={s.themeRow}>
             {THEME_OPTS.map((opt) => (
-              <TouchableOpacity
+              <Button
                 key={opt.value}
-                style={[s.themeBtn, preference === opt.value && s.themeBtnOn]}
+                variant="segment"
+                selected={preference === opt.value}
+                title={opt.label}
                 onPress={() => setTheme(opt.value)}
-              >
-                <Text
-                  style={[s.themeTxt, preference === opt.value && s.themeTxtOn]}
-                >
-                  {opt.label}
-                </Text>
-              </TouchableOpacity>
+                style={{ flex: 1 }}
+              />
             ))}
           </View>
         </View>
 
-        <Text style={s.secLbl}>Productivity</Text>
+        <View style={s.secLblWrap}><SectionLabel>Productivity</SectionLabel></View>
         <View style={s.sec}>
           <View style={s.wtRow}>
             <Text style={s.wtLbl}>Routine weight</Text>
@@ -194,12 +175,12 @@ export default function Settings() {
           </View>
         </View>
 
-        <Text style={s.secLbl}>Reminders</Text>
+        <View style={s.secLblWrap}><SectionLabel>Reminders</SectionLabel></View>
         <View style={s.sec}>
           <ReminderSection />
         </View>
 
-        <Text style={s.secLbl}>Data</Text>
+        <View style={s.secLblWrap}><SectionLabel>Data</SectionLabel></View>
         <View style={s.sec}>
           <View style={s.tzRow}>
             <Text style={s.tzLbl}>Timezone</Text>
@@ -207,7 +188,7 @@ export default function Settings() {
           </View>
         </View>
 
-        <Text style={s.secLbl}>Account</Text>
+        <View style={s.secLblWrap}><SectionLabel>Account</SectionLabel></View>
         <View style={s.sec}>
           <TouchableOpacity style={s.rowLast} onPress={() => signOut()}>
             <Text style={s.signOut}>Sign out</Text>

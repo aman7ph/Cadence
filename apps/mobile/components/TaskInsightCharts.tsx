@@ -3,6 +3,7 @@ import { api } from "@cadence/backend/convex/_generated/api";
 import type { DateRange } from "@cadence/shared";
 import { Text, View } from "react-native";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 import type { Granularity, TK } from "../lib/insightUtils";
 import { TASK_KEYS, taskColors, seriesColors, bucketCountsByWeek, bucketCountsByMonth } from "../lib/insightUtils";
 import { fillDailyGaps } from "@cadence/shared";
@@ -45,7 +46,7 @@ export function TasksByDayChart({ range, granularity }: { range: DateRange; gran
       <View style={{ flexDirection: "row", gap: 14, marginTop: 8 }}>
         {TASK_KEYS.map((k) => (
           <View key={k} style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: TC[k] }} />
+            <View style={{ width: 8, height: 8, borderRadius: radii.full, backgroundColor: TC[k] }} />
             <Text style={{ fontSize: 11, color: c.t3 }}>{k.charAt(0).toUpperCase() + k.slice(1)}</Text>
           </View>
         ))}
@@ -69,14 +70,14 @@ export function TaskBreakdownChart({ range }: { range: DateRange }) {
 
   return (
     <View style={{ gap: 14 }}>
-      <View style={{ flexDirection: "row", height: 22, borderRadius: 8, overflow: "hidden", gap: 2 }}>
+      <View style={{ flexDirection: "row", height: 22, borderRadius: radii.sm, overflow: "hidden", gap: 2 }}>
         {segs.map((s) => <View key={s.label} style={{ flex: s.value, backgroundColor: s.color }} />)}
       </View>
       <View style={{ gap: 8 }}>
         {segs.map((s) => (
           <View key={s.label} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-              <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: s.color }} />
+              <View style={{ width: 10, height: 10, borderRadius: radii.full, backgroundColor: s.color }} />
               <Text style={{ fontSize: 13, color: c.t2 }}>{s.label}</Text>
             </View>
             <Text style={{ fontSize: 13, color: c.t1 }}>
@@ -117,8 +118,8 @@ export function CarryoverCard({ range }: { range: DateRange }) {
           return (
             <View key={i} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
               <Text style={{ width: 26, textAlign: "right", fontSize: 12, color: c.t3 }}>{CARRY_LABELS[i]}</Text>
-              <View style={{ flex: 1, height: 18, backgroundColor: c.active, borderRadius: 6, overflow: "hidden" }}>
-                <View style={{ height: "100%", width: `${pct}%` as `${number}%`, backgroundColor: SC[1], borderRadius: 6 }} />
+              <View style={{ flex: 1, height: 18, backgroundColor: c.active, borderRadius: radii.sm, overflow: "hidden" }}>
+                <View style={{ height: "100%", width: `${pct}%` as `${number}%`, backgroundColor: SC[1], borderRadius: radii.sm }} />
               </View>
               <Text style={{ width: 64, textAlign: "right", fontSize: 12, color: c.t1 }}>
                 {b.count}<Text style={{ color: c.t3 }}> ({Math.round(pct)}%)</Text>

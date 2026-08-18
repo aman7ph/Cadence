@@ -39,7 +39,11 @@ export function DrawerContent(props: DrawerContentComponentProps) {
                     borderBottomWidth: 1, borderBottomColor: c.bd1 },
     brand:        { flex: 1, flexDirection: "row", alignItems: "center", gap: 10 },
     brandName:    { ...display("bold"), fontSize: 18, color: c.t1, letterSpacing: -0.4 },
-    navList:      { paddingVertical: 8 },
+    // Explicit paddingTop, not paddingVertical: DrawerContentScrollView sets
+    // `paddingTop: SPACING + insets.top` itself, and the more specific key wins
+    // over ours — so the status-bar inset was applied twice, once here and once
+    // in the header's own paddingTop: 56.
+    navList:      { paddingTop: 4, paddingBottom: 8 },
     item:         { paddingHorizontal: 20, paddingVertical: 12, position: "relative" },
     itemOn:       { backgroundColor: c.accBg },
     accent:       { position: "absolute", left: 0, top: 6, bottom: 6, width: 3,

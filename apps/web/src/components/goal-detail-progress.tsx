@@ -27,13 +27,13 @@ export function GoalDetailProgress({ targetValue, currentValue, unit }: Progress
           </span>
         </div>
         <span className="font-mono text-[22px] font-bold"
-          style={{ color: pct === 100 ? "var(--status-complete)" : "var(--action-primary)" }}>
+          style={{ color: "var(--action-primary)" }}>
           {pct}%
         </span>
       </div>
       <div className="mt-3 h-[4px] w-full overflow-hidden rounded-full bg-[var(--bg-sunken)]">
         <div className="h-full rounded-full transition-[width] duration-500 ease-out"
-          style={{ width: `${pct}%`, background: pct === 100 ? "var(--status-complete)" : "var(--action-primary)" }}
+          style={{ width: `${pct}%`, background: "var(--action-primary)" }}
         />
       </div>
     </SectionCard>

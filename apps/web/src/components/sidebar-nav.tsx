@@ -23,8 +23,8 @@ export const NAV_ITEMS: { view: AppView; label: string; icon: React.ReactNode }[
   { view: "today", label: "Today", icon: <CheckSquare className="size-[17px]" strokeWidth={2} /> },
   { view: "routines", label: "Routines", icon: <ListChecks className="size-[17px]" strokeWidth={2} /> },
   { view: "staging", label: "Staging", icon: <Inbox className="size-[17px]" strokeWidth={2} /> },
-  { view: "history", label: "History", icon: <CalendarDays className="size-[17px]" strokeWidth={2} /> },
   { view: "goals", label: "Goals", icon: <Target className="size-[17px]" strokeWidth={2} /> },
+  { view: "history", label: "History", icon: <CalendarDays className="size-[17px]" strokeWidth={2} /> },
   { view: "insights", label: "Insights", icon: <BarChart3 className="size-[17px]" strokeWidth={2} /> },
   { view: "settings", label: "Settings", icon: <Settings className="size-[17px]" strokeWidth={2} /> },
 ];

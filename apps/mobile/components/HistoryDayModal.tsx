@@ -6,6 +6,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
+import { SectionLabel } from "./ui/SectionLabel";
 import { fmtLong } from "../lib/dateUtils";
 import { parseMentionSegments } from "./ReflectionEditor";
 
@@ -37,29 +39,25 @@ function DayModalContent({ date, today, onClose }: { date: string; today: string
     hMeta:     { flex: 1 },
     hLabel:    { fontSize: 10, fontWeight: "700", textTransform: "uppercase", letterSpacing: 0.9, color: c.t3 },
     hDate:     { fontSize: 15, fontWeight: "600", color: c.t1, marginTop: 2 },
-    closeBtn:  { width: 34, height: 34, borderRadius: 17, backgroundColor: c.card,
+    closeBtn:  { width: 34, height: 34, borderRadius: radii.full, backgroundColor: c.card,
                  borderWidth: 1, borderColor: c.bd2, alignItems: "center", justifyContent: "center" },
     closeTxt:  { fontSize: 13, fontWeight: "600", color: c.t2 },
     content:   { paddingBottom: 40 },
-    secHdr:    { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline",
-                 paddingHorizontal: 16, paddingTop: 14, paddingBottom: 6,
-                 borderBottomWidth: 1, borderBottomColor: c.bd1 },
-    secLbl:    { fontSize: 11, fontWeight: "700", textTransform: "uppercase", letterSpacing: 0.7, color: c.t3 },
-    secCnt:    { fontSize: 11, color: c.t3 },
-    item:      { marginHorizontal: 16, marginBottom: 4, backgroundColor: c.card, borderWidth: 1,
-                 borderColor: c.bd1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10 },
+    secHdr:    { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 10 },
+    item:      { marginHorizontal: 16, marginBottom: 10, backgroundColor: c.card, borderWidth: 1,
+                 borderColor: c.bd1, borderRadius: radii.sm, paddingHorizontal: 12, paddingVertical: 10 },
     iRow:      { flexDirection: "row", alignItems: "center", gap: 8 },
-    dot:       { width: 8, height: 8, borderRadius: 4 },
+    dot:       { width: 8, height: 8, borderRadius: radii.full },
     iName:     { flex: 1, fontSize: 13, color: c.t1 },
     iStatus:   { fontSize: 11, color: c.t3 },
     italic:    { fontSize: 13, color: c.t3, fontStyle: "italic", paddingHorizontal: 16, paddingTop: 8 },
     emptyBox:  { margin: 24, borderWidth: 1, borderStyle: "dashed", borderColor: c.bd1,
-                 borderRadius: 12, paddingVertical: 36, alignItems: "center" },
+                 borderRadius: radii.md, paddingVertical: 36, alignItems: "center" },
     emptyTxt:  { fontSize: 13, color: c.t3 },
     refCard:   { marginHorizontal: 16, backgroundColor: c.card, borderWidth: 1, borderColor: c.bd1,
-                 borderRadius: 12, padding: 14 },
+                 borderRadius: radii.md, padding: 14 },
     refEmpty:  { marginHorizontal: 16, borderWidth: 1, borderStyle: "dashed", borderColor: c.bd1,
-                 borderRadius: 12, padding: 14 },
+                 borderRadius: radii.md, padding: 14 },
     refEmpty2: { fontSize: 13, color: c.t3, fontStyle: "italic" },
   });
 
@@ -96,8 +94,7 @@ function DayModalContent({ date, today, onClose }: { date: string; today: string
             <>
               {/* Routines */}
               <View style={s.secHdr}>
-                <Text style={s.secLbl}>Routines</Text>
-                <Text style={s.secCnt}>{rDone}/{counted.length}</Text>
+                <SectionLabel count={`${rDone}/${counted.length}`}>Routines</SectionLabel>
               </View>
               {routines.length === 0
                 ? <Text style={s.italic}>None scheduled</Text>
@@ -112,9 +109,8 @@ function DayModalContent({ date, today, onClose }: { date: string; today: string
                   ))}
 
               {/* Tasks */}
-              <View style={[s.secHdr, { marginTop: 8 }]}>
-                <Text style={s.secLbl}>Tasks</Text>
-                <Text style={s.secCnt}>{tDone}/{allTasks.length}</Text>
+              <View style={s.secHdr}>
+                <SectionLabel count={`${tDone}/${allTasks.length}`}>Tasks</SectionLabel>
               </View>
               {allTasks.length === 0
                 ? <Text style={s.italic}>No tasks</Text>
@@ -132,7 +128,7 @@ function DayModalContent({ date, today, onClose }: { date: string; today: string
 
           {/* Reflection */}
           <View style={s.secHdr}>
-            <Text style={s.secLbl}>Reflection</Text>
+            <SectionLabel>Reflection</SectionLabel>
           </View>
           {day?.reflection ? (
             <View style={s.refCard}>

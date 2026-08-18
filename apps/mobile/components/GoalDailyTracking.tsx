@@ -1,5 +1,6 @@
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 
 interface TrackingRoutine { routineId: string; name: string; status: string }
 interface TrackingTask    { taskId: string; title: string; status: string }
@@ -26,12 +27,12 @@ export function GoalDailyTracking({ selDate, minDate, maxDate, onPrev, onNext, o
     navBtn:    { padding: 6 },
     navTxt:    { fontSize: 18, color: c.t2 },
     navDate:   { fontSize: 12, color: c.t3, minWidth: 76, textAlign: "center" },
-    calBtn:    { width: 30, height: 30, borderRadius: 8, borderWidth: 1, borderColor: c.bd2,
+    calBtn:    { width: 30, height: 30, borderRadius: radii.sm, borderWidth: 1, borderColor: c.bd2,
                  alignItems: "center", justifyContent: "center", marginLeft: 4 },
-    item:      { marginHorizontal: 16, marginBottom: 4, backgroundColor: c.card, borderWidth: 1,
-                 borderColor: c.bd1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10 },
+    item:      { marginHorizontal: 16, marginBottom: 10, backgroundColor: c.card, borderWidth: 1,
+                 borderColor: c.bd1, borderRadius: radii.sm, paddingHorizontal: 12, paddingVertical: 10 },
     iRow:      { flexDirection: "row", alignItems: "center", gap: 8 },
-    dot:       { width: 8, height: 8, borderRadius: 4 },
+    dot:       { width: 8, height: 8, borderRadius: radii.full },
     iName:     { flex: 1, fontSize: 13, color: c.t1 },
     iTag:      { fontSize: 11, color: c.t3 },
     emptyTxt:  { textAlign: "center", fontSize: 13, color: c.t3, paddingVertical: 20 },

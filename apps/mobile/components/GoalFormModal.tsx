@@ -3,12 +3,12 @@ import { useMutation } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import {
-  KeyboardAvoidingView, Modal, Platform,
   ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from "react-native";
 import { useColors } from "../lib/theme";
 import { radii } from "../lib/radii";
 import { FormFooter } from "./ui/FormFooter";
+import { Sheet } from "./ui/Sheet";
 
 export interface GoalForForm {
   _id: Id<"goals">; title: string; description?: string;
@@ -43,28 +43,19 @@ export function GoalFormModal({ visible, goal, onDone }: Props) {
   };
 
   const s = StyleSheet.create({
-    overlay:  { flex: 1, justifyContent: "flex-end", backgroundColor: c.scrim },
-    backdrop: { flex: 1 },
-    sheet:    { backgroundColor: c.bgE, borderTopLeftRadius: radii.sheet, borderTopRightRadius: radii.sheet,
-                borderWidth: 1, borderBottomWidth: 0, borderColor: c.bd2, maxHeight: "85%", paddingBottom: 32 },
-    handle:   { width: 38, height: 4, borderRadius: 2, backgroundColor: c.bd3, alignSelf: "center", marginTop: 10, marginBottom: 4 },
     hTitle:   { fontSize: 16, fontWeight: "700", color: c.t1, paddingHorizontal: 20, paddingTop: 4, paddingBottom: 14 },
     sc:       { flexGrow: 0 },
     scC:      { paddingHorizontal: 20, paddingBottom: 8 },
-    input:    { backgroundColor: c.card, borderWidth: 1, borderColor: c.bd2, borderRadius: 10,
+    input:    { backgroundColor: c.card, borderWidth: 1, borderColor: c.bd2, borderRadius: radii.sm,
                 paddingHorizontal: 14, paddingVertical: 11, fontSize: 14, color: c.t1 },
     row:      { flexDirection: "row", gap: 10, marginTop: 10 },
-    half:     { flex: 1, backgroundColor: c.card, borderWidth: 1, borderColor: c.bd2, borderRadius: 10,
+    half:     { flex: 1, backgroundColor: c.card, borderWidth: 1, borderColor: c.bd2, borderRadius: radii.sm,
                 paddingHorizontal: 14, paddingVertical: 11, fontSize: 14, color: c.t1 },
     mt:       { marginTop: 10 },
   });
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onDone}>
-      <KeyboardAvoidingView style={s.overlay} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-        <TouchableOpacity style={s.backdrop} activeOpacity={1} onPress={onDone} />
-        <View style={s.sheet}>
-          <View style={s.handle} />
+    <Sheet visible={visible} onClose={onDone} avoidKeyboard maxHeight="85%">
           <Text style={s.hTitle}>{goal ? "Edit goal" : "New goal"}</Text>
           <ScrollView style={s.sc} contentContainerStyle={s.scC} keyboardShouldPersistTaps="handled">
             <TextInput style={s.input} value={title} onChangeText={setTitle}
@@ -86,8 +77,6 @@ export function GoalFormModal({ visible, goal, onDone }: Props) {
           <FormFooter onCancel={onDone} onSubmit={submit}
                       submitLabel={goal ? "Save changes" : "Create goal"}
                       pending={pending} invalid={invalid} />
-        </View>
-      </KeyboardAvoidingView>
-    </Modal>
+        </Sheet>
   );
 }

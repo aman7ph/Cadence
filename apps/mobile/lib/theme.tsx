@@ -11,7 +11,7 @@ interface ThemeCtx {
   colorScheme: "light" | "dark";
   colors: Colors;
   setTheme: (p: ThemePreference) => void;
-  /** Cycles light → dark → system → light, matching the web toggle exactly. */
+  /** Flips the RESOLVED scheme: one tap always changes what you see. */
   toggle: () => void;
 }
 
@@ -42,11 +42,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     void SecureStore.setItemAsync(STORE_KEY, p);
   };
 
-  // Same cycle as web's useTheme().toggle — light → dark → system → light — so
-  // the control behaves identically on both platforms. The three-way picker in
-  // Settings stays; this is the quick path through the same states.
-  const toggle = () =>
-    setTheme(pref === "light" ? "dark" : pref === "dark" ? "system" : "light");
+  // Binary, and driven by the RESOLVED scheme rather than the preference.
+  // Cycling light → dark → system meant that from dark the first tap landed on
+  // "system", which on a dark device resolves back to dark — so nothing
+  // visibly happened and it took two taps to reach light. Flipping the
+  // resolved scheme always changes what you see, on the first tap.
+  // "system" stays available in Settings, where it is an explicit choice.
+  const toggle = () => setTheme(scheme === "dark" ? "light" : "dark");
 
   return (
     <ThemeContext.Provider value={{

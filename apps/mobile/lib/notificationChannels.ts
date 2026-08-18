@@ -1,4 +1,6 @@
 import { Platform } from "react-native";
+// MUST stay above the expo-notifications import — see lib/devLogFilters.ts.
+import "./devLogFilters";
 import * as Notifications from "expo-notifications";
 import type { ReminderAlertMode } from "@cadence/shared";
 

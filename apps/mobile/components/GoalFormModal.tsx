@@ -3,10 +3,11 @@ import { useMutation } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import {
-  ActivityIndicator, KeyboardAvoidingView, Modal, Platform,
+  KeyboardAvoidingView, Modal, Platform,
   ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from "react-native";
 import { useColors } from "../lib/theme";
+import { FormFooter } from "./ui/FormFooter";
 
 export interface GoalForForm {
   _id: Id<"goals">; title: string; description?: string;
@@ -41,7 +42,7 @@ export function GoalFormModal({ visible, goal, onDone }: Props) {
   };
 
   const s = StyleSheet.create({
-    overlay:  { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.55)" },
+    overlay:  { flex: 1, justifyContent: "flex-end", backgroundColor: c.scrim },
     backdrop: { flex: 1 },
     sheet:    { backgroundColor: c.bgE, borderTopLeftRadius: 22, borderTopRightRadius: 22,
                 borderWidth: 1, borderBottomWidth: 0, borderColor: c.bd2, maxHeight: "85%", paddingBottom: 32 },
@@ -55,12 +56,6 @@ export function GoalFormModal({ visible, goal, onDone }: Props) {
     half:     { flex: 1, backgroundColor: c.card, borderWidth: 1, borderColor: c.bd2, borderRadius: 10,
                 paddingHorizontal: 14, paddingVertical: 11, fontSize: 14, color: c.t1 },
     mt:       { marginTop: 10 },
-    footer:   { flexDirection: "row", justifyContent: "flex-end", gap: 8, paddingHorizontal: 20, paddingTop: 12 },
-    cancelBtn:{ paddingHorizontal: 14, paddingVertical: 10 },
-    cancelTxt:{ fontSize: 13, color: c.t3 },
-    saveBtn:  { backgroundColor: c.prim, borderRadius: 10, paddingHorizontal: 20, paddingVertical: 10 },
-    saveDim:  { opacity: 0.45 },
-    saveTxt:  { fontSize: 13, fontWeight: "600", color: "#fff" },
   });
 
   return (
@@ -87,15 +82,9 @@ export function GoalFormModal({ visible, goal, onDone }: Props) {
             <TextInput style={[s.input, s.mt]} value={dueDate} onChangeText={setDueDate}
               placeholder="Due date (YYYY-MM-DD)" placeholderTextColor={c.t3} editable={!pending} />
           </ScrollView>
-          <View style={s.footer}>
-            <TouchableOpacity onPress={onDone} disabled={pending} style={s.cancelBtn}>
-              <Text style={s.cancelTxt}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={submit} disabled={invalid || pending} style={[s.saveBtn, invalid && s.saveDim]}>
-              {pending ? <ActivityIndicator color="#fff" size="small" />
-                       : <Text style={s.saveTxt}>{goal ? "Save changes" : "Create goal"}</Text>}
-            </TouchableOpacity>
-          </View>
+          <FormFooter onCancel={onDone} onSubmit={submit}
+                      submitLabel={goal ? "Save changes" : "Create goal"}
+                      pending={pending} invalid={invalid} />
         </View>
       </KeyboardAvoidingView>
     </Modal>

@@ -4,12 +4,22 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
 import { Slot, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useRef } from "react";
-import { ActivityIndicator, AppState, Text, View } from "react-native";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect, useRef, type ReactNode } from "react";
+import { AppState, View } from "react-native";
 import { convex } from "../lib/convexClient";
 import { tokenCache } from "../lib/tokenCache";
 import { ThemeProvider, useTheme, useColors } from "../lib/theme";
+import { displayFontMap } from "../lib/fonts";
+import { AppLoader } from "../components/AppLoader";
 import { useReminderSync } from "../lib/useReminderSync";
+
+// Hold the native splash until the fonts are registered, so the first frame the
+// user sees is already in the right typeface. Without this the splash hides on
+// its own and FontGate's bare background shows through for a beat.
+// Rejects harmlessly if the splash is already gone; nothing depends on it.
+void SplashScreen.preventAutoHideAsync().catch(() => {});
 
 const CLERK_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -61,14 +71,26 @@ function ReminderSync() {
   return null;
 }
 
-function LoadingScreen() {
+// Holds the first frame until Lora is registered, so no text renders in the UI
+// face and then reflows into the serif. Only the ground colour paints meanwhile
+// — deliberately no text, since text is the thing being waited on.
+//
+// A load failure is NOT fatal: RN falls back to the platform face for an
+// unknown family, so the app stays readable. Blocking the whole app on a font
+// would turn a cosmetic problem into an outage.
+function FontGate({ children }: { children: ReactNode }) {
   const c = useColors();
-  return (
-    <View style={{ flex: 1, backgroundColor: c.bg, alignItems: "center", justifyContent: "center", gap: 14 }}>
-      <Text style={{ fontSize: 26, fontWeight: "700", color: c.t1, letterSpacing: -0.5 }}>Cadence</Text>
-      <ActivityIndicator color={c.prim} size="small" />
-    </View>
-  );
+  const [loaded, error] = useFonts(displayFontMap);
+  const ready = loaded || !!error;
+
+  useEffect(() => {
+    if (ready) void SplashScreen.hideAsync().catch(() => {});
+  }, [ready]);
+
+  // Sits BEHIND the still-visible splash, so this is never actually seen — it
+  // exists so the tree has a ground colour if the splash is dismissed early.
+  if (!ready) return <View style={{ flex: 1, backgroundColor: c.bg }} />;
+  return <>{children}</>;
 }
 
 function AuthGuard() {
@@ -81,7 +103,7 @@ function AuthGuard() {
     if (!isSignedIn && inDrawer) router.replace("/sign-in");
     else if (isSignedIn && !inDrawer) router.replace("/");
   }, [isLoaded, isSignedIn, segments]);
-  if (!isLoaded) return <LoadingScreen />;
+  if (!isLoaded) return <AppLoader />;
   return (
     <>
       {isSignedIn && <EnsureProvisioned />}
@@ -95,12 +117,14 @@ function AuthGuard() {
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <ClerkProvider publishableKey={CLERK_KEY} tokenCache={tokenCache}>
-        <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-          <ThemedStatusBar />
-          <AuthGuard />
-        </ConvexProviderWithClerk>
-      </ClerkProvider>
+      <FontGate>
+        <ClerkProvider publishableKey={CLERK_KEY} tokenCache={tokenCache}>
+          <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+            <ThemedStatusBar />
+            <AuthGuard />
+          </ConvexProviderWithClerk>
+        </ClerkProvider>
+      </FontGate>
     </ThemeProvider>
   );
 }

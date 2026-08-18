@@ -43,13 +43,13 @@ export function GoalCard({ title, description, targetValue, currentValue, unit, 
       )}
       <View style={s.row}>
         {taskCount > 0 && (
-          <View style={[s.pill, { backgroundColor: "rgba(99,102,241,0.14)" }]}>
-            <Text style={[s.pillTxt, { color: "#818cf8" }]}>{taskCount} task{taskCount !== 1 ? "s" : ""}</Text>
+          <View style={[s.pill, { backgroundColor: c.bgS }]}>
+            <Text style={[s.pillTxt, { color: c.chart5 }]}>{taskCount} task{taskCount !== 1 ? "s" : ""}</Text>
           </View>
         )}
         {routineCount > 0 && (
-          <View style={[s.pill, { backgroundColor: "rgba(34,197,94,0.14)" }]}>
-            <Text style={[s.pillTxt, { color: "#4ade80" }]}>{routineCount} routine{routineCount !== 1 ? "s" : ""}</Text>
+          <View style={[s.pill, { backgroundColor: c.bgS }]}>
+            <Text style={[s.pillTxt, { color: c.chart2 }]}>{routineCount} routine{routineCount !== 1 ? "s" : ""}</Text>
           </View>
         )}
         {dueDate && <Text style={s.due}>Due {dueDate}</Text>}

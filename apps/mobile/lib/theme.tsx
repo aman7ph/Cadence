@@ -1,16 +1,18 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { useColorScheme } from "react-native";
 import * as SecureStore from "expo-secure-store";
-import { darkColors, lightColors } from "./colors";
+import { darkColors, lightColors, type Colors } from "./colors";
 
 export type ThemePreference = "light" | "dark" | "system";
-type Colors = { [K in keyof typeof darkColors]: string };
+export type { Colors };
 
 interface ThemeCtx {
   preference: ThemePreference;
   colorScheme: "light" | "dark";
   colors: Colors;
   setTheme: (p: ThemePreference) => void;
+  /** Cycles light → dark → system → light, matching the web toggle exactly. */
+  toggle: () => void;
 }
 
 const ThemeContext = createContext<ThemeCtx>({
@@ -18,6 +20,7 @@ const ThemeContext = createContext<ThemeCtx>({
   colorScheme: "dark",
   colors: darkColors,
   setTheme: () => {},
+  toggle: () => {},
 });
 
 const STORE_KEY = "theme_preference";
@@ -39,12 +42,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     void SecureStore.setItemAsync(STORE_KEY, p);
   };
 
+  // Same cycle as web's useTheme().toggle — light → dark → system → light — so
+  // the control behaves identically on both platforms. The three-way picker in
+  // Settings stays; this is the quick path through the same states.
+  const toggle = () =>
+    setTheme(pref === "light" ? "dark" : pref === "dark" ? "system" : "light");
+
   return (
     <ThemeContext.Provider value={{
       preference: pref,
       colorScheme: scheme,
       colors: scheme === "dark" ? darkColors : lightColors,
       setTheme,
+      toggle,
     }}>
       {children}
     </ThemeContext.Provider>
@@ -56,6 +66,6 @@ export function useColors(): Colors {
 }
 
 export function useTheme() {
-  const { preference, colorScheme, setTheme } = useContext(ThemeContext);
-  return { preference, colorScheme, setTheme };
+  const { preference, colorScheme, setTheme, toggle } = useContext(ThemeContext);
+  return { preference, colorScheme, setTheme, toggle };
 }

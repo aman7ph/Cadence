@@ -20,7 +20,7 @@ export function RepeatControl({ doneToday, target, remaining, onUndo, readOnly }
     row:        { flexDirection: "row", alignItems: "center", gap: 6 },
     badge:      { backgroundColor: c.accBg, borderRadius: 999,
                   paddingHorizontal: 7, paddingVertical: 2 },
-    badgeDone:  { backgroundColor: "rgba(43,168,74,0.18)" },
+    badgeDone:  { backgroundColor: c.successBg },
     badgeTxt:   { fontSize: 10, fontWeight: "700", color: c.tacc },
     badgeTxtDone: { color: c.cplt },
     wait:       { backgroundColor: c.active, borderRadius: 999,

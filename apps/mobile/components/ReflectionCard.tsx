@@ -22,7 +22,7 @@ function MentionText({ text, routines }: { text: string; routines: Routine[] }) 
       {parseMentionSegments(text).map((seg, i) =>
         seg.kind === "text"
           ? <Text key={i}>{seg.value}</Text>
-          : <Text key={i} style={routineIds.has(seg.id) ? { color: "#818cf8", fontWeight: "600" } : { color: "#fbbf24", fontWeight: "600" }}>{seg.name}</Text>
+          : <Text key={i} style={routineIds.has(seg.id) ? { color: c.tacc, fontWeight: "600" } : { color: c.carry, fontWeight: "600" }}>{seg.name}</Text>
       )}
     </Text>
   );
@@ -61,11 +61,11 @@ export function ReflectionCard({ date, reflection, routines, tasks, isPast }: Pr
     viewBody:   { paddingHorizontal: 14, paddingBottom: 14, paddingTop: 4 },
     tagList:    { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 10 },
     tagPill:    { borderRadius: 999, paddingHorizontal: 9, paddingVertical: 3 },
-    tagPillR:   { backgroundColor: "rgba(129,140,248,0.14)" },
-    tagPillT:   { backgroundColor: "rgba(251,191,36,0.14)" },
+    tagPillR:   { backgroundColor: c.accBg },
+    tagPillT:   { backgroundColor: c.bgS },
     tagPillTxt: { fontSize: 11, fontWeight: "600" },
-    tagTxtR:    { color: "#818cf8" },
-    tagTxtT:    { color: "#fbbf24" },
+    tagTxtR:    { color: c.tacc },
+    tagTxtT:    { color: c.t2 },
   });
 
   return (

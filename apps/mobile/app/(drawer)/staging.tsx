@@ -88,7 +88,7 @@ export default function StagingScreen() {
     },
     tabOn: { backgroundColor: c.prim, borderColor: c.prim },
     tabTxt: { fontSize: 13, fontWeight: "500", color: c.t2 },
-    tabTxtOn: { color: "#fff", fontWeight: "600" },
+    tabTxtOn: { color: c.onPrim, fontWeight: "600" },
     content: { paddingTop: 8, paddingBottom: 100 },
     center: { flex: 1, alignItems: "center", justifyContent: "center" },
     empty: {
@@ -119,7 +119,7 @@ export default function StagingScreen() {
       elevation: 8,
     },
     fabTxt: {
-      color: "#fff",
+      color: c.onPrim,
       fontSize: 26,
       fontWeight: "300",
       lineHeight: 28,

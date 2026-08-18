@@ -38,7 +38,7 @@ export function SchedulePicker({ scheduleType, customDays, disabled, onChange, o
                  justifyContent: "center", alignItems: "center" },
     dayBtnOn:  { borderColor: c.prim, backgroundColor: c.prim },
     dayTxt:    { fontSize: 11, fontWeight: "700", color: c.t2 },
-    dayTxtOn:  { color: "#fff" },
+    dayTxtOn:  { color: c.onPrim },
   });
 
   return (

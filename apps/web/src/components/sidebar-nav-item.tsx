@@ -32,7 +32,7 @@ export function NavItem({ icon, label, active, disabled, badge, onClick }: NavIt
       <span className="flex w-[18px] shrink-0 justify-center opacity-90">{icon}</span>
       <span className="flex-1">{label}</span>
       {badge && (
-        <span className="rounded-full bg-[var(--status-complete)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+        <span className="rounded-full bg-[var(--status-complete)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[var(--text-on-accent)]">
           {badge}
         </span>
       )}

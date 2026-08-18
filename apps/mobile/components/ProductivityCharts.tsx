@@ -5,7 +5,7 @@ import type { DateRange } from "@cadence/shared";
 import { Text, View } from "react-native";
 import { useColors } from "../lib/theme";
 import type { Granularity, LineSeries } from "../lib/insightUtils";
-import { computeEMA, bucketByWeek, bucketByMonth, HEAT_DARK, HEAT_LIGHT, DOW } from "../lib/insightUtils";
+import { computeEMA, bucketByWeek, bucketByMonth, DOW } from "../lib/insightUtils";
 import { SimpleLineChart } from "./SimpleLineChart";
 import { Loading, Empty, XLabels } from "./InsightShared";
 
@@ -22,8 +22,8 @@ export function MomentumChart({ range, granularity }: { range: DateRange; granul
   const ema = granularity === "daily" ? computeEMA(vals, 7) : null;
 
   const series: LineSeries[] = [
-    { data: vals.map(Math.round), color: "#818cf8", strokeWidth: 1.5, opacity: 0.35 },
-    ...(ema ? [{ data: ema.map(Math.round), color: "#818cf8", strokeWidth: 2.5 }] : []),
+    { data: vals.map(Math.round), color: c.chart1, strokeWidth: 1.5, opacity: 0.35 },
+    ...(ema ? [{ data: ema.map(Math.round), color: c.chart1, strokeWidth: 2.5 }] : []),
   ];
 
   return (
@@ -33,11 +33,11 @@ export function MomentumChart({ range, granularity }: { range: DateRange; granul
       {ema && (
         <View style={{ flexDirection: "row", gap: 14, marginTop: 8 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-            <View style={{ width: 16, height: 1.5, backgroundColor: "#818cf8", opacity: 0.4 }} />
+            <View style={{ width: 16, height: 1.5, backgroundColor: c.chart1, opacity: 0.4 }} />
             <Text style={{ fontSize: 11, color: c.t3 }}>Score</Text>
           </View>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-            <View style={{ width: 16, height: 2.5, backgroundColor: "#818cf8" }} />
+            <View style={{ width: 16, height: 2.5, backgroundColor: c.chart1 }} />
             <Text style={{ fontSize: 11, color: c.t3 }}>7-day EMA</Text>
           </View>
         </View>
@@ -52,8 +52,9 @@ export function DowHeatmap({ range, today }: { range: DateRange; today: string }
 
   if (!stats) return <Loading />;
 
-  const isDark = c.bg === "#0e0f14" || c.bg.startsWith("#0") || c.bg.startsWith("#1");
-  const heat = isDark ? HEAT_DARK : HEAT_LIGHT;
+  // The ramp comes from the token layer, and the theme from the theme —
+  // this previously guessed at dark mode by string-matching the background hex.
+  const heat = [c.heat0, c.heat1, c.heat2, c.heat3, c.heat4];
 
   return (
     <View style={{ flexDirection: "row", gap: 6, marginTop: 4 }}>

@@ -19,7 +19,7 @@ export function ActionSheet({ visible, title, actions, onCancel }: Props) {
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onCancel}>
-      <TouchableOpacity style={s.overlay} activeOpacity={1} onPress={onCancel} />
+      <TouchableOpacity style={[s.overlay, { backgroundColor: c.scrim }]} activeOpacity={1} onPress={onCancel} />
       <View style={[s.sheet, { backgroundColor: c.bgE, borderColor: c.bd2 }]}>
         {title && (
           <Text style={[s.title, { color: c.t2, borderBottomColor: c.bd1 }]}>
@@ -54,7 +54,7 @@ export function ActionSheet({ visible, title, actions, onCancel }: Props) {
 }
 
 const s = StyleSheet.create({
-  overlay:   { flex: 1, backgroundColor: "rgba(0,0,0,0.5)" },
+  overlay:   { flex: 1 },
   sheet:     { borderTopLeftRadius: 20, borderTopRightRadius: 20,
                borderWidth: 1, borderBottomWidth: 0, paddingBottom: 32 },
   title:     { textAlign: "center", fontSize: 11, fontWeight: "700", letterSpacing: 0.8,

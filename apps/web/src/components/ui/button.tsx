@@ -38,7 +38,7 @@ const buttonVariants = cva(
         block:
           "w-full rounded-md border border-[var(--border-subtle)] bg-transparent text-[var(--text-secondary)] hover:border-[var(--border-default)] hover:text-[var(--text-primary)]",
       },
-      /** Colour of `outline` — the prototype tones Mark complete green. */
+      /** Colour of `outline` — the prototype tones Mark complete with the accent. */
       tone: {
         neutral: "",
         success: "",

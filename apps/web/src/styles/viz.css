@@ -15,7 +15,7 @@
    * hues are spaced around the wheel to stay separable for the colour-blind
    * and in greyscale, not merely "different colours". ---- */
   --viz-1: #bd7a15;  /* gold — accent */
-  --viz-2: #3d8a3f;  /* green */
+  --viz-2: #9a6210;  /* bronze — was green; the prototype has none */
   --viz-3: #3d9b8f;  /* teal */
   --viz-4: #c9504f;  /* rose */
   --viz-5: #8a6fc4;  /* violet */
@@ -23,7 +23,7 @@
 
   /* ---- Chart series, dark ground — same hues, lifted for contrast. ---- */
   --viz-1-lift: #e8a13d;
-  --viz-2-lift: #6cbf68;
+  --viz-2-lift: #c9862a;
   --viz-3-lift: #52b8aa;
   --viz-4-lift: #e07370;
   --viz-5-lift: #a992e0;

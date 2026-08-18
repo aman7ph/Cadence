@@ -58,7 +58,7 @@ export function AddTaskBar({ today }: Props) {
     iconTxtActive:   { color: c.tacc },
     btn:             { width: 44, backgroundColor: c.prim, borderRadius: 10,
                        justifyContent: "center", alignItems: "center" },
-    btnTxt:          { color: "#fff", fontSize: 24, fontWeight: "300", lineHeight: 26 },
+    btnTxt:          { color: c.onPrim, fontSize: 24, fontWeight: "300", lineHeight: 26 },
     goalPanel:       { backgroundColor: c.bgE, borderWidth: 1, borderColor: c.bd1,
                        borderRadius: 10, padding: 10, gap: 8 },
     goalLbl:         { fontSize: 10, fontWeight: "700", textTransform: "uppercase",
@@ -92,7 +92,7 @@ export function AddTaskBar({ today }: Props) {
           </TouchableOpacity>
         )}
         <TouchableOpacity onPress={submit} disabled={pending} style={s.btn} activeOpacity={0.8}>
-          {pending ? <ActivityIndicator color="#fff" size="small" /> : <Text style={s.btnTxt}>+</Text>}
+          {pending ? <ActivityIndicator color={c.onPrim} size="small" /> : <Text style={s.btnTxt}>+</Text>}
         </TouchableOpacity>
       </View>
       {showGoal && hasGoals && (

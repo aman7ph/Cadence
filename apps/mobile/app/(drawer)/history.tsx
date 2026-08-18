@@ -5,12 +5,11 @@ import {
   daysInMonth, endOfMonth, firstWeekdayOfMonth,
   formatMonthYear, nextMonth, prevMonth, scoreToHeatBand, startOfMonth, todayLocal,
 } from "@cadence/shared";
-import { HEAT_DARK, HEAT_LIGHT } from "../../lib/insightUtils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AppBar } from "../../components/AppBar";
 import { HistoryDayModal } from "../../components/HistoryDayModal";
-import { useColors, useTheme } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 
 const DOW = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 
@@ -21,8 +20,7 @@ const DOW = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 
 export default function HistoryScreen() {
   const c = useColors();
-  const { colorScheme } = useTheme();
-  const heat = colorScheme === "dark" ? HEAT_DARK : HEAT_LIGHT;
+  const heat = [c.heat0, c.heat1, c.heat2, c.heat3, c.heat4];
 
   const today = todayLocal();
   const currentMonth = today.slice(0, 7);

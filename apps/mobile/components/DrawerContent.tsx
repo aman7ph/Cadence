@@ -3,6 +3,9 @@ import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { usePathname, useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useColors } from "../lib/theme";
+import { display } from "../lib/fonts";
+import { Logo } from "./Logo";
+import { ThemeToggle } from "./ThemeToggle";
 
 const NAV = [
   { name: "index",    label: "Today",    route: "/(drawer)/"        },
@@ -11,6 +14,7 @@ const NAV = [
   { name: "goals",    label: "Goals",    route: "/(drawer)/goals"    },
   { name: "history",  label: "History",  route: "/(drawer)/history"  },
   { name: "insights", label: "Insights", route: "/(drawer)/insights" },
+  { name: "settings", label: "Settings", route: "/(drawer)/settings" },
 ] as const;
 
 export function DrawerContent(props: DrawerContentComponentProps) {
@@ -34,12 +38,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
                     paddingTop: 56, paddingHorizontal: 20, paddingBottom: 14,
                     borderBottomWidth: 1, borderBottomColor: c.bd1 },
     brand:        { flex: 1, flexDirection: "row", alignItems: "center", gap: 10 },
-    brandMark:    { width: 28, height: 28, borderRadius: 8, backgroundColor: c.prim,
-                    justifyContent: "center", alignItems: "center" },
-    brandMarkTxt: { color: "#fff", fontWeight: "700", fontSize: 14 },
-    brandName:    { fontSize: 18, fontWeight: "700", color: c.t1, letterSpacing: -0.4 },
-    gear:         { padding: 4 },
-    gearTxt:      { fontSize: 20, color: c.t2 },
+    brandName:    { ...display("bold"), fontSize: 18, color: c.t1, letterSpacing: -0.4 },
     navList:      { paddingVertical: 8 },
     item:         { paddingHorizontal: 20, paddingVertical: 12, position: "relative" },
     itemOn:       { backgroundColor: c.accBg },
@@ -53,12 +52,10 @@ export function DrawerContent(props: DrawerContentComponentProps) {
     <View style={s.container}>
       <View style={s.head}>
         <View style={s.brand}>
-          <View style={s.brandMark}><Text style={s.brandMarkTxt}>C</Text></View>
+          <Logo size={28} />
           <Text style={s.brandName}>Cadence</Text>
         </View>
-        <TouchableOpacity onPress={() => go("/(drawer)/settings")} hitSlop={10} style={s.gear}>
-          <Text style={s.gearTxt}>⚙</Text>
-        </TouchableOpacity>
+        <ThemeToggle />
       </View>
       <DrawerContentScrollView {...props} scrollEnabled={false} contentContainerStyle={s.navList}>
         {NAV.map((item) => {

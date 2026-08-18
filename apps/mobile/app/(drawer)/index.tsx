@@ -49,7 +49,7 @@ export default function Today() {
     greeting:     { fontSize: 21, fontWeight: "700", color: c.t1, letterSpacing: -0.4, marginBottom: 2 },
     date:         { fontSize: 12, color: c.t2 },
     dateHeading:  { fontSize: 19, fontWeight: "700", color: c.t1, letterSpacing: -0.3, marginBottom: 4 },
-    pastBadge:    { alignSelf: "flex-start", backgroundColor: "rgba(224,161,0,0.14)",
+    pastBadge:    { alignSelf: "flex-start", backgroundColor: c.accBg,
                     borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3, marginBottom: 2 },
     pastBadgeTxt: { fontSize: 11, fontWeight: "600", color: c.carry },
   });

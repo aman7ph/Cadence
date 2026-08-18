@@ -33,7 +33,7 @@ export default function GoalsScreen() {
     tab:      { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, borderWidth: 1, borderColor: c.bd2 },
     tabOn:    { backgroundColor: c.prim, borderColor: c.prim },
     tabTxt:   { fontSize: 13, fontWeight: "500", color: c.t2 },
-    tabTxtOn: { color: "#fff", fontWeight: "600" },
+    tabTxtOn: { color: c.onPrim, fontWeight: "600" },
     content:  { paddingTop: 8, paddingBottom: 100 },
     center:   { flex: 1, alignItems: "center", justifyContent: "center" },
     empty:    { margin: 24, borderWidth: 1, borderStyle: "dashed", borderColor: c.bd1,
@@ -43,7 +43,7 @@ export default function GoalsScreen() {
                 borderRadius: 25, backgroundColor: c.prim, justifyContent: "center", alignItems: "center",
                 shadowColor: c.prim, shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.5, shadowRadius: 12, elevation: 8 },
-    fabTxt:   { color: "#fff", fontSize: 26, fontWeight: "300", lineHeight: 28, includeFontPadding: false },
+    fabTxt:   { color: c.onPrim, fontSize: 26, fontWeight: "300", lineHeight: 28, includeFontPadding: false },
   });
 
   return (

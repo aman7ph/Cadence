@@ -33,7 +33,7 @@ export function RangePickerSheet({ visible, range, label, today, onChange, onClo
   };
 
   const s = StyleSheet.create({
-    overlay:    { flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: "flex-end" },
+    overlay:    { flex: 1, backgroundColor: c.scrim, justifyContent: "flex-end" },
     sheet:      { backgroundColor: c.bgE, borderTopLeftRadius: 20, borderTopRightRadius: 20,
                   paddingBottom: 32, maxHeight: "90%" as const },
     handle:     { width: 36, height: 4, backgroundColor: c.bd3, borderRadius: 2,
@@ -60,7 +60,7 @@ export function RangePickerSheet({ visible, range, label, today, onChange, onClo
     errTxt:     { fontSize: 12, color: c.chart4, paddingHorizontal: 20, paddingTop: 4 },
     applyBtn:   { marginHorizontal: 20, marginTop: 12, paddingVertical: 12, backgroundColor: c.prim,
                   borderRadius: 12, alignItems: "center" },
-    applyTxt:   { fontSize: 14, fontWeight: "700", color: "#fff" },
+    applyTxt:   { fontSize: 14, fontWeight: "700", color: c.onPrim },
   });
 
   return (

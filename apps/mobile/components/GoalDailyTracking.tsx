@@ -71,7 +71,7 @@ export function GoalDailyTracking({ selDate, minDate, maxDate, onPrev, onNext, o
       {tasks.map((t) => (
         <View key={t.taskId} style={s.item}>
           <View style={s.iRow}>
-            <View style={[s.dot, { backgroundColor: t.status === "completed" ? "#818cf8" : c.bd3 }]} />
+            <View style={[s.dot, { backgroundColor: t.status === "completed" ? c.cplt : c.bd3 }]} />
             <Text style={s.iName}>{t.title}</Text>
             <Text style={s.iTag}>task</Text>
           </View>

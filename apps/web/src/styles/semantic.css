@@ -36,8 +36,13 @@
   --action-primary: var(--gold-600);
   --action-primary-hover: var(--gold-700);
 
-  --status-complete: var(--green-600);
-  --status-streak: var(--green-600);
+  /* Gold, not green. The design prototype contains NO green at all — its
+   * completed checkbox, its streaks and its charts are all gold. Green was an
+   * unexamined carryover from the pre-redesign palette; see the mobile plan's
+   * "no green" finding. Completion sharing the accent hue is intentional in
+   * this language, not a collision. */
+  --status-complete: var(--gold-600);
+  --status-streak: var(--gold-600);
   /* Carryover is deliberately NEUTRAL, not amber. In the prototype a carried
    * task wears a muted `×N` badge, and an amber one would sit close enough to
    * the gold accent to read as a primary action. "Stale" should look quiet. */
@@ -48,8 +53,8 @@
   /* Tinted surfaces for status chips and hover states. These exist so no
    * component has to hand-roll a translucent colour — see the note in
    * palette.css about raw rgba() in components. */
-  --surface-success: var(--green-100);
-  --text-success: var(--green-700);
+  --surface-success: var(--gold-100);
+  --text-success: var(--gold-700);
   --surface-danger: var(--red-50);
 
   --chart-1: var(--viz-1);
@@ -71,7 +76,7 @@
   --shadow-sm: 0 1px 2px rgba(23, 20, 15, 0.06), 0 1px 1px rgba(23, 20, 15, 0.04);
   --shadow-md: 0 4px 12px rgba(23, 20, 15, 0.08), 0 1px 3px rgba(23, 20, 15, 0.05);
   --shadow-accent: 0 2px 10px rgba(189, 122, 21, 0.25);
-  --shadow-success: 0 2px 8px rgba(61, 138, 63, 0.25);
+  --shadow-success: 0 2px 8px rgba(189, 122, 21, 0.25);
 }
 
 /* ---- DARK ---- */
@@ -101,16 +106,16 @@
   --action-primary: var(--gold-400);
   --action-primary-hover: var(--gold-200);
 
-  --status-complete: var(--green-500);
-  --status-streak: var(--green-500);
+  --status-complete: var(--gold-400);
+  --status-streak: var(--gold-400);
   --status-carryover: var(--sand-400);   /* neutral — see light theme note */
   --status-danger: var(--red-500);
   /* Mid-tone, not dark: pending renders as text/icons on --bg-app, so it has to
    * out-contrast the borders rather than sit below them. */
   --status-pending: var(--sand-500);
 
-  --surface-success: var(--green-950);
-  --text-success: var(--green-500);
+  --surface-success: var(--gold-950);
+  --text-success: var(--gold-400);
   --surface-danger: var(--red-950);
 
   --focus-ring: var(--gold-400);

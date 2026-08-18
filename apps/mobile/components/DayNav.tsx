@@ -30,7 +30,7 @@ export function DayNav({ date, today, onPrev, onNext, onToday }: Props) {
     arrowDimTxt:  { color: c.t3 },
     chip:         { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6,
                     backgroundColor: c.card, borderWidth: 1, borderColor: c.bd2 },
-    chipToday:    { backgroundColor: c.accBg, borderColor: "rgba(128,121,240,0.35)" },
+    chipToday:    { backgroundColor: c.accBg, borderColor: c.bdAcc },
     chipTxt:      { fontSize: 11, fontWeight: "600", color: c.t3 },
     chipTxtToday: { color: c.tacc },
   });

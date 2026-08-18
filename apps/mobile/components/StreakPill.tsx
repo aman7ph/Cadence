@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import { useColors } from "../lib/theme";
 
-// The green day-streak pill from RoutineItem, extracted so that file stays
+// The day-streak pill from RoutineItem, extracted so that file stays
 // within the project's 150-line limit. Cold (zero) streaks render muted.
 export function StreakPill({ count }: { count: number }) {
   const c = useColors();
@@ -9,7 +9,7 @@ export function StreakPill({ count }: { count: number }) {
 
   const s = StyleSheet.create({
     pill:     { flexDirection: "row", alignItems: "baseline", gap: 1,
-                backgroundColor: "rgba(43,168,74,0.18)", borderRadius: 999,
+                backgroundColor: c.successBg, borderRadius: 999,
                 paddingHorizontal: 8, paddingVertical: 3 },
     pillCold: { backgroundColor: c.active },
     num:      { fontSize: 12, fontWeight: "700", color: c.cplt },

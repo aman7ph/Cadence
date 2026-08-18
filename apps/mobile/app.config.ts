@@ -1,20 +1,36 @@
 import type { ExpoConfig, ConfigContext } from "expo/config";
+// Read from the token layer so the native splash/launcher ground cannot drift
+// from the app's own background — it silently did until the Step 1 re-theme.
+import { darkColors } from "./lib/colors.ts";
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: "Cadence",
   slug: "cadence",
-  // 1.1.0 — expo-notifications is a native module, so per the runtimeVersion
-  // note below this bump is mandatory and the reminder feature ships as a full
-  // EAS build, not an OTA update.
-  version: "1.1.0",
+  // 1.2.0 — expo-splash-screen is a NEW native module (verified absent from the
+  // lockfile at the previous commit), so the runtimeVersion rule below makes
+  // this bump mandatory and the redesign ships as a full EAS build.
+  // NOTE: expo-font, added earlier in the redesign, did NOT require a bump —
+  // it was already a dependency of `expo` and already in the binary.
+  version: "1.2.0",
   orientation: "portrait",
   scheme: "cadence",
   userInterfaceStyle: "dark",
+  // Both icon layers are GENERATED, never hand-drawn — `node icon.mjs` in
+  // .agent/design/harness renders them from the web's own styles/mark.css, so
+  // the launcher art and the in-app mark cannot drift apart. Re-run it if the
+  // mark changes rather than editing the PNGs.
   icon: "./assets/images/icon.png",
   android: {
     package: "com.cadence.app",
-    backgroundColor: "#0e0f14",
+    backgroundColor: darkColors.bg,
+    // Without this, Android 8+ plates the square icon instead of masking a
+    // proper foreground. The foreground PNG is deliberately transparent so the
+    // launcher composites it over backgroundColor and applies its own mask.
+    adaptiveIcon: {
+      foregroundImage: "./assets/images/icon-foreground.png",
+      backgroundColor: darkColors.bg,
+    },
     softwareKeyboardLayoutMode: "pan",
   },
   ios: {
@@ -37,6 +53,22 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-router",
     "expo-secure-store",
     "expo-web-browser",
+    [
+      // The mark on the app's own ground, so launch reads as the gyroscope
+      // rather than a plated tile. Uses the TRANSPARENT foreground PNG — the
+      // same file the adaptive icon uses — composited over backgroundColor.
+      //
+      // imageWidth is derived, not guessed: the mark occupies 62% of that PNG
+      // (see icon.mjs), and AppLoader renders it at 132px, so 132 / 0.62 ≈ 213
+      // makes the splash hand off to the loader at the same size instead of
+      // visibly jumping.
+      "expo-splash-screen",
+      {
+        image: "./assets/images/icon-foreground.png",
+        backgroundColor: darkColors.bg,
+        imageWidth: 213,
+      },
+    ],
     [
       "expo-build-properties",
       {

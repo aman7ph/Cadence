@@ -86,8 +86,8 @@ export function ReflectionEditor({ initialText, routines, tasks, onSave, onCance
                       paddingHorizontal: 12, paddingVertical: 10 },
     menuItemActive: { backgroundColor: c.active },
     typeDot:        { width: 7, height: 7, borderRadius: 4 },
-    dotRoutine:     { backgroundColor: "#818cf8" },
-    dotTask:        { backgroundColor: "#fbbf24" },
+    dotRoutine:     { backgroundColor: c.tacc },
+    dotTask:        { backgroundColor: c.chart3 },
     menuTxt:        { flex: 1, fontSize: 13, color: c.t1 },
     menuType:       { fontSize: 10, color: c.t3 },
     actions:        { flexDirection: "row", justifyContent: "flex-end", gap: 8,
@@ -95,7 +95,7 @@ export function ReflectionEditor({ initialText, routines, tasks, onSave, onCance
     cancelBtn:      { paddingHorizontal: 14, paddingVertical: 8 },
     cancelTxt:      { fontSize: 13, color: c.t3 },
     saveBtn:        { backgroundColor: c.prim, borderRadius: 8, paddingHorizontal: 16, paddingVertical: 8 },
-    saveTxt:        { fontSize: 13, fontWeight: "600", color: "#fff" },
+    saveTxt:        { fontSize: 13, fontWeight: "600", color: c.onPrim },
   });
 
   return (

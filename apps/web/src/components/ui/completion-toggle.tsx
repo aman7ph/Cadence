@@ -27,7 +27,7 @@ const CompletionToggle = React.forwardRef<HTMLButtonElement, CompletionTogglePro
           "relative inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-150",
           "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring focus-visible:ring-offset-0",
           isComplete
-            ? "border-[var(--status-complete)] bg-[var(--status-complete)] text-white shadow-[var(--shadow-success)]"
+            ? "border-[var(--status-complete)] bg-[var(--status-complete)] text-[var(--text-on-accent)] shadow-[var(--shadow-success)]"
             : isSkipped
               ? "border-[var(--border-default)] bg-[var(--surface-active)] text-muted-foreground"
               : "border-[var(--border-default)] bg-card hover:border-[var(--status-complete)] hover:bg-[var(--surface-success)]",

@@ -13,7 +13,7 @@ export default function DrawerLayout() {
         screenOptions={{
           headerShown: false,
           drawerStyle: { backgroundColor: c.bgE, width: 280 },
-          overlayColor: "rgba(0,0,0,0.55)",
+          overlayColor: c.scrim,
           swipeEdgeWidth: 50,
         }}
       >

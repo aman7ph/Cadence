@@ -47,10 +47,10 @@ function GoalDetailContent({ goal: initGoal, onClose }: { goal: GoalData; onClos
   const pct       = goal.targetValue ? Math.min(100, Math.round((currentValue / goal.targetValue) * 100)) : null;
   const barColor  = pct === 100 ? c.success : c.prim;
   const badge     = goal.status === "completed"
-    ? { bg: "rgba(34,197,94,0.14)", fg: "#4ade80", label: "Completed" }
+    ? { bg: c.successBg, fg: c.tSuccess, label: "Completed" }
     : goal.status === "abandoned"
-    ? { bg: "rgba(107,114,128,0.14)", fg: "#9ca3af", label: "Abandoned" }
-    : { bg: "rgba(99,102,241,0.14)", fg: "#818cf8", label: "Active" };
+    ? { bg: c.bgS, fg: c.t3, label: "Abandoned" }
+    : { bg: c.accBg, fg: c.tacc, label: "Active" };
   const routines  = day?.routines ?? [];
   const tasks     = day?.tasks ?? [];
 
@@ -67,8 +67,8 @@ function GoalDetailContent({ goal: initGoal, onClose }: { goal: GoalData; onClos
     metaRow:  { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 8 },
     badge:    { borderRadius: 999, paddingHorizontal: 9, paddingVertical: 3 },
     startTxt: { fontSize: 12, color: c.t3 },
-    dueBadge: { borderRadius: 999, paddingHorizontal: 9, paddingVertical: 3, backgroundColor: "rgba(224,161,0,0.12)" },
-    dueTxt:   { fontSize: 11, fontWeight: "600", color: "#c2820b" },
+    dueBadge: { borderRadius: 999, paddingHorizontal: 9, paddingVertical: 3, backgroundColor: c.accBg },
+    dueTxt:   { fontSize: 11, fontWeight: "600", color: c.tacc },
     desc:     { fontSize: 13, color: c.t2, lineHeight: 20, marginBottom: 8 },
     divider:  { height: 1, backgroundColor: c.bd1, marginVertical: 10 },
     pRow:     { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 8 },

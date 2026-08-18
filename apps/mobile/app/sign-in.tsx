@@ -10,6 +10,8 @@ import {
   View,
 } from "react-native";
 import { useColors } from "../lib/theme";
+import { display } from "../lib/fonts";
+import { Logo } from "../components/Logo";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -41,10 +43,7 @@ export default function SignIn() {
     container:   { flex: 1, backgroundColor: c.bg },
     inner:       { flex: 1, justifyContent: "center", padding: 32, gap: 12 },
     logoRow:     { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 8 },
-    logoMark:    { width: 40, height: 40, borderRadius: 11, backgroundColor: c.prim,
-                   justifyContent: "center", alignItems: "center" },
-    logoMarkTxt: { color: "#fff", fontWeight: "700", fontSize: 20 },
-    logo:        { fontSize: 34, fontWeight: "700", color: c.t1, letterSpacing: -0.5 },
+    logo:        { ...display("bold"), fontSize: 34, color: c.t1, letterSpacing: -0.5 },
     tagline:     { fontSize: 15, color: c.t2, marginBottom: 28 },
     err:         { color: c.danger, fontSize: 13 },
     googleBtn:   { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10,
@@ -57,9 +56,7 @@ export default function SignIn() {
     <View style={s.container}>
       <View style={s.inner}>
         <View style={s.logoRow}>
-          <View style={s.logoMark}>
-            <Text style={s.logoMarkTxt}>C</Text>
-          </View>
+          <Logo size={40} />
           <Text style={s.logo}>Cadence</Text>
         </View>
         <Text style={s.tagline}>Your habits, your goals, your progress.</Text>
@@ -79,6 +76,9 @@ export default function SignIn() {
   );
 }
 
+// The ONLY hexes allowed outside lib/colors.ts. These are Google's brand
+// colours, not ours — they must not follow our theme, and re-pointing them at
+// tokens would misrepresent someone else's mark.
 function GoogleIcon() {
   return (
     <View style={gStyles.wrapper}>

@@ -6,7 +6,7 @@ import { countsTowardRate, rollingCompletionRate, startOfWeek } from "@cadence/s
 import { Text, View } from "react-native";
 import { useColors } from "../lib/theme";
 import type { Granularity, LineSeries } from "../lib/insightUtils";
-import { CC } from "../lib/insightUtils";
+import { seriesColors } from "../lib/insightUtils";
 import { SimpleLineChart } from "./SimpleLineChart";
 import { Loading, Empty, XLabels } from "./InsightShared";
 
@@ -57,13 +57,14 @@ function buildRoutineData(rows: RoutineTimelineRow[], g: Granularity) {
 
 export function RoutineComparisonChart({ range, today }: { range: DateRange; today: string }) {
   const c = useColors();
+  const SC = seriesColors(c);
   const rows = useQuery(api.analyticsRoutines.routineConsistency, { from: range.from, to: range.to, today });
 
   if (!rows) return <Loading />;
   if (rows.length === 0) return <Empty msg="No active routines." />;
 
   const data = rows.filter((r) => r.rate !== null)
-    .map((r, i) => ({ id: r.routineId as string, name: r.name, rate: r.rate ?? 0, color: CC[i % CC.length]! }));
+    .map((r, i) => ({ id: r.routineId as string, name: r.name, rate: r.rate ?? 0, color: SC[i % SC.length]! }));
 
   if (data.length === 0) return <Empty msg="No scheduled days in this window." />;
 
@@ -88,6 +89,7 @@ export function RoutineComparisonChart({ range, today }: { range: DateRange; tod
 
 export function RoutineCompletionLines({ range, granularity, today }: { range: DateRange; granularity: Granularity; today: string }) {
   const c = useColors();
+  const SC = seriesColors(c);
   const rows = useQuery(api.analyticsRoutines.routineTimeline, { from: range.from, to: range.to, today });
 
   if (!rows) return <Loading />;
@@ -96,7 +98,7 @@ export function RoutineCompletionLines({ range, granularity, today }: { range: D
   const { dates, series } = buildRoutineData(rows as RoutineTimelineRow[], granularity);
   if (dates.length === 0) return <Empty msg="No data in this window." />;
 
-  const lineSeries: LineSeries[] = series.map((s, i) => ({ data: s.data, color: CC[i % CC.length]!, strokeWidth: 2 }));
+  const lineSeries: LineSeries[] = series.map((s, i) => ({ data: s.data, color: SC[i % SC.length]!, strokeWidth: 2 }));
 
   return (
     <View>
@@ -105,7 +107,7 @@ export function RoutineCompletionLines({ range, granularity, today }: { range: D
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 10 }}>
         {series.map((s, i) => (
           <View key={s.id} style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: CC[i % CC.length] }} />
+            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: SC[i % SC.length] }} />
             <Text style={{ fontSize: 11, color: c.t3 }} numberOfLines={1}>{s.name}</Text>
           </View>
         ))}

@@ -45,7 +45,7 @@ export function DatePickerModal({ visible, value, min, max, onChange, onClose }:
   }
 
   const s = StyleSheet.create({
-    overlay:  { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.55)" },
+    overlay:  { flex: 1, justifyContent: "flex-end", backgroundColor: c.scrim },
     backdrop: { flex: 1 },
     sheet:    { backgroundColor: c.bgE, borderTopLeftRadius: 22, borderTopRightRadius: 22,
                 borderWidth: 1, borderBottomWidth: 0, borderColor: c.bd2, paddingBottom: 28 },
@@ -60,7 +60,7 @@ export function DatePickerModal({ visible, value, min, max, onChange, onClose }:
     cell:     { flex: 1, height: 40, borderRadius: 10, alignItems: "center", justifyContent: "center" },
     cellSel:  { backgroundColor: c.prim },
     cellTxt:  { fontSize: 14, color: c.t1 },
-    cellSelTxt:{ fontSize: 14, color: "#fff", fontWeight: "700" },
+    cellSelTxt:{ fontSize: 14, color: c.onPrim, fontWeight: "700" },
     cellDim:  { opacity: 0.22 },
   });
 

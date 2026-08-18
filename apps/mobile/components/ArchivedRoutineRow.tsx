@@ -55,7 +55,7 @@ export function ArchivedRoutineRow({ routine }: Props) {
     deleteBtn:   { paddingHorizontal: 8, paddingVertical: 6 },
     deleteTxt:   { fontSize: 12, color: c.t3 },
     confirmRow:  { flexDirection: "row", alignItems: "center", gap: 6,
-                   borderWidth: 1, borderColor: "rgba(239,68,68,0.35)",
+                   borderWidth: 1, borderColor: c.danger,
                    borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
     confirmTxt:  { fontSize: 11, color: c.danger },
     yesTxt:      { fontSize: 11, fontWeight: "700", color: c.danger },

@@ -31,7 +31,7 @@ export function GoalActionButtons({ confirm, onConfirmChange, onComplete, onAban
           <TouchableOpacity
             style={[s.confBtn, { backgroundColor: confirm === "complete" ? c.success : c.danger, borderColor: "transparent" }]}
             onPress={confirm === "complete" ? onComplete : onAbandon}>
-            <Text style={{ fontSize: 12, fontWeight: "600", color: "#fff" }}>
+            <Text style={{ fontSize: 12, fontWeight: "600", color: confirm === "complete" ? c.onPrim : c.onStatus }}>
               {confirm === "complete" ? "Mark complete" : "Abandon"}
             </Text>
           </TouchableOpacity>
@@ -43,7 +43,7 @@ export function GoalActionButtons({ confirm, onConfirmChange, onComplete, onAban
   return (
     <View style={s.actRow}>
       <TouchableOpacity
-        style={[s.actBtn, { backgroundColor: "rgba(34,197,94,0.12)", borderColor: "rgba(34,197,94,0.3)" }]}
+        style={[s.actBtn, { backgroundColor: c.successBg, borderColor: c.cplt }]}
         onPress={() => onConfirmChange("complete")} activeOpacity={0.7}>
         <Text style={{ fontSize: 12, fontWeight: "600", color: c.success }}>✓ Mark complete</Text>
       </TouchableOpacity>

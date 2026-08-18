@@ -6,6 +6,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-nati
 import { AppBar } from "../../components/AppBar";
 import { ReminderSection } from "../../components/ReminderSection";
 import { useColors, useTheme } from "../../lib/theme";
+import { display } from "../../lib/fonts";
 import type { ThemePreference } from "../../lib/theme";
 
 const THEME_OPTS: { label: string; value: ThemePreference }[] = [
@@ -42,7 +43,7 @@ export default function Settings() {
                  borderRadius: 14, padding: 14, marginBottom: 24, borderWidth: 1, borderColor: c.bd1 },
     avatar:    { width: 44, height: 44, borderRadius: 22, backgroundColor: c.prim,
                  justifyContent: "center", alignItems: "center" },
-    avatarTxt: { color: "#fff", fontWeight: "700", fontSize: 17 },
+    avatarTxt: { ...display("bold"), color: c.onPrim, fontSize: 17 },
     acctInfo:  { flex: 1 },
     acctName:  { fontSize: 15, fontWeight: "600", color: c.t1 },
     acctEmail: { fontSize: 12, color: c.t3 },

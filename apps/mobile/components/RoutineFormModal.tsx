@@ -4,13 +4,14 @@ import { api } from "@cadence/backend/convex/_generated/api";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import { todayLocal } from "@cadence/shared";
 import {
-  ActivityIndicator, KeyboardAvoidingView, Modal, Platform,
+  KeyboardAvoidingView, Modal, Platform,
   ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from "react-native";
 import { RepeatSection } from "./RepeatSection";
 import { SchedulePicker } from "./SchedulePicker";
 import type { ScheduleType } from "./SchedulePicker";
 import { useColors } from "../lib/theme";
+import { FormFooter } from "./ui/FormFooter";
 import { useRepeatFields } from "../lib/useRepeatFields";
 
 export interface RoutineForForm {
@@ -61,7 +62,7 @@ export function RoutineFormModal({ visible, routine, onDone }: Props) {
   };
 
   const s = StyleSheet.create({
-    overlay:     { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.55)" },
+    overlay:     { flex: 1, justifyContent: "flex-end", backgroundColor: c.scrim },
     backdrop:    { flex: 1 },
     sheet:       { backgroundColor: c.bgE, borderTopLeftRadius: 22, borderTopRightRadius: 22,
                    borderWidth: 1, borderBottomWidth: 0, borderColor: c.bd2,
@@ -81,13 +82,6 @@ export function RoutineFormModal({ visible, routine, onDone }: Props) {
     goalChipOn:  { borderColor: c.prim, backgroundColor: c.accBg },
     goalTxt:     { fontSize: 12, color: c.t3, maxWidth: 140 },
     goalTxtOn:   { color: c.tacc, fontWeight: "600" },
-    footer:      { flexDirection: "row", justifyContent: "flex-end", gap: 8,
-                   paddingHorizontal: 20, paddingTop: 12 },
-    cancelBtn:   { paddingHorizontal: 14, paddingVertical: 10 },
-    cancelTxt:   { fontSize: 13, color: c.t3 },
-    saveBtn:     { backgroundColor: c.prim, borderRadius: 10, paddingHorizontal: 20, paddingVertical: 10 },
-    saveDim:     { opacity: 0.45 },
-    saveTxt:     { fontSize: 13, fontWeight: "600", color: "#fff" },
   });
 
   return (
@@ -127,15 +121,9 @@ export function RoutineFormModal({ visible, routine, onDone }: Props) {
             )}
             <RepeatSection repeat={repeat} disabled={pending} />
           </ScrollView>
-          <View style={s.footer}>
-            <TouchableOpacity onPress={onDone} disabled={pending} style={s.cancelBtn}>
-              <Text style={s.cancelTxt}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={submit} disabled={invalid || pending} style={[s.saveBtn, invalid && s.saveDim]}>
-              {pending ? <ActivityIndicator color="#fff" size="small" />
-                       : <Text style={s.saveTxt}>{routine ? "Save changes" : "Add routine"}</Text>}
-            </TouchableOpacity>
-          </View>
+          <FormFooter onCancel={onDone} onSubmit={submit}
+                      submitLabel={routine ? "Save changes" : "Add routine"}
+                      pending={pending} invalid={invalid} />
         </View>
       </KeyboardAvoidingView>
     </Modal>

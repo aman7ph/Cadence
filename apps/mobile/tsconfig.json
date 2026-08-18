@@ -3,6 +3,12 @@
   "compilerOptions": {
     "strict": true,
     "noUncheckedIndexedAccess": true,
+    // Only app.config.ts needs this. Expo's config loader transpiles that file
+    // alone and resolves its requires through plain Node, which has no .ts
+    // resolver — so importing the token layer there needs the extension
+    // spelled out. Safe under noEmit (inherited from expo/tsconfig.base):
+    // the flag permits the extension, it never requires it.
+    "allowImportingTsExtensions": true,
     "paths": {
       "@/*": [
         "./*"

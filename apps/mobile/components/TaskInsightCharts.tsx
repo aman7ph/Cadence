@@ -4,7 +4,7 @@ import type { DateRange } from "@cadence/shared";
 import { Text, View } from "react-native";
 import { useColors } from "../lib/theme";
 import type { Granularity, TK } from "../lib/insightUtils";
-import { CC, TASK_KEYS, TASK_COLORS, bucketCountsByWeek, bucketCountsByMonth } from "../lib/insightUtils";
+import { TASK_KEYS, taskColors, seriesColors, bucketCountsByWeek, bucketCountsByMonth } from "../lib/insightUtils";
 import { fillDailyGaps } from "@cadence/shared";
 import { SimpleLineChart } from "./SimpleLineChart";
 import { Loading, Empty, XLabels } from "./InsightShared";
@@ -13,6 +13,7 @@ const CARRY_LABELS = ["0×", "1×", "2×", "3+"];
 
 export function TasksByDayChart({ range, granularity }: { range: DateRange; granularity: Granularity }) {
   const c = useColors();
+  const TC = taskColors(c);
   const rawRows = useQuery(api.analyticsTasks.randomTasksByDay, { from: range.from, to: range.to });
 
   if (!rawRows) return <Loading />;
@@ -34,8 +35,8 @@ export function TasksByDayChart({ range, granularity }: { range: DateRange; gran
           const hPct = total > 0 ? (total / maxTotal) * 100 : 0;
           return (
             <View key={i} style={{ flex: 1, height: `${hPct}%` as `${number}%`, flexDirection: "column-reverse", borderRadius: 2, overflow: "hidden" }}>
-              {(r.completed ?? 0) > 0 && <View style={{ flex: r.completed, backgroundColor: TASK_COLORS.completed }} />}
-              {(r.open ?? 0) > 0 && <View style={{ flex: r.open, backgroundColor: TASK_COLORS.open }} />}
+              {(r.completed ?? 0) > 0 && <View style={{ flex: r.completed, backgroundColor: TC.completed }} />}
+              {(r.open ?? 0) > 0 && <View style={{ flex: r.open, backgroundColor: TC.open }} />}
             </View>
           );
         })}
@@ -44,7 +45,7 @@ export function TasksByDayChart({ range, granularity }: { range: DateRange; gran
       <View style={{ flexDirection: "row", gap: 14, marginTop: 8 }}>
         {TASK_KEYS.map((k) => (
           <View key={k} style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: TASK_COLORS[k] }} />
+            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: TC[k] }} />
             <Text style={{ fontSize: 11, color: c.t3 }}>{k.charAt(0).toUpperCase() + k.slice(1)}</Text>
           </View>
         ))}
@@ -95,6 +96,7 @@ export function TaskBreakdownChart({ range }: { range: DateRange }) {
 
 export function CarryoverCard({ range }: { range: DateRange }) {
   const c = useColors();
+  const SC = seriesColors(c);
   const result = useQuery(api.analyticsTasks.avgCarryover, { from: range.from, to: range.to });
 
   if (!result) return <Loading />;
@@ -116,7 +118,7 @@ export function CarryoverCard({ range }: { range: DateRange }) {
             <View key={i} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
               <Text style={{ width: 26, textAlign: "right", fontSize: 12, color: c.t3 }}>{CARRY_LABELS[i]}</Text>
               <View style={{ flex: 1, height: 18, backgroundColor: c.active, borderRadius: 6, overflow: "hidden" }}>
-                <View style={{ height: "100%", width: `${pct}%` as `${number}%`, backgroundColor: CC[1], borderRadius: 6 }} />
+                <View style={{ height: "100%", width: `${pct}%` as `${number}%`, backgroundColor: SC[1], borderRadius: 6 }} />
               </View>
               <Text style={{ width: 64, textAlign: "right", fontSize: 12, color: c.t1 }}>
                 {b.count}<Text style={{ color: c.t3 }}> ({Math.round(pct)}%)</Text>
@@ -131,6 +133,7 @@ export function CarryoverCard({ range }: { range: DateRange }) {
 
 export function OpenTasksTrendChart({ range, granularity }: { range: DateRange; granularity: Granularity }) {
   const rawRows = useQuery(api.analyticsTasks.openTasksByOriginDate, { from: range.from, to: range.to });
+  const SC = seriesColors(useColors());
 
   if (!rawRows) return <Loading />;
   if (rawRows.length === 0) return <Empty msg="No tasks still open from this window — all resolved!" />;
@@ -145,7 +148,7 @@ export function OpenTasksTrendChart({ range, granularity }: { range: DateRange; 
   return (
     <View>
       <SimpleLineChart
-        series={[{ data: bucketed.map((r) => r.count), color: CC[3]!, strokeWidth: 2 }]}
+        series={[{ data: bucketed.map((r) => r.count), color: SC[3]!, strokeWidth: 2 }]}
         height={140} domainY={[0, maxVal]}
       />
       <XLabels dates={bucketed.map((r) => r.date)} granularity={granularity} />

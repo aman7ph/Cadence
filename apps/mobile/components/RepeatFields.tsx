@@ -32,7 +32,7 @@ export function RepeatFields({
     lbl:   { fontSize: 12, color: c.t2 },
     echo:  { fontSize: 11, color: c.t3, backgroundColor: c.active,
              borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
-    err:   { fontSize: 12, color: "#f87171" },
+    err:   { fontSize: 12, color: c.danger },
   });
 
   return (

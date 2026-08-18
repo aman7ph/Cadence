@@ -41,12 +41,6 @@
   --gold-975: #1c1305;  /* (prototype) ink ON gold — dark theme's accent text */
 
   /* ---- Green: completion and streaks. Warmed to sit on sand. ---- */
-  --green-50: #eef7ec;
-  --green-100: #dbeed7;
-  --green-500: #52a64f;
-  --green-600: #3d8a3f;
-  --green-700: #2f6d33;
-  --green-950: #1e3a24;  /* dark-ground success tint */
 
   /* ---- Amber: warnings only.
    * Pushed orange-forward so it separates from gold by HUE, not just by

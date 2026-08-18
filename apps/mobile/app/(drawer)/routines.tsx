@@ -73,7 +73,7 @@ export default function RoutinesScreen() {
                     borderRadius: 25, backgroundColor: c.prim, justifyContent: "center", alignItems: "center",
                     shadowColor: c.prim, shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: 0.5, shadowRadius: 12, elevation: 8 },
-    fabTxt:       { color: "#fff", fontSize: 26, fontWeight: "300", lineHeight: 28,
+    fabTxt:       { color: c.onPrim, fontSize: 26, fontWeight: "300", lineHeight: 28,
                     includeFontPadding: false },
   });
 

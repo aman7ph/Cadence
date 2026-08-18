@@ -1,5 +1,6 @@
 import { addDays, daysBetween, startOfWeek, startOfMonth, startOfYear } from "@cadence/shared";
 import type { DateRange, Granularity } from "@cadence/shared";
+import type { Colors } from "./colors";
 
 // `null` is a gap, not a zero: a routine with no scheduled days in a stretch
 // must leave a hole rather than draw along the floor. SimpleLineChart skips any
@@ -13,12 +14,19 @@ export interface RangePreset {
   range: (today: string) => DateRange;
 }
 
-export const CC = ["#818cf8", "#4ade80", "#fbbf24", "#f87171", "#60a5fa", "#c084fc"];
-export const HEAT_DARK  = ["#20232d", "#1f3a26", "#2b6c3a", "#3aa052", "#6fd581"];
-export const HEAT_LIGHT = ["#ebedf0", "#c6e8cb", "#86cf92", "#43ae59", "#1b8a36"];
 export const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export const TASK_KEYS: TK[] = ["completed", "open"];
-export const TASK_COLORS: Record<TK, string> = { completed: "#4ade80", open: CC[0]! };
+
+// These were module-level const arrays of raw hex — a second chart palette
+// living outside colors.ts, which is exactly what the token layer forbids.
+// They take the active colours instead, so the charts follow the theme.
+// Order and role match web: series run --chart-1..6; completed/open are
+// --chart-2 / --chart-5 (see insights-task-charts.tsx).
+export const seriesColors = (c: Colors): string[] =>
+  [c.chart1, c.chart2, c.chart3, c.chart4, c.chart5, c.chart6];
+
+export const taskColors = (c: Colors): Record<TK, string> =>
+  ({ completed: c.chart2, open: c.chart5 });
 
 export const RANGE_PRESETS: RangePreset[] = [
   { label: "Last 7 days",   range: (t) => ({ from: addDays(t, -6),   to: t }) },

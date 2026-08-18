@@ -1,7 +1,13 @@
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useColors } from "../lib/theme";
+import { display } from "../lib/fonts";
 
+/**
+ * `title` is omitted only on Today, which carries its own greeting header — so
+ * that page's bar is the burger alone. This matches the prototype's phone
+ * frame, whose Today bar has no wordmark either.
+ */
 type Props = { title?: string };
 
 export function AppBar({ title }: Props) {
@@ -14,12 +20,7 @@ export function AppBar({ title }: Props) {
                    borderBottomWidth: 1, borderBottomColor: c.bd1, gap: 10 },
     ham:         { width: 38, height: 38, justifyContent: "center", gap: 5, paddingHorizontal: 10 },
     line:        { width: 18, height: 1.5, backgroundColor: c.t1, borderRadius: 1 },
-    title:       { fontSize: 17, fontWeight: "700", color: c.t1, letterSpacing: -0.3, flex: 1 },
-    logo:        { flexDirection: "row", alignItems: "center", gap: 8, flex: 1 },
-    logoMark:    { width: 26, height: 26, borderRadius: 7, backgroundColor: c.prim,
-                   justifyContent: "center", alignItems: "center" },
-    logoMarkTxt: { color: "#fff", fontWeight: "700", fontSize: 13 },
-    logoName:    { fontSize: 17, fontWeight: "700", color: c.t1, letterSpacing: -0.3 },
+    title:       { ...display("bold"), fontSize: 17, color: c.t1, letterSpacing: -0.3, flex: 1 },
   });
 
   return (
@@ -29,16 +30,7 @@ export function AppBar({ title }: Props) {
         <View style={s.line} />
         <View style={s.line} />
       </TouchableOpacity>
-      {title ? (
-        <Text style={s.title}>{title}</Text>
-      ) : (
-        <View style={s.logo}>
-          <View style={s.logoMark}>
-            <Text style={s.logoMarkTxt}>C</Text>
-          </View>
-          <Text style={s.logoName}>Cadence</Text>
-        </View>
-      )}
+      {title ? <Text style={s.title}>{title}</Text> : null}
     </View>
   );
 }

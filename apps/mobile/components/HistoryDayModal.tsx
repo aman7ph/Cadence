@@ -19,7 +19,7 @@ function MentionText({ text, routineIds, taskIds }: { text: string; routineIds: 
       {parseMentionSegments(text).map((seg, i) =>
         seg.kind === "text"
           ? <Text key={i} style={{ color: c.t1 }}>{seg.value}</Text>
-          : <Text key={i} style={{ color: rSet.has(seg.id) ? "#818cf8" : tSet.has(seg.id) ? "#fbbf24" : c.t2, fontWeight: "600" }}>{seg.name}</Text>
+          : <Text key={i} style={{ color: rSet.has(seg.id) ? c.tacc : tSet.has(seg.id) ? c.carry : c.t2, fontWeight: "600" }}>{seg.name}</Text>
       )}
     </Text>
   );
@@ -121,7 +121,7 @@ function DayModalContent({ date, today, onClose }: { date: string; today: string
                 : allTasks.map((t) => (
                     <View key={t.taskId} style={s.item}>
                       <View style={s.iRow}>
-                        <View style={[s.dot, { backgroundColor: t.status === "completed" ? "#818cf8" : c.bd3 }]} />
+                        <View style={[s.dot, { backgroundColor: t.status === "completed" ? c.cplt : c.bd3 }]} />
                         <Text style={s.iName}>{t.title}</Text>
                         <Text style={s.iStatus}>{t.status}</Text>
                       </View>

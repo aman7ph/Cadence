@@ -40,16 +40,35 @@ export default function SignIn() {
   }, [startSSOFlow]);
 
   const s = StyleSheet.create({
-    container:   { flex: 1, backgroundColor: c.bg },
-    inner:       { flex: 1, justifyContent: "center", padding: 32, gap: 12 },
-    logoRow:     { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 8 },
-    logo:        { ...display("bold"), fontSize: 34, color: c.t1, letterSpacing: -0.5 },
-    tagline:     { fontSize: 15, color: c.t2, marginBottom: 28 },
-    err:         { color: c.danger, fontSize: 13 },
-    googleBtn:   { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10,
-                   backgroundColor: c.card, borderWidth: 1, borderColor: c.bd2,
-                   borderRadius: 14, padding: 16, marginTop: 8 },
-    googleTxt:   { fontSize: 16, fontWeight: "600", color: c.t1 },
+    container: { flex: 1, backgroundColor: c.bg },
+    inner: { flex: 1, justifyContent: "center", padding: 32, gap: 12 },
+    logoRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      marginBottom: 8,
+    },
+    logo: {
+      ...display("bold"),
+      fontSize: 34,
+      color: c.t1,
+      letterSpacing: -0.5,
+    },
+    tagline: { fontSize: 15, color: c.t2, marginBottom: 28 },
+    err: { color: c.danger, fontSize: 13 },
+    googleBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 10,
+      backgroundColor: c.card,
+      borderWidth: 1,
+      borderColor: c.bd2,
+      borderRadius: 14,
+      padding: 16,
+      marginTop: 8,
+    },
+    googleTxt: { fontSize: 16, fontWeight: "600", color: c.t1 },
   });
 
   return (
@@ -61,7 +80,12 @@ export default function SignIn() {
         </View>
         <Text style={s.tagline}>Your habits, your goals, your progress.</Text>
         {error ? <Text style={s.err}>{error}</Text> : null}
-        <TouchableOpacity style={s.googleBtn} onPress={handleGoogle} disabled={loading} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={s.googleBtn}
+          onPress={handleGoogle}
+          disabled={loading}
+          activeOpacity={0.8}
+        >
           {loading ? (
             <ActivityIndicator color={c.t1} />
           ) : (
@@ -94,5 +118,5 @@ function GoogleIcon() {
 
 const gStyles = StyleSheet.create({
   wrapper: { flexDirection: "row" },
-  letter:  { fontSize: 15, fontWeight: "700" },
+  letter: { fontSize: 15, fontWeight: "700" },
 });

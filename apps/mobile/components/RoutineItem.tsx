@@ -6,6 +6,7 @@ import { todayLocal } from "@cadence/shared";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import * as Haptics from "expo-haptics";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 import { useRepeatRow } from "../lib/useRepeatRow";
 import { ActionSheet } from "./ActionSheet";
 import { RepeatControl } from "./RepeatControl";
@@ -81,10 +82,10 @@ export function RoutineItem({ routine, date, readOnly }: Props) {
   const s = StyleSheet.create({
     card:          { flexDirection: "row", alignItems: "center", gap: 10,
                      backgroundColor: c.card, borderWidth: 1, borderColor: c.bd1,
-                     borderRadius: 12, padding: 12 },
+                     borderRadius: radii.sm, padding: 12 },
     dim:           { opacity: 0.55 },
     toggle:        { padding: 2 },
-    circle:        { width: 22, height: 22, borderRadius: 11, borderWidth: 1.5,
+    circle:        { width: 22, height: 22, borderRadius: radii.full, borderWidth: 1.5,
                      borderColor: c.bd3, justifyContent: "center", alignItems: "center" },
     circleDone:    { backgroundColor: c.cplt, borderColor: c.cplt },
     circleSkip:    { borderColor: c.t3 },
@@ -96,10 +97,10 @@ export function RoutineItem({ routine, date, readOnly }: Props) {
     meta:          { fontSize: 12, color: c.t3 },
     err:           { fontSize: 12, color: c.danger },
     goalPill:      { alignSelf: "flex-start", backgroundColor: c.accBg,
-                     borderRadius: 999, paddingHorizontal: 7, paddingVertical: 2, marginTop: 2 },
+                     borderRadius: radii.pill, paddingHorizontal: 7, paddingVertical: 2, marginTop: 2 },
     goalTxt:       { fontSize: 10, fontWeight: "600", color: c.tacc },
     right:         { flexDirection: "row", alignItems: "center", gap: 6 },
-    skipBadge:     { backgroundColor: c.active, borderRadius: 999, paddingHorizontal: 6, paddingVertical: 2 },
+    skipBadge:     { backgroundColor: c.active, borderRadius: radii.pill, paddingHorizontal: 6, paddingVertical: 2 },
     skipBadgeTxt:  { fontSize: 10, color: c.t3 },
     more:          { fontSize: 16, color: c.t3, letterSpacing: 1 },
   });

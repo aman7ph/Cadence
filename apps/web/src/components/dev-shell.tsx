@@ -145,6 +145,7 @@ export function DevShell() {
             onEdit={() => {}}
             onRequestComplete={() => {}}
             onRequestAbandon={() => {}}
+            onRequestDelete={() => {}}
           />
         </Drawer>
       </main>

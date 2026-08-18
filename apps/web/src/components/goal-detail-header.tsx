@@ -1,4 +1,4 @@
-import { CheckCircle, Circle, Pencil } from "lucide-react";
+import { CheckCircle, Circle, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const CARD = "rounded-md border border-[var(--border-subtle)] bg-card";
@@ -18,9 +18,10 @@ interface GoalDetailHeaderProps {
   onEdit: () => void;
   onRequestComplete: () => void;
   onRequestAbandon: () => void;
+  onRequestDelete: () => void;
 }
 
-export function GoalDetailHeader({ goal, onEdit, onRequestComplete, onRequestAbandon }: GoalDetailHeaderProps) {
+export function GoalDetailHeader({ goal, onEdit, onRequestComplete, onRequestAbandon, onRequestDelete }: GoalDetailHeaderProps) {
   const started = new Date(goal.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   return (
     <>
@@ -43,19 +44,26 @@ export function GoalDetailHeader({ goal, onEdit, onRequestComplete, onRequestAba
               )}
             </div>
             {goal.description && <p className="text-[14px] leading-relaxed text-[var(--text-secondary)]">{goal.description}</p>}
-            {goal.status === "active" && (
-              <div className="flex flex-wrap items-center gap-2 border-t border-[var(--border-subtle)] pt-3">
-                <Button variant="outline" size="sm" onClick={onEdit}>
-                  <Pencil className="size-3.5" /> Edit
-                </Button>
-                <Button variant="outline" tone="success" size="sm" onClick={onRequestComplete}>
-                  <CheckCircle className="size-3.5" /> Mark complete
-                </Button>
-                <Button variant="outline" size="sm" onClick={onRequestAbandon}>
-                  <Circle className="size-3.5" /> Abandon
-                </Button>
-              </div>
-            )}
+            <div className="flex flex-wrap items-center gap-2 border-t border-[var(--border-subtle)] pt-3">
+              {goal.status === "active" && (
+                <>
+                  <Button variant="outline" size="sm" onClick={onEdit}>
+                    <Pencil className="size-3.5" /> Edit
+                  </Button>
+                  <Button variant="outline" tone="success" size="sm" onClick={onRequestComplete}>
+                    <CheckCircle className="size-3.5" /> Mark complete
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={onRequestAbandon}>
+                    <Circle className="size-3.5" /> Abandon
+                  </Button>
+                </>
+              )}
+              {/* Outside the active-only group: a completed or abandoned goal
+                  still has to be removable. */}
+              <Button variant="danger" size="sm" className="ml-auto" onClick={onRequestDelete}>
+                <Trash2 className="size-3.5" /> Delete
+              </Button>
+            </div>
           </div>
         </div>
       )}

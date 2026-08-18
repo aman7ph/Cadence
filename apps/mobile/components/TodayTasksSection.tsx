@@ -1,8 +1,12 @@
 import { StyleSheet, Text, View } from "react-native";
 import { TaskItem } from "./TaskItem";
-import { AddTaskBar } from "./AddTaskBar";
+import { Button } from "./ui/Button";
+import { TodayAddTaskModal } from "./TodayAddTaskModal";
 import type { Task } from "./TaskItem";
+import { useState } from "react";
 import { useColors } from "../lib/theme";
+import { SectionLabel } from "./ui/SectionLabel";
+import { radii } from "../lib/radii";
 
 interface Props {
   tasks: Task[];
@@ -15,25 +19,23 @@ interface Props {
 // can sit off-screen while still counting against the day's score.
 export function TodayTasksSection({ tasks, viewedDate, isPast }: Props) {
   const c = useColors();
+  const [adding, setAdding] = useState(false);
   const done = tasks.filter((t) => t.status === "completed").length;
 
   const s = StyleSheet.create({
-    section:   { marginHorizontal: 16, marginBottom: 20, gap: 6 },
-    head:      { flexDirection: "row", justifyContent: "space-between",
-                 alignItems: "baseline", paddingVertical: 6 },
-    lbl:       { fontSize: 11, fontWeight: "700", color: c.t2,
-                 textTransform: "uppercase", letterSpacing: 0.7 },
-    cnt:       { fontSize: 11, color: c.t3 },
+    section:   { marginHorizontal: 16, marginBottom: 20, gap: 10 },
+    head:      { paddingVertical: 6 },
     empty:     { borderWidth: 1, borderColor: c.bd1, borderStyle: "dashed",
-                 borderRadius: 12, paddingVertical: 24, alignItems: "center" },
+                 borderRadius: radii.md, paddingVertical: 24, alignItems: "center" },
     emptyTxt:  { fontSize: 13, color: c.t3 },
   });
 
   return (
     <View style={s.section}>
       <View style={s.head}>
-        <Text style={s.lbl}>Tasks</Text>
-        {tasks.length > 0 && <Text style={s.cnt}>{done} / {tasks.length}</Text>}
+        <SectionLabel count={tasks.length > 0 ? `${done}/${tasks.length}` : undefined}>
+          Tasks
+        </SectionLabel>
       </View>
       {tasks.length === 0 ? (
         <View style={s.empty}>
@@ -44,7 +46,21 @@ export function TodayTasksSection({ tasks, viewedDate, isPast }: Props) {
           <TaskItem key={t.taskId} task={t} viewedDate={viewedDate} readOnly={isPast} />
         ))
       )}
-      {!isPast && <AddTaskBar today={viewedDate} />}
+      {!isPast && (
+        <>
+          <Button
+            variant="block"
+            title="+  New task"
+            onPress={() => setAdding(true)}
+            style={{ marginTop: 4 }}
+          />
+          <TodayAddTaskModal
+            visible={adding}
+            today={viewedDate}
+            onDone={() => setAdding(false)}
+          />
+        </>
+      )}
     </View>
   );
 }

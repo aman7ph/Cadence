@@ -12,7 +12,6 @@ import { scheduleLabel } from "./routines-schedule-form";
 interface StagedTaskRowProps {
   stagedTask: Doc<"stagedTasks">;
   goalTitle?: string;
-  onEdit: () => void;
   onSchedule: () => void;
 }
 
@@ -20,7 +19,7 @@ function prettyCreatedAt(ts: number): string {
   return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-export function StagedTaskRow({ stagedTask, goalTitle, onEdit, onSchedule }: StagedTaskRowProps) {
+export function StagedTaskRow({ stagedTask, goalTitle, onSchedule }: StagedTaskRowProps) {
   const unschedule = useMutation(api.stagedTaskScheduling.unschedule);
   const remove = useMutation(api.stagedTasks.remove);
   const [confirm, setConfirm] = useState<"delete" | "unschedule" | null>(null);
@@ -78,24 +77,18 @@ export function StagedTaskRow({ stagedTask, goalTitle, onEdit, onSchedule }: Sta
                   {isScheduled ? "Edit schedule…" : "Schedule…"}
                 </button>
                 <div className="mx-3 h-px bg-[var(--border-subtle)]" />
-                {isScheduled ? (
-                  <button
-                    type="button"
-                    onClick={() => { setConfirm("unschedule"); setMenuOpen(false); }}
-                    className="w-full px-3.5 py-2.5 text-left text-[13px] font-medium text-foreground hover:bg-[var(--surface-hover)] transition-colors"
-                  >
-                    Unschedule
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => { onEdit(); setMenuOpen(false); }}
-                    className="w-full px-3.5 py-2.5 text-left text-[13px] font-medium text-foreground hover:bg-[var(--surface-hover)] transition-colors"
-                  >
-                    Edit
-                  </button>
+                {isScheduled && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => { setConfirm("unschedule"); setMenuOpen(false); }}
+                      className="w-full px-3.5 py-2.5 text-left text-[13px] font-medium text-foreground hover:bg-[var(--surface-hover)] transition-colors"
+                    >
+                      Unschedule
+                    </button>
+                    <div className="mx-3 h-px bg-[var(--border-subtle)]" />
+                  </>
                 )}
-                <div className="mx-3 h-px bg-[var(--border-subtle)]" />
                 <button
                   type="button"
                   onClick={() => { setConfirm("delete"); setMenuOpen(false); }}

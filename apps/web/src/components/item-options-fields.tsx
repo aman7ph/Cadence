@@ -1,5 +1,4 @@
 import { useQuery } from "convex/react";
-import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import { api } from "@cadence/backend/convex/_generated/api";
 import { ComposerGoalPanel } from "./composer-goal-panel";
 import { ComposerSpreadPanel } from "./composer-spread-panel";
@@ -14,55 +13,28 @@ import { ComposerSpreadPanel } from "./composer-spread-panel";
  * control type, in bounds handling and in holding values as strings rather than
  * numbers. Anything that touches these settings goes through here now.
  */
-export interface ItemOptions {
-  goalId: Id<"goals"> | "";
-  goalContribution: number;
-  spread: boolean;
-  repeatTarget: number;
-  repeatIntervalMinutes: number;
-}
+// The shape, its defaults and its conversion now live in @cadence/shared so
+// mobile cannot drift from it — mobile had grown a third implementation that
+// held these numbers as strings. Re-exported so existing import sites keep
+// working.
+import type { Id } from "@cadence/backend/convex/_generated/dataModel";
+import {
+  EMPTY_ITEM_OPTIONS,
+  type ItemOptions,
+  itemOptionsFrom,
+  itemOptionsToArgs as toArgs,
+} from "@cadence/shared";
 
-export const EMPTY_ITEM_OPTIONS: ItemOptions = {
-  goalId: "",
-  goalContribution: 1,
-  spread: false,
-  repeatTarget: 2,
-  repeatIntervalMinutes: 60,
-};
-
-/** Seed the block from an existing task/routine, for edit forms. */
-export function itemOptionsFrom(doc: {
-  goalId?: string;
-  goalContribution?: number;
-  repeatTarget?: number;
-  repeatIntervalMinutes?: number;
-}): ItemOptions {
-  return {
-    goalId: (doc.goalId as Id<"goals">) ?? "",
-    goalContribution: doc.goalContribution ?? 1,
-    spread: doc.repeatTarget !== undefined,
-    repeatTarget: doc.repeatTarget ?? 2,
-    repeatIntervalMinutes: doc.repeatIntervalMinutes ?? 60,
-  };
-}
+export { EMPTY_ITEM_OPTIONS, itemOptionsFrom, type ItemOptions };
 
 /**
- * Mutation arguments for the options. Unset settings become `undefined` rather
- * than 0 or "", which is what the backend treats as "not configured" — an
- * ordinary task must not arrive carrying repeatTarget: 2.
+ * Shared holds `goalId` as a plain string: packages/shared is imported BY the
+ * backend, so it cannot import Convex's branded `Id` type without a cycle. The
+ * brand is re-applied here, at the one edge that talks to mutations.
  */
-export function itemOptionsToArgs(o: ItemOptions): {
-  goalId?: Id<"goals">;
-  goalContribution?: number;
-  repeatTarget?: number;
-  repeatIntervalMinutes?: number;
-} {
-  return {
-    goalId: o.goalId || undefined,
-    goalContribution: o.goalId ? o.goalContribution : undefined,
-    repeatTarget: o.spread ? o.repeatTarget : undefined,
-    repeatIntervalMinutes: o.spread ? o.repeatIntervalMinutes : undefined,
-  };
+export function itemOptionsToArgs(o: ItemOptions) {
+  const args = toArgs(o);
+  return { ...args, goalId: args.goalId as Id<"goals"> | undefined };
 }
 
 interface ItemOptionsFieldsProps {

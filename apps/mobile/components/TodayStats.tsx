@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View } from "react-native";
 import { ProductivityTile } from "./ProductivityTile";
 import { useColors } from "../lib/theme";
+import { display } from "../lib/fonts";
+import { radii } from "../lib/radii";
 
 export interface TodayStatsProps {
   done: number;
@@ -23,11 +25,11 @@ function Card({ label, val, unit, delta, up }: {
   const c = useColors();
   const s = StyleSheet.create({
     card:    { flex: 1, backgroundColor: c.card, borderWidth: 1, borderColor: c.bd1,
-               borderRadius: 14, padding: 11 },
-    lbl:     { fontSize: 10, fontWeight: "700", textTransform: "uppercase",
-               letterSpacing: 0.6, color: c.t2, marginBottom: 3 },
-    val:     { fontSize: 21, fontWeight: "700", letterSpacing: -0.5, color: c.t1, lineHeight: 24 },
-    unit:    { fontSize: 12, fontWeight: "500", color: c.t2 },
+               borderRadius: radii.md, padding: 11 },
+    lbl:     { ...display("regular"), fontSize: 10, textTransform: "uppercase",
+               letterSpacing: 0.5, color: c.t3, marginBottom: 3 },
+    val:     { ...display("bold"), fontSize: 24, letterSpacing: -0.5, color: c.t1, lineHeight: 27 },
+    unit:    { ...display("regular"), fontSize: 13, color: c.t2 },
     delta:   { fontSize: 11, color: c.t3, marginTop: 2 },
     deltaUp: { color: c.cplt },
   });

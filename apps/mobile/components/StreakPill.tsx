@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 
 // The day-streak pill from RoutineItem, extracted so that file stays
 // within the project's 150-line limit. Cold (zero) streaks render muted.
@@ -9,7 +10,7 @@ export function StreakPill({ count }: { count: number }) {
 
   const s = StyleSheet.create({
     pill:     { flexDirection: "row", alignItems: "baseline", gap: 1,
-                backgroundColor: c.successBg, borderRadius: 999,
+                backgroundColor: c.successBg, borderRadius: radii.full,
                 paddingHorizontal: 8, paddingVertical: 3 },
     pillCold: { backgroundColor: c.active },
     num:      { fontSize: 12, fontWeight: "700", color: c.cplt },

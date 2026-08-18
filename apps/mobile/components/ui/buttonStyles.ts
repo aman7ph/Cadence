@@ -119,8 +119,10 @@ export function buttonStyles(
       return {
         box: {
           ...base,
-          width: 50,
-          height: 50,
+          // 48, measured off the prototype's phone frames — not the 50 the
+          // three pages had each hand-written.
+          width: 48,
+          height: 48,
           padding: 0,
           borderRadius: radii.full,
           backgroundColor: c.prim,

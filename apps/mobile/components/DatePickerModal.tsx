@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 
 const DAY_LABELS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -47,7 +48,7 @@ export function DatePickerModal({ visible, value, min, max, onChange, onClose }:
   const s = StyleSheet.create({
     overlay:  { flex: 1, justifyContent: "flex-end", backgroundColor: c.scrim },
     backdrop: { flex: 1 },
-    sheet:    { backgroundColor: c.bgE, borderTopLeftRadius: 22, borderTopRightRadius: 22,
+    sheet:    { backgroundColor: c.bgE, borderTopLeftRadius: radii.sheet, borderTopRightRadius: radii.sheet,
                 borderWidth: 1, borderBottomWidth: 0, borderColor: c.bd2, paddingBottom: 28 },
     handle:   { width: 38, height: 4, borderRadius: 2, backgroundColor: c.bd3, alignSelf: "center", marginTop: 10, marginBottom: 8 },
     hdr:      { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingBottom: 12 },

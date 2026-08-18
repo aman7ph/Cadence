@@ -5,6 +5,7 @@ import { api } from "@cadence/backend/convex/_generated/api";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import { ReflectionEditor, parseMentionSegments } from "./ReflectionEditor";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 
 interface Routine { routineId: Id<"routines">; name: string }
 interface Task    { taskId: Id<"dailyTasks">;  title: string }
@@ -52,7 +53,7 @@ export function ReflectionCard({ date, reflection, routines, tasks, isPast }: Pr
 
   const s = StyleSheet.create({
     card:       { backgroundColor: c.card, borderWidth: 1, borderColor: c.bd1,
-                  borderRadius: 16, overflow: "hidden", marginHorizontal: 16, marginTop: 8, marginBottom: 24 },
+                  borderRadius: radii.lg, overflow: "hidden", marginHorizontal: 16, marginTop: 8, marginBottom: 24 },
     topBar:     { height: 3, backgroundColor: c.prim },
     head:       { flexDirection: "row", justifyContent: "space-between", alignItems: "center",
                   paddingHorizontal: 14, paddingTop: 12, paddingBottom: 4 },
@@ -60,7 +61,7 @@ export function ReflectionCard({ date, reflection, routines, tasks, isPast }: Pr
     editBtn:    { fontSize: 12, fontWeight: "600", color: c.tacc },
     viewBody:   { paddingHorizontal: 14, paddingBottom: 14, paddingTop: 4 },
     tagList:    { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 10 },
-    tagPill:    { borderRadius: 999, paddingHorizontal: 9, paddingVertical: 3 },
+    tagPill:    { borderRadius: radii.full, paddingHorizontal: 9, paddingVertical: 3 },
     tagPillR:   { backgroundColor: c.accBg },
     tagPillT:   { backgroundColor: c.bgS },
     tagPillTxt: { fontSize: 11, fontWeight: "600" },

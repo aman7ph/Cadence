@@ -1,55 +1,36 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 
 interface Props {
-  confirm: "complete" | "abandon" | null;
-  onConfirmChange: (v: "complete" | "abandon" | null) => void;
-  onComplete: () => Promise<void>;
-  onAbandon: () => Promise<void>;
+  onRequestComplete: () => void;
+  onRequestAbandon: () => void;
 }
 
-export function GoalActionButtons({ confirm, onConfirmChange, onComplete, onAbandon }: Props) {
+/**
+ * The two status actions on an active goal. They only REQUEST — the
+ * confirmation is a `ConfirmSheet`, as it is everywhere else in both apps.
+ * This component used to render its own inline confirm row, which was the last
+ * hand-rolled confirmation on mobile.
+ */
+export function GoalActionButtons({ onRequestComplete, onRequestAbandon }: Props) {
   const c = useColors();
   const s = StyleSheet.create({
-    confTxt: { fontSize: 13, color: c.t1, marginBottom: 10 },
-    confRow: { flexDirection: "row", gap: 8 },
-    confBtn: { flex: 1, paddingVertical: 8, borderRadius: 10, alignItems: "center", borderWidth: 1, borderColor: c.bd2 },
-    actRow:  { flexDirection: "row", gap: 8 },
-    actBtn:  { flex: 1, paddingVertical: 9, borderRadius: 10, alignItems: "center", borderWidth: 1 },
+    actRow: { flexDirection: "row", gap: 8 },
+    actBtn: { flex: 1, paddingVertical: 9, borderRadius: radii.sm, alignItems: "center", borderWidth: 1 },
+    txt: { fontSize: 12, fontWeight: "600" },
   });
-
-  if (confirm) {
-    return (
-      <>
-        <Text style={s.confTxt}>
-          {confirm === "complete" ? "Mark this goal as complete?" : "Abandon this goal?"}
-        </Text>
-        <View style={s.confRow}>
-          <TouchableOpacity style={s.confBtn} onPress={() => onConfirmChange(null)}>
-            <Text style={{ fontSize: 12, fontWeight: "600", color: c.t2 }}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[s.confBtn, { backgroundColor: confirm === "complete" ? c.success : c.danger, borderColor: "transparent" }]}
-            onPress={confirm === "complete" ? onComplete : onAbandon}>
-            <Text style={{ fontSize: 12, fontWeight: "600", color: confirm === "complete" ? c.onPrim : c.onStatus }}>
-              {confirm === "complete" ? "Mark complete" : "Abandon"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </>
-    );
-  }
 
   return (
     <View style={s.actRow}>
       <TouchableOpacity
         style={[s.actBtn, { backgroundColor: c.successBg, borderColor: c.cplt }]}
-        onPress={() => onConfirmChange("complete")} activeOpacity={0.7}>
-        <Text style={{ fontSize: 12, fontWeight: "600", color: c.success }}>✓ Mark complete</Text>
+        onPress={onRequestComplete} activeOpacity={0.7}>
+        <Text style={[s.txt, { color: c.success }]}>✓ Mark complete</Text>
       </TouchableOpacity>
       <TouchableOpacity style={[s.actBtn, { borderColor: c.bd2 }]}
-        onPress={() => onConfirmChange("abandon")} activeOpacity={0.7}>
-        <Text style={{ fontSize: 12, fontWeight: "600", color: c.t2 }}>Abandon</Text>
+        onPress={onRequestAbandon} activeOpacity={0.7}>
+        <Text style={[s.txt, { color: c.t2 }]}>Abandon</Text>
       </TouchableOpacity>
     </View>
   );

@@ -10,7 +10,7 @@ import {
 import { requestNotificationPermission } from "./notificationChannels";
 
 // The interval is held as text, not a number, for the same reason
-// useRepeatFields does it: a TextInput mid-edit legitimately contains "" or
+// the Stepper does it: a TextInput mid-edit legitimately contains "" or
 // "1", neither of which is a valid setting but both of which the user must be
 // allowed to type through.
 interface Draft {

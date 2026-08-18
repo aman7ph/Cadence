@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation } from "convex/react";
+import { type Mention, tagsFromStored, toEditorText, toStoredText } from "@cadence/shared";
 import { PenLine } from "lucide-react";
 import { api } from "@cadence/backend/convex/_generated/api";
 import { Button } from "@/components/ui/button";
@@ -12,24 +13,14 @@ export interface ReflectionEditorProps {
   hasExisting: boolean; onSaved: () => void; onCancel: () => void;
 }
 
-function parseTagsFromText(text: string, routines: Routine[], tasks: Task[]) {
-  const regex = /@\[([^\]]+)\]\(([^)]+)\)/g;
-  const tags: Array<{ entityId: string; entityType: "task" | "routine" }> = [];
-  const seen = new Set<string>();
-  let m: RegExpExecArray | null;
-  while ((m = regex.exec(text)) !== null) {
-    const id = m[2]!;
-    if (seen.has(id)) continue;
-    seen.add(id);
-    if (routines.some((r) => r.routineId === id)) tags.push({ entityId: id, entityType: "routine" });
-    else if (tasks.some((t) => t.taskId === id)) tags.push({ entityId: id, entityType: "task" });
-  }
-  return tags;
-}
-
 export function ReflectionEditor({ date, initialText, routines, tasks, hasExisting, onSaved, onCancel }: ReflectionEditorProps) {
   const upsert = useMutation(api.reflections.upsert);
-  const [text, setText] = useState(initialText);
+  // The textarea holds the READABLE form (`@Name`); the stored form carries
+  // the id and is rebuilt on save. Binding straight to storage is what showed
+  // `@[Name](jn77h2ks…)` mid-sentence.
+  const initial = toEditorText(initialText);
+  const [text, setText] = useState(initial.text);
+  const [mentions, setMentions] = useState<Mention[]>(initial.mentions);
   const [saving, setSaving] = useState(false);
   const [mention, setMention] = useState<{ query: string; start: number } | null>(null);
   const [mentionIdx, setMentionIdx] = useState(0);
@@ -62,7 +53,8 @@ export function ReflectionEditor({ date, initialText, routines, tasks, hasExisti
     const ta = taRef.current;
     if (!ta || !mention) return;
     const before = text.slice(0, mention.start);
-    const insert = `@[${name}](${id})`;
+    const insert = `@${name}`;
+    setMentions((prev) => (prev.some((x) => x.id === id) ? prev : [...prev, { id, name }]));
     const newText = before + insert + text.slice(ta.selectionStart);
     setText(newText); setMention(null);
     setTimeout(() => {
@@ -89,7 +81,15 @@ export function ReflectionEditor({ date, initialText, routines, tasks, hasExisti
   async function save() {
     if (!text.trim()) return;
     setSaving(true);
-    try { await upsert({ date, text, tags: parseTagsFromText(text, routines, tasks) }); onSaved(); }
+    const stored = toStoredText(text, mentions);
+    try {
+      await upsert({
+        date,
+        text: stored,
+        tags: tagsFromStored(stored, routines.map((r) => r.routineId), tasks.map((t) => t.taskId)),
+      });
+      onSaved();
+    }
     finally { setSaving(false); }
   }
 

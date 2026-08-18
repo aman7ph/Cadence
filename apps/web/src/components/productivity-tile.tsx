@@ -71,7 +71,7 @@ export function ProductivityTile({
               value={routinePct}
               onChange={(e) => handleChange(Number(e.target.value))}
               aria-label="Routine weight"
-              className="w-full accent-[var(--indigo-600,_#4f46e5)]"
+              className="w-full accent-[var(--action-primary)]"
             />
             <div className="flex items-center justify-between text-[11px] font-mono">
               <span className="text-foreground">

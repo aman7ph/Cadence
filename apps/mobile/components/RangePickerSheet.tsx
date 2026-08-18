@@ -3,6 +3,7 @@ import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "rea
 import type { DateRange } from "@cadence/shared";
 import { DatePickerModal } from "./DatePickerModal";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 import { RANGE_PRESETS, fmtShort } from "../lib/insightUtils";
 
 interface Props {
@@ -34,7 +35,7 @@ export function RangePickerSheet({ visible, range, label, today, onChange, onClo
 
   const s = StyleSheet.create({
     overlay:    { flex: 1, backgroundColor: c.scrim, justifyContent: "flex-end" },
-    sheet:      { backgroundColor: c.bgE, borderTopLeftRadius: 20, borderTopRightRadius: 20,
+    sheet:      { backgroundColor: c.bgE, borderTopLeftRadius: radii.sheet, borderTopRightRadius: radii.sheet,
                   paddingBottom: 32, maxHeight: "90%" as const },
     handle:     { width: 36, height: 4, backgroundColor: c.bd3, borderRadius: 2,
                   alignSelf: "center", marginTop: 10, marginBottom: 4 },

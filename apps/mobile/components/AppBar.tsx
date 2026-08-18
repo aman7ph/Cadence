@@ -20,7 +20,7 @@ export function AppBar({ title }: Props) {
                    borderBottomWidth: 1, borderBottomColor: c.bd1, gap: 10 },
     ham:         { width: 38, height: 38, justifyContent: "center", gap: 5, paddingHorizontal: 10 },
     line:        { width: 18, height: 1.5, backgroundColor: c.t1, borderRadius: 1 },
-    title:       { ...display("bold"), fontSize: 17, color: c.t1, letterSpacing: -0.3, flex: 1 },
+    title:       { ...display("semibold"), fontSize: 19, color: c.t1, letterSpacing: -0.3, flex: 1 },
   });
 
   return (

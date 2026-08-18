@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
 import { StagedTaskRow } from "./staged-task-row";
-import { StagedTaskFormDrawer, type StagedTaskFormValues } from "./staged-task-form-drawer";
+import { StagedTaskFormDrawer } from "./staged-task-form-drawer";
 import { StagedTaskScheduleDrawer } from "./staged-task-schedule-drawer";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -19,7 +19,7 @@ export function StagingPage() {
   const [tab, setTab] = useState<Tab>("unscheduled");
   // Exactly one drawer is open at a time; both are mounted on demand so opening
   // one always seeds fresh fields.
-  const [form, setForm] = useState<{ stagedTask?: StagedTaskFormValues } | null>(null);
+  const [form, setForm] = useState(false);
   const [scheduling, setScheduling] = useState<Doc<"stagedTasks"> | null>(null);
   const { columns } = useListColumns();
 
@@ -41,7 +41,7 @@ export function StagingPage() {
         active={tab}
         onTabChange={setTab}
         action={
-          <Button onClick={() => setForm({})}>
+          <Button onClick={() => setForm(true)}>
             <Plus className="size-3.5" /> New task
           </Button>
         }
@@ -66,15 +66,6 @@ export function StagingPage() {
               key={t._id}
               stagedTask={t}
               goalTitle={t.goalId ? goalTitleById.get(t.goalId) : undefined}
-              onEdit={() =>
-                setForm({
-                  stagedTask: {
-                    _id: t._id,
-                    title: t.title,
-                    description: t.description,
-                  },
-                })
-              }
               onSchedule={() => setScheduling(t)}
             />
           ))}
@@ -84,8 +75,7 @@ export function StagingPage() {
 
       {form && (
         <StagedTaskFormDrawer
-          stagedTask={form.stagedTask}
-          onClose={() => setForm(null)}
+          onClose={() => setForm(false)}
         />
       )}
       {scheduling && (

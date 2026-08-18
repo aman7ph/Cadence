@@ -1,18 +1,12 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
-import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import { FormDrawer } from "@/components/ui/form-drawer";
 import { Input } from "@/components/ui/input";
 
-export interface StagedTaskFormValues {
-  _id: Id<"stagedTasks">;
-  title: string;
-  description?: string;
-}
-
 /**
- * Capture and edit a staged task — one form for both, as with routines.
+ * Capture a staged task. Create only: editing a staged task's text now happens
+ * in the schedule drawer, which already carries those fields.
  *
  * Deliberately carries **no** goal or repeat options: in this app those are
  * chosen when the task is scheduled, not when it is captured, which is what the
@@ -20,38 +14,30 @@ export interface StagedTaskFormValues {
  * schedule drawer, and open question 4 on whether the two should merge.
  */
 export function StagedTaskFormDrawer({
-  stagedTask,
   onClose,
 }: {
-  /** Omit to create. */
-  stagedTask?: StagedTaskFormValues;
   onClose: () => void;
 }) {
   const create = useMutation(api.stagedTasks.create);
-  const update = useMutation(api.stagedTasks.update);
 
-  const [title, setTitle] = useState(stagedTask?.title ?? "");
-  const [description, setDescription] = useState(stagedTask?.description ?? "");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
   const submit = async () => {
     const shared = {
       title: title.trim(),
       description: description.trim() || undefined,
     };
-    if (stagedTask) {
-      await update({ stagedTaskId: stagedTask._id, ...shared });
-    } else {
-      await create(shared);
-    }
+    await create(shared);
   };
 
   return (
     <FormDrawer
       open
       onOpenChange={(o) => !o && onClose()}
-      title={stagedTask ? "Edit staged task" : "New staged task"}
+      title="New staged task"
       description="Capture it now. Choose where and when it lands later."
-      submitLabel={stagedTask ? "Save changes" : "Add task"}
+      submitLabel="Add task"
       submitDisabled={!title.trim()}
       onSubmit={submit}
     >

@@ -10,14 +10,18 @@ import {
 import { SchedulePicker } from "./SchedulePicker";
 import type { ScheduleType } from "./SchedulePicker";
 import { DatePickerModal } from "./DatePickerModal";
-import { GoalChipsField } from "./GoalChipsField";
-import { RepeatSection } from "./RepeatSection";
+import { ItemOptionsFields } from "./ItemOptionsFields";
 import { StagedTaskDestinationPills } from "./StagedTaskDestinationPills";
 import type { StagedTaskDestination } from "./StagedTaskDestinationPills";
 import type { StagedTaskData } from "./StagedTaskItem";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 import { FormFooter } from "./ui/FormFooter";
-import { useRepeatFields } from "../lib/useRepeatFields";
+import {
+  type ItemOptions,
+  itemOptionsFrom,
+  itemOptionsToArgs,
+} from "@cadence/shared";
 import { fmtLong } from "../lib/dateUtils";
 
 interface Props { visible: boolean; stagedTask: StagedTaskData | null; onDone: () => void }
@@ -33,11 +37,9 @@ export function StagedTaskScheduleModal({ visible, stagedTask, onDone }: Props) 
   const [date, setDate] = useState(stagedTask?.scheduledDate ?? today);
   const [sched, setSched] = useState<ScheduleType>(stagedTask?.routineScheduleType ?? "daily");
   const [days, setDays] = useState<number[]>(stagedTask?.routineCustomDays ?? []);
-  const [goalId, setGoalId] = useState<Id<"goals"> | "">(stagedTask?.goalId ?? "");
-  const [contrib, setCtb] = useState(stagedTask?.goalContribution?.toString() ?? "");
+  const [options, setOptions] = useState<ItemOptions>(itemOptionsFrom(stagedTask ?? {}));
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pending, setPending] = useState(false);
-  const repeat = useRepeatFields(stagedTask?.repeatTarget, stagedTask?.repeatIntervalMinutes);
 
   const invalid =
     !title.trim() || !date || date < today ||
@@ -47,10 +49,10 @@ export function StagedTaskScheduleModal({ visible, stagedTask, onDone }: Props) 
 
   const submit = async () => {
     if (invalid || pending || !stagedTask) return;
-    const repeatArgs = repeat.collect();
-    if (!repeatArgs) return;
+
     setPending(true);
     try {
+      const { goalId, ...rest } = itemOptionsToArgs(options);
       await schedule({
         stagedTaskId: stagedTask._id,
         title: title.trim(),
@@ -59,9 +61,8 @@ export function StagedTaskScheduleModal({ visible, stagedTask, onDone }: Props) 
         scheduledDate: date,
         routineScheduleType: destination === "routine" ? sched : undefined,
         routineCustomDays: destination === "routine" && sched === "custom" ? days : undefined,
-        goalId: goalId || undefined,
-        goalContribution: goalId && contrib ? parseFloat(contrib) : undefined,
-        ...repeatArgs,
+        ...rest,
+        goalId: goalId as Id<"goals"> | undefined,
         today,
       });
       onDone();
@@ -71,7 +72,7 @@ export function StagedTaskScheduleModal({ visible, stagedTask, onDone }: Props) 
   const s = StyleSheet.create({
     overlay:     { flex: 1, justifyContent: "flex-end", backgroundColor: c.scrim },
     backdrop:    { flex: 1 },
-    sheet:       { backgroundColor: c.bgE, borderTopLeftRadius: 22, borderTopRightRadius: 22,
+    sheet:       { backgroundColor: c.bgE, borderTopLeftRadius: radii.sheet, borderTopRightRadius: radii.sheet,
                    borderWidth: 1, borderBottomWidth: 0, borderColor: c.bd2,
                    maxHeight: "85%", paddingBottom: 32 },
     handle:      { width: 38, height: 4, borderRadius: 2, backgroundColor: c.bd3,
@@ -81,7 +82,7 @@ export function StagedTaskScheduleModal({ visible, stagedTask, onDone }: Props) 
     scroll:      { flexGrow: 0 },
     scrollContent: { paddingHorizontal: 20, paddingBottom: 8 },
     input:       { backgroundColor: c.card, borderWidth: 1, borderColor: c.bd2,
-                   borderRadius: 10, paddingHorizontal: 14, paddingVertical: 11,
+                   borderRadius: radii.sm, paddingHorizontal: 14, paddingVertical: 11,
                    fontSize: 14, color: c.t1 },
     mt:          { marginTop: 10 },
     dateTxt:     { fontSize: 14, color: c.t1 },
@@ -119,10 +120,7 @@ export function StagedTaskScheduleModal({ visible, stagedTask, onDone }: Props) 
                   disabled={pending} onChange={setSched} onDayToggle={toggleDay} />
               </View>
             )}
-            <RepeatSection repeat={repeat} disabled={pending}
-              cadenceLabel={destination === "routine" ? "each day" : "today"} />
-            <GoalChipsField goalId={goalId} contribution={contrib} disabled={pending}
-              onGoalChange={(id) => { setGoalId(id); setCtb(""); }} onContributionChange={setCtb} />
+            <ItemOptionsFields value={options} onChange={setOptions} disabled={pending} />
           </ScrollView>
           <FormFooter onCancel={onDone} onSubmit={submit}
                       submitLabel={date === today ? "Schedule for today" : "Schedule"}

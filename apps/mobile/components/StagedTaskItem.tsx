@@ -5,10 +5,12 @@ import { api } from "@cadence/backend/convex/_generated/api";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import * as Haptics from "expo-haptics";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 import { fmtShort, fmtTimestamp } from "../lib/dateUtils";
 import { ActionSheet } from "./ActionSheet";
 import type { ActionItem } from "./ActionSheet";
 import { scheduleLabel } from "./SchedulePicker";
+import { ConfirmSheet } from "./ui/ConfirmSheet";
 
 export interface StagedTaskData {
   _id: Id<"stagedTasks">;
@@ -28,15 +30,15 @@ export interface StagedTaskData {
 interface Props {
   stagedTask: StagedTaskData;
   goalTitle?: string;
-  onEdit: () => void;
   onSchedule?: () => void;
 }
 
-export function StagedTaskItem({ stagedTask, goalTitle, onEdit, onSchedule }: Props) {
+export function StagedTaskItem({ stagedTask, goalTitle, onSchedule }: Props) {
   const c = useColors();
   const remove = useMutation(api.stagedTasks.remove);
   const unschedule = useMutation(api.stagedTaskScheduling.unschedule);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [confirm, setConfirm] = useState<"delete" | "unschedule" | null>(null);
 
   const isScheduled = stagedTask.scheduledDate !== undefined;
   const meta = stagedTask.description?.trim() || `Added ${fmtTimestamp(stagedTask.createdAt)}`;
@@ -46,39 +48,30 @@ export function StagedTaskItem({ stagedTask, goalTitle, onEdit, onSchedule }: Pr
 
   const menuActions: ActionItem[] = [
     ...(onSchedule ? [{ label: isScheduled ? "Edit schedule…" : "Schedule…", onPress: onSchedule }] : []),
-    isScheduled
-      ? {
-          label: "Unschedule",
-          onPress: () => {
-            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            void unschedule({ stagedTaskId: stagedTask._id });
-          },
-        }
-      : { label: "Edit", onPress: onEdit },
+    ...(isScheduled
+      ? [{ label: "Unschedule", onPress: () => setConfirm("unschedule") }]
+      : []),
     {
       label: "Delete",
       style: "destructive" as const,
-      onPress: () => {
-        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        void remove({ stagedTaskId: stagedTask._id });
-      },
+      onPress: () => setConfirm("delete"),
     },
   ];
 
   const s = StyleSheet.create({
     card:     { flexDirection: "row", alignItems: "flex-start", gap: 10,
                 backgroundColor: c.card, borderWidth: 1, borderColor: c.bd1,
-                borderRadius: 12, padding: 12, marginHorizontal: 16, marginBottom: 8 },
+                borderRadius: radii.sm, paddingHorizontal: 13, paddingVertical: 11 },
     body:     { flex: 1, gap: 2 },
-    title:    { fontSize: 14, fontWeight: "600", color: c.t1 },
-    meta:     { fontSize: 12, color: c.t3 },
+    title:    { fontSize: 13.5, fontWeight: "600", color: c.t1 },
+    meta:     { fontSize: 10.5, color: c.t2 },
     goalPill: { alignSelf: "flex-start", backgroundColor: c.accBg,
-                borderRadius: 999, paddingHorizontal: 7, paddingVertical: 2, marginTop: 2 },
-    goalTxt:  { fontSize: 10, fontWeight: "600", color: c.tacc },
+                borderRadius: radii.pill, paddingHorizontal: 8, paddingVertical: 2, marginTop: 2 },
+    goalTxt:  { fontSize: 9, fontWeight: "600", color: c.tacc, letterSpacing: 0.27 },
     right:    { flexDirection: "row", alignItems: "flex-start", gap: 6, paddingTop: 1 },
-    destBadge:    { backgroundColor: c.accBg, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2, maxWidth: 130 },
+    destBadge:    { backgroundColor: c.accBg, borderRadius: radii.pill, paddingHorizontal: 6, paddingVertical: 2, maxWidth: 130 },
     destBadgeTxt: { fontSize: 10, fontWeight: "700", color: c.tacc },
-    dateBadge:    { backgroundColor: c.active, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 },
+    dateBadge:    { backgroundColor: c.active, borderRadius: radii.pill, paddingHorizontal: 6, paddingVertical: 2 },
     dateBadgeTxt: { fontSize: 10, color: c.t3 },
     more:     { fontSize: 16, color: c.t3, letterSpacing: 1 },
   });
@@ -108,6 +101,35 @@ export function StagedTaskItem({ stagedTask, goalTitle, onEdit, onSchedule }: Pr
         </TouchableOpacity>
       </View>
       <ActionSheet visible={menuOpen} title={stagedTask.title} actions={menuActions} onCancel={() => setMenuOpen(false)} />
+
+      {/* Copy matches web's staged-task-row drawers. Unschedule is reversible,
+          so it takes the accent tone; only delete is danger. */}
+      <ConfirmSheet
+        visible={confirm === "unschedule"}
+        onCancel={() => setConfirm(null)}
+        title="Unschedule this task?"
+        description="It returns to Unscheduled and keeps its details. You can schedule it again at any time."
+        confirmLabel="Unschedule"
+        tone="accent"
+        onConfirm={async () => {
+          void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          await unschedule({ stagedTaskId: stagedTask._id });
+        }}
+      />
+      <ConfirmSheet
+        visible={confirm === "delete"}
+        onCancel={() => setConfirm(null)}
+        title="Delete this staged task?"
+        description="This cannot be undone."
+        confirmLabel="Delete task"
+        tone="danger"
+        onConfirm={async () => {
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          await remove({ stagedTaskId: stagedTask._id });
+        }}
+      >
+        <Text style={{ fontSize: 13, color: c.t1 }}>{stagedTask.title}</Text>
+      </ConfirmSheet>
     </View>
   );
 }

@@ -9,6 +9,7 @@ import { ActionSheet } from "./ActionSheet";
 import { GoalFormModal } from "./GoalFormModal";
 import { DatePickerModal } from "./DatePickerModal";
 import { GoalActionButtons } from "./GoalActionButtons";
+import { ConfirmSheet } from "./ui/ConfirmSheet";
 import { GoalDailyTracking } from "./GoalDailyTracking";
 import { useColors } from "../lib/theme";
 import { fmtTimestamp } from "../lib/dateUtils";
@@ -25,7 +26,7 @@ function shiftDate(d: string, n: number) { const dt = new Date(d + "T12:00:00");
 function GoalDetailContent({ goal: initGoal, onClose }: { goal: GoalData; onClose: () => void }) {
   const c = useColors();
   const today = todayLocal();
-  const [confirm, setConfirm]       = useState<"complete" | "abandon" | null>(null);
+  const [confirm, setConfirm]       = useState<"complete" | "abandon" | "delete" | null>(null);
   const [selDate, setSelDate]       = useState(today);
   const [editKey, setEditKey]       = useState(0);
   const [editOpen, setEditOpen]     = useState(false);
@@ -111,10 +112,8 @@ function GoalDetailContent({ goal: initGoal, onClose }: { goal: GoalData; onClos
             <>
               <View style={s.divider} />
               <GoalActionButtons
-                confirm={confirm}
-                onConfirmChange={setConfirm}
-                onComplete={async () => { await complete({ goalId: initGoal._id }); setConfirm(null); onClose(); }}
-                onAbandon={async () => { await abandon({ goalId: initGoal._id }); setConfirm(null); onClose(); }}
+                onRequestComplete={() => setConfirm("complete")}
+                onRequestAbandon={() => setConfirm("abandon")}
               />
             </>
           )}
@@ -148,8 +147,41 @@ function GoalDetailContent({ goal: initGoal, onClose }: { goal: GoalData; onClos
 
       <ActionSheet visible={menuOpen} title={goal.title}
         actions={[{ label: "Delete goal", style: "destructive",
-          onPress: async () => { await remove({ goalId: initGoal._id }); onClose(); } }]}
+          onPress: () => setConfirm("delete") }]}
         onCancel={() => setMenuOpen(false)} />
+
+      {/* Copy matches web's goals-page drawers word for word. Complete and
+          abandon are reversible — the goal changes tab rather than vanishing —
+          so they take the accent tone; only delete is danger. */}
+      <ConfirmSheet
+        visible={confirm === "complete"}
+        onCancel={() => setConfirm(null)}
+        title="Mark this goal complete?"
+        description="It moves to Completed and stops accepting contributions."
+        confirmLabel="Mark complete"
+        tone="accent"
+        onConfirm={async () => { await complete({ goalId: initGoal._id }); onClose(); }}
+      />
+      <ConfirmSheet
+        visible={confirm === "abandon"}
+        onCancel={() => setConfirm(null)}
+        title="Abandon this goal?"
+        description="It moves to Abandoned and stops accepting contributions. Nothing is deleted."
+        confirmLabel="Abandon goal"
+        tone="accent"
+        onConfirm={async () => { await abandon({ goalId: initGoal._id }); onClose(); }}
+      />
+      <ConfirmSheet
+        visible={confirm === "delete"}
+        onCancel={() => setConfirm(null)}
+        title="Delete this goal forever?"
+        description="This cannot be undone. Tasks and routines linked to it are unlinked, not deleted."
+        confirmLabel="Delete forever"
+        tone="danger"
+        onConfirm={async () => { await remove({ goalId: initGoal._id }); onClose(); }}
+      >
+        <Text style={{ fontSize: 13, color: c.t1 }}>{goal.title}</Text>
+      </ConfirmSheet>
       <GoalFormModal key={editKey} visible={editOpen}
         goal={{ _id: initGoal._id, title: goal.title, description: goal.description,
                 targetValue: goal.targetValue, unit: goal.unit, dueDate: goal.dueDate }}

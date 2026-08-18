@@ -13,9 +13,9 @@ export interface ComposerGoal {
 
 interface ComposerGoalPanelProps {
   goals: ComposerGoal[];
-  goalId: Id<"goals"> | "";
+  goalId: string;
   contribution: number;
-  onSelect: (id: Id<"goals"> | "") => void;
+  onSelect: (id: string) => void;
   onContributionChange: (n: number) => void;
 }
 

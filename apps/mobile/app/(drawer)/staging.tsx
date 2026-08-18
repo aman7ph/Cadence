@@ -12,12 +12,13 @@ import {
   View,
 } from "react-native";
 import { AppBar } from "../../components/AppBar";
+import { Button } from "../../components/ui/Button";
 import { StagedTaskItem } from "../../components/StagedTaskItem";
 import type { StagedTaskData } from "../../components/StagedTaskItem";
 import { StagedTaskFormModal } from "../../components/StagedTaskFormModal";
-import type { StagedTaskForForm } from "../../components/StagedTaskFormModal";
 import { StagedTaskScheduleModal } from "../../components/StagedTaskScheduleModal";
 import { useColors } from "../../lib/theme";
+import { radii } from "../../lib/radii";
 
 const TABS = ["Unscheduled", "Scheduled"] as const;
 type Tab = (typeof TABS)[number];
@@ -35,7 +36,6 @@ export default function StagingScreen() {
   };
   const [formKey, setFormKey] = useState(0);
   const [formVisible, setFormVisible] = useState(false);
-  const [editTarget, setEditTarget] = useState<StagedTaskForForm | null>(null);
   const [schedKey, setSchedKey] = useState(0);
   const [schedVisible, setSchedVisible] = useState(false);
   const [schedTarget, setSchedTarget] = useState<StagedTaskData | null>(null);
@@ -46,12 +46,6 @@ export default function StagingScreen() {
 
   const openCreate = () => {
     setFormKey((k) => k + 1);
-    setEditTarget(null);
-    setFormVisible(true);
-  };
-  const openEdit = (t: StagedTaskForForm) => {
-    setFormKey((k) => k + 1);
-    setEditTarget({ _id: t._id, title: t.title, description: t.description });
     setFormVisible(true);
   };
   const openSchedule = (t: StagedTaskData) => {
@@ -79,52 +73,20 @@ export default function StagingScreen() {
       paddingBottom: 6,
       gap: 8,
     },
-    tab: {
-      paddingHorizontal: 14,
-      paddingVertical: 7,
-      borderRadius: 20,
-      borderWidth: 1,
-      borderColor: c.bd2,
-    },
-    tabOn: { backgroundColor: c.prim, borderColor: c.prim },
-    tabTxt: { fontSize: 13, fontWeight: "500", color: c.t2 },
-    tabTxtOn: { color: c.onPrim, fontWeight: "600" },
-    content: { paddingTop: 8, paddingBottom: 100 },
+    content: { paddingTop: 8, paddingBottom: 100, paddingHorizontal: 16, gap: 10 },
     center: { flex: 1, alignItems: "center", justifyContent: "center" },
     empty: {
       margin: 24,
       borderWidth: 1,
       borderStyle: "dashed",
       borderColor: c.bd1,
-      borderRadius: 14,
+      borderRadius: radii.md,
       paddingVertical: 40,
       paddingHorizontal: 20,
       alignItems: "center",
     },
     emptyTxt: { fontSize: 13, color: c.t3, textAlign: "center" },
-    fab: {
-      position: "absolute",
-      bottom: 28,
-      right: 18,
-      width: 50,
-      height: 50,
-      borderRadius: 25,
-      backgroundColor: c.prim,
-      justifyContent: "center",
-      alignItems: "center",
-      shadowColor: c.prim,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.5,
-      shadowRadius: 12,
-      elevation: 8,
-    },
-    fabTxt: {
-      color: c.onPrim,
-      fontSize: 26,
-      fontWeight: "300",
-      lineHeight: 28,
-      includeFontPadding: false,
-    },
+    fab: { position: "absolute", bottom: 28, right: 18 },
   });
 
   return (
@@ -132,17 +94,13 @@ export default function StagingScreen() {
       <AppBar title="Staging" />
       <View style={s.tabs}>
         {TABS.map((t) => (
-          <TouchableOpacity
+          <Button
             key={t}
-            style={[s.tab, tab === t && s.tabOn]}
+            variant="tab"
+            selected={tab === t}
+            title={`${t}${count(t === "Unscheduled" ? unscheduled : scheduled)}`}
             onPress={() => setTab(t)}
-            activeOpacity={0.8}
-          >
-            <Text style={[s.tabTxt, tab === t && s.tabTxtOn]}>
-              {t}
-              {count(t === "Unscheduled" ? unscheduled : scheduled)}
-            </Text>
-          </TouchableOpacity>
+          />
         ))}
       </View>
       {stagedTasks === undefined ? (
@@ -174,13 +132,6 @@ export default function StagingScreen() {
                 key={t._id}
                 stagedTask={t}
                 goalTitle={t.goalId ? goalTitleById.get(t.goalId) : undefined}
-                onEdit={() =>
-                  openEdit({
-                    _id: t._id,
-                    title: t.title,
-                    description: t.description,
-                  })
-                }
                 onSchedule={() => openSchedule(t)}
               />
             ))
@@ -188,18 +139,17 @@ export default function StagingScreen() {
         </ScrollView>
       )}
       {tab === "Unscheduled" && (
-        <TouchableOpacity
-          style={s.fab}
+        <Button
+          variant="fab"
+          title="+"
           onPress={openCreate}
-          activeOpacity={0.85}
-        >
-          <Text style={s.fabTxt}>+</Text>
-        </TouchableOpacity>
+          style={s.fab}
+          accessibilityLabel="New staged task"
+        />
       )}
       <StagedTaskFormModal
         key={formKey}
         visible={formVisible}
-        stagedTask={editTarget}
         onDone={() => setFormVisible(false)}
       />
       <StagedTaskScheduleModal

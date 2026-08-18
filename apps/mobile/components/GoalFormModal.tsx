@@ -7,6 +7,7 @@ import {
   ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from "react-native";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 import { FormFooter } from "./ui/FormFooter";
 
 export interface GoalForForm {
@@ -44,7 +45,7 @@ export function GoalFormModal({ visible, goal, onDone }: Props) {
   const s = StyleSheet.create({
     overlay:  { flex: 1, justifyContent: "flex-end", backgroundColor: c.scrim },
     backdrop: { flex: 1 },
-    sheet:    { backgroundColor: c.bgE, borderTopLeftRadius: 22, borderTopRightRadius: 22,
+    sheet:    { backgroundColor: c.bgE, borderTopLeftRadius: radii.sheet, borderTopRightRadius: radii.sheet,
                 borderWidth: 1, borderBottomWidth: 0, borderColor: c.bd2, maxHeight: "85%", paddingBottom: 32 },
     handle:   { width: 38, height: 4, borderRadius: 2, backgroundColor: c.bd3, alignSelf: "center", marginTop: 10, marginBottom: 4 },
     hTitle:   { fontSize: 16, fontWeight: "700", color: c.t1, paddingHorizontal: 20, paddingTop: 4, paddingBottom: 14 },

@@ -22,7 +22,8 @@ export function ArchivedRoutineRow({ routine }: ArchivedRoutineRowProps) {
   const restore = useMutation(api.routineManagement.restore);
   const permanentDelete = useMutation(api.routineManagement.permanentDelete);
   const [pending, setPending] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
+  // Exactly one drawer at a time, so the two confirms cannot stack.
+  const [confirm, setConfirm] = useState<"restore" | "delete" | null>(null);
 
   return (
     <div className="flex items-center gap-3 rounded-md border border-[var(--border-subtle)] bg-card px-4 py-3.5 opacity-60 hover:opacity-100 transition-all duration-150">
@@ -46,11 +47,7 @@ export function ArchivedRoutineRow({ routine }: ArchivedRoutineRowProps) {
         <button
           type="button"
           disabled={pending}
-          onClick={async () => {
-            setPending(true);
-            try { await restore({ routineId: routine._id }); }
-            finally { setPending(false); }
-          }}
+          onClick={() => setConfirm("restore")}
           className="flex items-center gap-1.5 h-8 rounded-sm px-2.5 text-[12px] font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-foreground transition-all duration-150 disabled:opacity-50"
         >
           <RotateCcw className="size-3.5" />
@@ -59,7 +56,7 @@ export function ArchivedRoutineRow({ routine }: ArchivedRoutineRowProps) {
 
           <button
             type="button"
-            onClick={() => setConfirmDelete(true)}
+            onClick={() => setConfirm("delete")}
             aria-label="Delete permanently"
             className="flex h-8 w-8 items-center justify-center rounded-sm text-[var(--text-tertiary)] transition-colors duration-150 hover:bg-[var(--surface-hover)] hover:text-[var(--status-danger)]"
           >
@@ -68,8 +65,27 @@ export function ArchivedRoutineRow({ routine }: ArchivedRoutineRowProps) {
       </div>
 
       <ConfirmDrawer
-        open={confirmDelete}
-        onOpenChange={setConfirmDelete}
+        open={confirm === "restore"}
+        onOpenChange={(o) => setConfirm(o ? "restore" : null)}
+        title="Restore this routine?"
+        description="It returns to your active routines and starts appearing on the days it is scheduled."
+        confirmLabel="Restore"
+        tone="accent"
+        onConfirm={async () => {
+          setPending(true);
+          try {
+            await restore({ routineId: routine._id });
+          } finally {
+            setPending(false);
+          }
+        }}
+      >
+        <p className="text-[13px] text-foreground">{routine.name}</p>
+      </ConfirmDrawer>
+
+      <ConfirmDrawer
+        open={confirm === "delete"}
+        onOpenChange={(o) => setConfirm(o ? "delete" : null)}
         title="Delete this routine forever?"
         description="This cannot be undone. Its completion history and streaks are removed with it."
         confirmLabel="Delete forever"

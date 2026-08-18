@@ -28,7 +28,8 @@ export function GoalsPage() {
   const { columns } = useListColumns();
   const completeGoal = useMutation(api.goals.complete);
   const abandonGoal = useMutation(api.goals.abandon);
-  const [confirm, setConfirm] = useState<"complete" | "abandon" | null>(null);
+  const removeGoal = useMutation(api.goals.remove);
+  const [confirm, setConfirm] = useState<"complete" | "abandon" | "delete" | null>(null);
 
   const active = goalsWithCounts ?? [];
   const completed = (allGoals ?? []).filter((g) => g.status === "completed");
@@ -111,6 +112,7 @@ export function GoalsPage() {
               const g = rows.find((r) => r.goal._id === openGoalId)?.goal;
               if (g) setForm({ goal: g });
             }}
+            onRequestDelete={() => setConfirm("delete")}
             onRequestComplete={() => setConfirm("complete")}
             onRequestAbandon={() => setConfirm("abandon")}
           />
@@ -120,7 +122,7 @@ export function GoalsPage() {
       {/* Both are reversible — the goal moves tab rather than disappearing —
           so they use the accent tone, not danger. */}
       <ConfirmDrawer
-        open={confirm !== null}
+        open={confirm === "complete" || confirm === "abandon"}
         onOpenChange={(o) => !o && setConfirm(null)}
         title={confirm === "complete" ? "Mark this goal complete?" : "Abandon this goal?"}
         description={
@@ -134,6 +136,24 @@ export function GoalsPage() {
           if (!openGoalId) return;
           if (confirm === "complete") await completeGoal({ goalId: openGoalId });
           else await abandonGoal({ goalId: openGoalId });
+          setConfirm(null);
+          setOpenGoalId(null);
+        }}
+      />
+
+      {/* Delete is the one irreversible action here, so it is the one that gets
+          the danger tone — and it stays available for completed and abandoned
+          goals, not just active ones. */}
+      <ConfirmDrawer
+        open={confirm === "delete"}
+        onOpenChange={(o) => !o && setConfirm(null)}
+        title="Delete this goal forever?"
+        description="This cannot be undone. Tasks and routines linked to it are unlinked, not deleted."
+        confirmLabel="Delete forever"
+        tone="danger"
+        onConfirm={async () => {
+          if (!openGoalId) return;
+          await removeGoal({ goalId: openGoalId });
           setConfirm(null);
           setOpenGoalId(null);
         }}

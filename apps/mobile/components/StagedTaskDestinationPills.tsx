@@ -1,5 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 
 export type StagedTaskDestination = "task" | "routine";
 
@@ -15,7 +16,7 @@ export function StagedTaskDestinationPills({ value, disabled, onChange }: Props)
 
   const s = StyleSheet.create({
     row:   { flexDirection: "row", gap: 8 },
-    btn:   { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 999,
+    btn:   { paddingHorizontal: 14, paddingVertical: 7, borderRadius: radii.pill,
              borderWidth: 1, borderColor: c.bd2, backgroundColor: c.card },
     btnOn: { borderColor: c.prim, backgroundColor: c.accBg },
     txt:   { fontSize: 12, fontWeight: "600", color: c.t2 },

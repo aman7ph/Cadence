@@ -5,6 +5,7 @@ import { api } from "@cadence/backend/convex/_generated/api";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import * as Haptics from "expo-haptics";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 import { fmtShort } from "../lib/dateUtils";
 import { useRepeatRow } from "../lib/useRepeatRow";
 import { ActionSheet } from "./ActionSheet";
@@ -77,10 +78,10 @@ export function TaskItem({ task, viewedDate, readOnly }: Props) {
   const s = StyleSheet.create({
     card:            { flexDirection: "row", alignItems: "flex-start", gap: 10,
                        backgroundColor: c.card, borderWidth: 1, borderColor: c.bd1,
-                       borderRadius: 12, padding: 12 },
+                       borderRadius: radii.sm, padding: 12 },
     dim:             { opacity: 0.55 },
     toggle:          { padding: 2, paddingTop: 1 },
-    circle:          { width: 22, height: 22, borderRadius: 11, borderWidth: 1.5,
+    circle:          { width: 22, height: 22, borderRadius: radii.full, borderWidth: 1.5,
                        borderColor: c.bd3, justifyContent: "center", alignItems: "center" },
     circleDone:      { backgroundColor: c.cplt, borderColor: c.cplt },
     checkTxt:        { color: c.onPrim, fontSize: 11, fontWeight: "700" },
@@ -90,10 +91,10 @@ export function TaskItem({ task, viewedDate, readOnly }: Props) {
     meta:            { fontSize: 12, color: c.t3 },
     err:             { fontSize: 12, color: c.danger },
     goalPill:        { alignSelf: "flex-start", backgroundColor: c.accBg,
-                       borderRadius: 999, paddingHorizontal: 7, paddingVertical: 2, marginTop: 2 },
+                       borderRadius: radii.pill, paddingHorizontal: 7, paddingVertical: 2, marginTop: 2 },
     goalTxt:         { fontSize: 10, fontWeight: "600", color: c.tacc },
     right:           { flexDirection: "row", alignItems: "flex-start", gap: 6, paddingTop: 1 },
-    carryBadge:      { backgroundColor: c.accBg, borderRadius: 4,
+    carryBadge:      { backgroundColor: c.accBg, borderRadius: radii.pill,
                        paddingHorizontal: 6, paddingVertical: 2 },
     carryTxt:        { fontSize: 10, fontWeight: "700", color: c.carry },
     more:            { fontSize: 16, color: c.t3, letterSpacing: 1 },

@@ -7,12 +7,17 @@ import {
   KeyboardAvoidingView, Modal, Platform,
   ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from "react-native";
-import { RepeatSection } from "./RepeatSection";
+import { ItemOptionsFields } from "./ItemOptionsFields";
 import { SchedulePicker } from "./SchedulePicker";
 import type { ScheduleType } from "./SchedulePicker";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 import { FormFooter } from "./ui/FormFooter";
-import { useRepeatFields } from "../lib/useRepeatFields";
+import {
+  type ItemOptions,
+  itemOptionsFrom,
+  itemOptionsToArgs,
+} from "@cadence/shared";
 
 export interface RoutineForForm {
   _id: Id<"routines">; name: string; description?: string;
@@ -32,28 +37,24 @@ export function RoutineFormModal({ visible, routine, onDone }: Props) {
   const [desc, setDesc]   = useState(routine?.description ?? "");
   const [sched, setSched] = useState<ScheduleType>(routine?.scheduleType ?? "daily");
   const [days, setDays]   = useState<number[]>(routine?.customDays ?? []);
-  const [goalId, setGoalId] = useState<Id<"goals"> | "">(routine?.goalId ?? "");
-  const [contrib, setCtb] = useState(routine?.goalContribution?.toString() ?? "");
+  const [options, setOptions] = useState<ItemOptions>(itemOptionsFrom(routine ?? {}));
   const [pending, setPend] = useState(false);
-  const repeat = useRepeatFields(routine?.repeatTarget, routine?.repeatIntervalMinutes);
 
-  const selGoal = goals?.find((g) => g._id === goalId);
   const invalid = !name.trim() || (sched === "custom" && days.length === 0);
   const toggleDay = (d: number) =>
     setDays((p) => p.includes(d) ? p.filter((x) => x !== d) : [...p, d].sort());
 
   const submit = async () => {
     if (invalid || pending) return;
-    const repeatArgs = repeat.collect();
-    if (!repeatArgs) return;
+
     setPend(true);
     try {
+      const { goalId, ...rest } = itemOptionsToArgs(options);
       const base = {
         name: name.trim(), description: desc.trim() || undefined,
         scheduleType: sched, customDays: sched === "custom" ? days : undefined,
-        goalId: goalId || undefined,
-        goalContribution: goalId && contrib ? parseFloat(contrib) : undefined,
-        ...repeatArgs,
+        ...rest,
+        goalId: goalId as Id<"goals"> | undefined,
       };
       routine ? await update({ routineId: routine._id, ...base })
               : await create({ ...base, today: todayLocal() });
@@ -64,7 +65,7 @@ export function RoutineFormModal({ visible, routine, onDone }: Props) {
   const s = StyleSheet.create({
     overlay:     { flex: 1, justifyContent: "flex-end", backgroundColor: c.scrim },
     backdrop:    { flex: 1 },
-    sheet:       { backgroundColor: c.bgE, borderTopLeftRadius: 22, borderTopRightRadius: 22,
+    sheet:       { backgroundColor: c.bgE, borderTopLeftRadius: radii.sheet, borderTopRightRadius: radii.sheet,
                    borderWidth: 1, borderBottomWidth: 0, borderColor: c.bd2,
                    maxHeight: "85%", paddingBottom: 32 },
     handle:      { width: 38, height: 4, borderRadius: 2, backgroundColor: c.bd3,
@@ -74,7 +75,7 @@ export function RoutineFormModal({ visible, routine, onDone }: Props) {
     scroll:      { flexGrow: 0 },
     scrollContent: { paddingHorizontal: 20, paddingBottom: 8 },
     input:       { backgroundColor: c.card, borderWidth: 1, borderColor: c.bd2,
-                   borderRadius: 10, paddingHorizontal: 14, paddingVertical: 11,
+                   borderRadius: radii.sm, paddingHorizontal: 14, paddingVertical: 11,
                    fontSize: 14, color: c.t1 },
     mt:          { marginTop: 10 },
     goalChip:    { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999,
@@ -101,25 +102,9 @@ export function RoutineFormModal({ visible, routine, onDone }: Props) {
               <SchedulePicker scheduleType={sched} customDays={days}
                 disabled={pending} onChange={setSched} onDayToggle={toggleDay} />
             </View>
-            {(goals?.length ?? 0) > 0 && (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.mt}>
-                <TouchableOpacity onPress={() => setGoalId("")} style={[s.goalChip, !goalId && s.goalChipOn]}>
-                  <Text style={[s.goalTxt, !goalId && s.goalTxtOn]}>No goal</Text>
-                </TouchableOpacity>
-                {goals!.map((g) => (
-                  <TouchableOpacity key={g._id} onPress={() => setGoalId(g._id)}
-                    style={[s.goalChip, goalId === g._id && s.goalChipOn]}>
-                    <Text style={[s.goalTxt, goalId === g._id && s.goalTxtOn]} numberOfLines={1}>{g.title}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            )}
-            {!!goalId && selGoal?.targetValue != null && (
-              <TextInput style={[s.input, s.mt]} value={contrib} onChangeText={setCtb}
-                placeholder={selGoal.unit ?? "Contribution amount"}
-                placeholderTextColor={c.t3} keyboardType="numeric" editable={!pending} />
-            )}
-            <RepeatSection repeat={repeat} disabled={pending} />
+            <View style={s.mt}>
+              <ItemOptionsFields value={options} onChange={setOptions} disabled={pending} />
+            </View>
           </ScrollView>
           <FormFooter onCancel={onDone} onSubmit={submit}
                       submitLabel={routine ? "Save changes" : "Add routine"}

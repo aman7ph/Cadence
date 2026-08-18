@@ -1,5 +1,6 @@
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 
 export interface ActionItem {
   label: string;
@@ -55,7 +56,7 @@ export function ActionSheet({ visible, title, actions, onCancel }: Props) {
 
 const s = StyleSheet.create({
   overlay:   { flex: 1 },
-  sheet:     { borderTopLeftRadius: 20, borderTopRightRadius: 20,
+  sheet:     { borderTopLeftRadius: radii.sheet, borderTopRightRadius: radii.sheet,
                borderWidth: 1, borderBottomWidth: 0, paddingBottom: 32 },
   title:     { textAlign: "center", fontSize: 11, fontWeight: "700", letterSpacing: 0.8,
                textTransform: "uppercase", paddingVertical: 14, borderBottomWidth: 1 },

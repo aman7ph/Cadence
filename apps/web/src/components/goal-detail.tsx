@@ -11,9 +11,10 @@ interface GoalDetailProps {
   onEdit: () => void;
   onRequestComplete: () => void;
   onRequestAbandon: () => void;
+  onRequestDelete: () => void;
 }
 
-export function GoalDetail({ goalId, onBack, onEdit, onRequestComplete, onRequestAbandon }: GoalDetailProps) {
+export function GoalDetail({ goalId, onBack, onEdit, onRequestComplete, onRequestAbandon, onRequestDelete }: GoalDetailProps) {
   const linked = useQuery(api.goalLinks.getLinkedItems, { goalId });
 
   if (linked === undefined) {
@@ -39,6 +40,7 @@ export function GoalDetail({ goalId, onBack, onEdit, onRequestComplete, onReques
         onEdit={onEdit}
         onRequestComplete={onRequestComplete}
         onRequestAbandon={onRequestAbandon}
+        onRequestDelete={onRequestDelete}
       />
       {goal.targetValue && (
         <GoalDetailProgress

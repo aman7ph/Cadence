@@ -14,8 +14,17 @@ export const radii = {
   md: 12, // blocks: ghost add-rows, menus, popovers
   lg: 16, // cards and panels
   pill: 20, // segmented controls and chips
+  /** Bottom-sheet top corners. Larger than a card on purpose — the sheet is
+   *  the window edge, not a panel sitting on the page. Seven sheets had this
+   *  hand-written as 20 or 22; this is the value most of them meant. */
+  sheet: 20,
   /** Circles only — avatars, day dots, the FAB. Not a step on the scale. */
   full: 999,
 } as const;
 
 export type Radius = keyof typeof radii;
+
+// EXEMPT: 1–2px rounding on hairline bars (the burger lines, the drawer's
+// active accent, a skipped-routine dash) is an end-cap on a 1.5px stroke, not a
+// container radius. Snapping those to a step would change how they read, so
+// they stay as literals — the only radii allowed outside this file.

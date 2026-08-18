@@ -1,7 +1,15 @@
 import { useRef, useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
+import {
+  type Mention,
+  parseMentionSegments,
+  tagsFromStored,
+  toEditorText,
+  toStoredText,
+} from "@cadence/shared";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 
 interface Mentionable { id: string; name: string; type: "routine" | "task" }
 
@@ -13,42 +21,18 @@ interface Props {
   onCancel: () => void;
 }
 
-export type MentionSegment =
-  | { kind: "text"; value: string }
-  | { kind: "mention"; name: string; id: string };
-
-export function parseMentionSegments(text: string): MentionSegment[] {
-  const regex = /@\[([^\]]+)\]\(([^)]+)\)/g;
-  const out: MentionSegment[] = [];
-  let last = 0; let m: RegExpExecArray | null;
-  while ((m = regex.exec(text)) !== null) {
-    if (m.index > last) out.push({ kind: "text", value: text.slice(last, m.index) });
-    out.push({ kind: "mention", name: m[1]!, id: m[2]! });
-    last = m.index + m[0].length;
-  }
-  if (last < text.length) out.push({ kind: "text", value: text.slice(last) });
-  return out;
-}
-
-export function parseTagsFromText(
-  text: string,
-  routines: { routineId: string; name: string }[],
-  tasks:    { taskId: string; title: string }[],
-): { entityId: string; entityType: "task" | "routine" }[] {
-  const regex = /@\[([^\]]+)\]\(([^)]+)\)/g;
-  const tags: { entityId: string; entityType: "task" | "routine" }[] = [];
-  let m: RegExpExecArray | null;
-  while ((m = regex.exec(text)) !== null) {
-    const id = m[2]!;
-    if (routines.some((r) => r.routineId === id)) tags.push({ entityId: id, entityType: "routine" });
-    else if (tasks.some((t) => t.taskId === id))  tags.push({ entityId: id, entityType: "task" });
-  }
-  return tags;
-}
+// Re-exported so the read-only renderers keep their import path.
+export { parseMentionSegments } from "@cadence/shared";
+export type { MentionSegment } from "@cadence/shared";
 
 export function ReflectionEditor({ initialText, routines, tasks, onSave, onCancel }: Props) {
   const c = useColors();
-  const [text, setText]       = useState(initialText);
+  // The editor holds the READABLE form (`@Name`); the stored form carries the
+  // id and is rebuilt on save. Binding straight to storage is what put
+  // `@[Name](jn77h2ks…)` in front of the user.
+  const initial = toEditorText(initialText);
+  const [text, setText]       = useState(initial.text);
+  const [mentions, setMentions] = useState<Mention[]>(initial.mentions);
   const [query, setQuery]     = useState<string | null>(null);
   const [menuIdx, setMenuIdx] = useState(0);
   const cursorRef             = useRef(0);
@@ -71,21 +55,30 @@ export function ReflectionEditor({ initialText, routines, tasks, onSave, onCance
     const m = text.slice(0, cursor).match(/@([^@\[\]()]*?)$/);
     if (!m) return;
     const start = cursor - m[0].length;
-    setText(text.slice(0, start) + `@[${item.name}](${item.id})` + text.slice(cursor));
+    setText(text.slice(0, start) + `@${item.name}` + text.slice(cursor));
+    setMentions((prev) =>
+      prev.some((x) => x.id === item.id) ? prev : [...prev, { id: item.id, name: item.name }],
+    );
     setQuery(null);
   };
 
-  const save = () => onSave(text, parseTagsFromText(text, routines, tasks));
+  const save = () => {
+    const stored = toStoredText(text, mentions);
+    onSave(
+      stored,
+      tagsFromStored(stored, routines.map((r) => r.routineId as string), tasks.map((t) => t.taskId as string)),
+    );
+  };
 
   const s = StyleSheet.create({
     input:          { color: c.t1, fontSize: 14, lineHeight: 22,
                       paddingHorizontal: 14, paddingTop: 6, paddingBottom: 10, minHeight: 96 },
     menu:           { backgroundColor: c.bgE, borderWidth: 1, borderColor: c.bd2,
-                      borderRadius: 10, marginHorizontal: 14, marginBottom: 4, overflow: "hidden" },
+                      borderRadius: radii.sm, marginHorizontal: 14, marginBottom: 4, overflow: "hidden" },
     menuItem:       { flexDirection: "row", alignItems: "center", gap: 8,
                       paddingHorizontal: 12, paddingVertical: 10 },
     menuItemActive: { backgroundColor: c.active },
-    typeDot:        { width: 7, height: 7, borderRadius: 4 },
+    typeDot:        { width: 7, height: 7, borderRadius: radii.full },
     dotRoutine:     { backgroundColor: c.tacc },
     dotTask:        { backgroundColor: c.chart3 },
     menuTxt:        { flex: 1, fontSize: 13, color: c.t1 },
@@ -94,7 +87,7 @@ export function ReflectionEditor({ initialText, routines, tasks, onSave, onCance
                       paddingHorizontal: 14, paddingBottom: 12, paddingTop: 4 },
     cancelBtn:      { paddingHorizontal: 14, paddingVertical: 8 },
     cancelTxt:      { fontSize: 13, color: c.t3 },
-    saveBtn:        { backgroundColor: c.prim, borderRadius: 8, paddingHorizontal: 16, paddingVertical: 8 },
+    saveBtn:        { backgroundColor: c.prim, borderRadius: radii.sm, paddingHorizontal: 16, paddingVertical: 8 },
     saveTxt:        { fontSize: 13, fontWeight: "600", color: c.onPrim },
   });
 
@@ -102,7 +95,14 @@ export function ReflectionEditor({ initialText, routines, tasks, onSave, onCance
     <View>
       {query !== null && filtered.length > 0 && (
         <View style={s.menu}>
-          <ScrollView keyboardShouldPersistTaps="always" style={{ maxHeight: 160 }}>
+          {/* nestedScrollEnabled is required on Android: this list sits inside
+              Today's page ScrollView, and without it the parent swallows the
+              drag so the menu cannot be scrolled to reach later matches. */}
+          <ScrollView
+            nestedScrollEnabled
+            keyboardShouldPersistTaps="always"
+            style={{ maxHeight: 200 }}
+          >
             {filtered.map((item, i) => (
               <TouchableOpacity key={item.id} onPress={() => insertMention(item)}
                 style={[s.menuItem, i === menuIdx && s.menuItemActive]}>

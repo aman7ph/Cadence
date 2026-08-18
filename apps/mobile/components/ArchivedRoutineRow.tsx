@@ -6,6 +6,8 @@ import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import { scheduleLabel } from "./SchedulePicker";
 import type { ScheduleType } from "./SchedulePicker";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
+import { ConfirmSheet } from "./ui/ConfirmSheet";
 
 export interface RoutineForArchive {
   _id: Id<"routines">;
@@ -21,32 +23,22 @@ export function ArchivedRoutineRow({ routine }: Props) {
   const c = useColors();
   const restore = useMutation(api.routineManagement.restore);
   const perm    = useMutation(api.routineManagement.permanentDelete);
-  const [pending, setPending] = useState(false);
-  const [confirm, setConfirm] = useState(false);
-
-  const doRestore = async () => {
-    setPending(true);
-    try { await restore({ routineId: routine._id }); }
-    finally { setPending(false); }
-  };
-
-  const doDelete = async () => {
-    setPending(true);
-    try { await perm({ routineId: routine._id }); }
-    finally { setPending(false); setConfirm(false); }
-  };
+  // Exactly one sheet is mounted at a time — two overlapping bottom sheets
+  // would stack their scrims and trap the backdrop tap.
+  const [confirm, setConfirm] = useState<"restore" | "delete" | null>(null);
 
   const sched = scheduleLabel(routine.scheduleType, routine.customDays);
 
   const s = StyleSheet.create({
     card:        { flexDirection: "row", alignItems: "center", gap: 10,
-                   borderBottomWidth: 1, borderBottomColor: c.bd1,
-                   paddingHorizontal: 20, paddingVertical: 12, opacity: 0.65 },
+                   backgroundColor: c.card, borderWidth: 1, borderColor: c.bd1,
+                   borderRadius: radii.sm, paddingHorizontal: 12, paddingVertical: 10,
+                   opacity: 0.65 },
     body:        { flex: 1, gap: 2 },
     nameRow:     { flexDirection: "row", alignItems: "center", gap: 7, flexWrap: "wrap" },
     name:        { fontSize: 13, fontWeight: "500", color: c.t2,
                    textDecorationLine: "line-through", flexShrink: 1 },
-    chip:        { backgroundColor: c.active, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 },
+    chip:        { backgroundColor: c.active, borderRadius: radii.full, paddingHorizontal: 6, paddingVertical: 2 },
     chipTxt:     { fontSize: 10, fontWeight: "600", color: c.t3 },
     archDate:    { fontSize: 11, color: c.t3 },
     actions:     { flexDirection: "row", alignItems: "center", gap: 4 },
@@ -54,12 +46,7 @@ export function ArchivedRoutineRow({ routine }: Props) {
     restoreTxt:  { fontSize: 12, fontWeight: "600", color: c.t2 },
     deleteBtn:   { paddingHorizontal: 8, paddingVertical: 6 },
     deleteTxt:   { fontSize: 12, color: c.t3 },
-    confirmRow:  { flexDirection: "row", alignItems: "center", gap: 6,
-                   borderWidth: 1, borderColor: c.danger,
-                   borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
-    confirmTxt:  { fontSize: 11, color: c.danger },
-    yesTxt:      { fontSize: 11, fontWeight: "700", color: c.danger },
-    noTxt:       { fontSize: 12, color: c.t3 },
+    confirmName: { fontSize: 13, color: c.t1 },
   });
 
   return (
@@ -72,25 +59,37 @@ export function ArchivedRoutineRow({ routine }: Props) {
         {routine.archivedDate && <Text style={s.archDate}>Archived {routine.archivedDate}</Text>}
       </View>
       <View style={s.actions}>
-        <TouchableOpacity onPress={doRestore} disabled={pending} style={s.restoreBtn}>
+        <TouchableOpacity onPress={() => setConfirm("restore")} style={s.restoreBtn}>
           <Text style={s.restoreTxt}>Restore</Text>
         </TouchableOpacity>
-        {!confirm ? (
-          <TouchableOpacity onPress={() => setConfirm(true)} disabled={pending} style={s.deleteBtn}>
-            <Text style={s.deleteTxt}>Delete</Text>
-          </TouchableOpacity>
-        ) : (
-          <View style={s.confirmRow}>
-            <Text style={s.confirmTxt}>Forever?</Text>
-            <TouchableOpacity onPress={doDelete} disabled={pending}>
-              <Text style={s.yesTxt}>Yes</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setConfirm(false)}>
-              <Text style={s.noTxt}>✕</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+        <TouchableOpacity onPress={() => setConfirm("delete")} style={s.deleteBtn}>
+          <Text style={s.deleteTxt}>Delete</Text>
+        </TouchableOpacity>
       </View>
+
+      <ConfirmSheet
+        visible={confirm === "restore"}
+        onCancel={() => setConfirm(null)}
+        title="Restore this routine?"
+        description="It returns to your active routines and starts appearing on the days it is scheduled."
+        confirmLabel="Restore"
+        tone="accent"
+        onConfirm={async () => { await restore({ routineId: routine._id }); }}
+      >
+        <Text style={s.confirmName}>{routine.name}</Text>
+      </ConfirmSheet>
+
+      <ConfirmSheet
+        visible={confirm === "delete"}
+        onCancel={() => setConfirm(null)}
+        title="Delete this routine forever?"
+        description="This cannot be undone. Its completion history and streaks are removed with it."
+        confirmLabel="Delete forever"
+        tone="danger"
+        onConfirm={async () => { await perm({ routineId: routine._id }); }}
+      >
+        <Text style={s.confirmName}>{routine.name}</Text>
+      </ConfirmSheet>
     </View>
   );
 }

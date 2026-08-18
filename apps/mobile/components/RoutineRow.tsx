@@ -4,6 +4,7 @@ import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import { scheduleLabel } from "./SchedulePicker";
 import type { ScheduleType } from "./SchedulePicker";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 import { ActionSheet } from "./ActionSheet";
 
 export interface RoutineForRow {
@@ -27,18 +28,19 @@ export function RoutineRow({ routine, onEdit, onArchive }: Props) {
 
   const s = StyleSheet.create({
     card:     { flexDirection: "row", alignItems: "flex-start", gap: 12,
-                borderBottomWidth: 1, borderBottomColor: c.bd1, paddingHorizontal: 20, paddingVertical: 13 },
-    dot:      { width: 4, height: 4, borderRadius: 2, backgroundColor: c.bd3, marginTop: 6, flexShrink: 0 },
+                backgroundColor: c.card, borderWidth: 1, borderColor: c.bd1,
+                borderRadius: radii.sm, paddingHorizontal: 12, paddingVertical: 10 },
+    dot:      { width: 4, height: 4, borderRadius: radii.full, backgroundColor: c.bd3, marginTop: 6, flexShrink: 0 },
     body:     { flex: 1, gap: 3 },
     nameRow:  { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
     name:     { fontSize: 14, fontWeight: "500", color: c.t1, flexShrink: 1 },
-    chip:     { backgroundColor: c.accBg, borderRadius: 4, paddingHorizontal: 7, paddingVertical: 2 },
-    chipTxt:  { fontSize: 10, fontWeight: "600", color: c.tacc, letterSpacing: 0.2 },
+    chip:     { backgroundColor: c.bgS, borderRadius: radii.pill, paddingHorizontal: 8, paddingVertical: 3 },
+    chipTxt:  { fontSize: 10, fontWeight: "400", color: c.t2 },
     desc:     { fontSize: 12, color: c.t2 },
-    streak:   { fontSize: 11, fontWeight: "600", color: c.carry },
-    goalPill: { alignSelf: "flex-start", backgroundColor: c.accBg, borderRadius: 4,
-                paddingHorizontal: 7, paddingVertical: 2 },
-    goalTxt:  { fontSize: 10, fontWeight: "600", color: c.tacc },
+    streak:   { fontSize: 10.5, fontWeight: "600", color: c.tacc },
+    goalPill: { alignSelf: "flex-start", backgroundColor: c.accBg, borderRadius: radii.pill,
+                paddingHorizontal: 8, paddingVertical: 2 },
+    goalTxt:  { fontSize: 9, fontWeight: "600", color: c.tacc, letterSpacing: 0.27 },
     more:     { paddingLeft: 4, paddingTop: 2 },
     moreTxt:  { fontSize: 16, color: c.t3, letterSpacing: 1 },
   });

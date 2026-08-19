@@ -15,6 +15,8 @@ export function useRepeatRow(repeatTarget?: number, nextRepAllowedAt?: number) {
     error,
     clearError: () => setError(null),
     fail: (e: unknown) =>
-      setError(e instanceof Error ? e.message.split("\n")[0]! : "Something went wrong"),
+      setError(
+        e instanceof Error ? e.message.split("\n")[0]! : "Something went wrong",
+      ),
   };
 }

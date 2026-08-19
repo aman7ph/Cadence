@@ -13,7 +13,12 @@ export interface DateRangePickerProps {
   onChange: (range: DateRange, label: string) => void;
 }
 
-export function DateRangePicker({ value, label, today, onChange }: DateRangePickerProps) {
+export function DateRangePicker({
+  value,
+  label,
+  today,
+  onChange,
+}: DateRangePickerProps) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -44,13 +49,23 @@ export function DateRangePicker({ value, label, today, onChange }: DateRangePick
 
       {open && (
         <>
-          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} aria-hidden />
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => setOpen(false)}
+            aria-hidden
+          />
           <DateRangePickerPanel
             value={value}
             today={today}
             activePresetLabel={activePreset?.label}
-            onPreset={(range, lbl) => { onChange(range, lbl); setOpen(false); }}
-            onApply={(range, lbl) => { onChange(range, lbl); setOpen(false); }}
+            onPreset={(range, lbl) => {
+              onChange(range, lbl);
+              setOpen(false);
+            }}
+            onApply={(range, lbl) => {
+              onChange(range, lbl);
+              setOpen(false);
+            }}
             onClose={() => setOpen(false)}
           />
         </>

@@ -35,7 +35,10 @@ export function ComposerGoalPanel({
   return (
     <div className="flex min-w-0 flex-1 flex-col gap-2.5">
       <div className="flex items-center gap-1.5">
-        <Target className="size-3 text-[var(--text-accent)]" strokeWidth={2.5} />
+        <Target
+          className="size-3 text-[var(--text-accent)]"
+          strokeWidth={2.5}
+        />
         <span className="font-display text-[10px] uppercase tracking-[0.05em] text-[var(--text-tertiary)]">
           Goal contribution
         </span>
@@ -50,7 +53,10 @@ export function ComposerGoalPanel({
           {goals.map((g) => {
             const active = g._id === goalId;
             const target = g.targetValue ?? 0;
-            const pct = target > 0 ? Math.min(100, ((g.currentValue ?? 0) / target) * 100) : 0;
+            const pct =
+              target > 0
+                ? Math.min(100, ((g.currentValue ?? 0) / target) * 100)
+                : 0;
             return (
               <button
                 key={g._id}

@@ -103,9 +103,9 @@ const config: Config = {
        * than intent — its own handoff notes demand consistency and forbid
        * introducing new radii. These are the clusters that drift falls into. */
       borderRadius: {
-        sm: "9px",    // controls: buttons, inputs, outlined actions
-        md: "12px",   // blocks: ghost add-rows, menus, popovers
-        lg: "16px",   // cards and panels
+        sm: "9px", // controls: buttons, inputs, outlined actions
+        md: "12px", // blocks: ghost add-rows, menus, popovers
+        lg: "16px", // cards and panels
         pill: "20px", // segmented controls and chips
       },
       fontFamily: {
@@ -121,12 +121,7 @@ const config: Config = {
         ],
         // Display: headings, nav, section labels and stat numerals.
         display: ["Lora", "Georgia", "Cambria", "Times New Roman", "serif"],
-        mono: [
-          "JetBrains Mono",
-          "ui-monospace",
-          "SFMono-Regular",
-          "monospace",
-        ],
+        mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "monospace"],
       },
     },
   },

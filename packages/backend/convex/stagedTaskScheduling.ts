@@ -2,6 +2,7 @@ import { validateRepeatArgs } from "@cadence/shared";
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { requireUser } from "./lib/auth";
+import { requireOwnedStagedTask } from "./lib/ownership";
 import { promoteStagedTask } from "./lib/promoteStagedTask";
 
 const targetType = v.union(v.literal("task"), v.literal("routine"));
@@ -27,11 +28,7 @@ export const schedule = mutation({
     today: v.string(),
   },
   handler: async (ctx, args) => {
-    const user = await requireUser(ctx);
-    const staged = await ctx.db.get(args.stagedTaskId);
-    if (!staged || staged.userId !== user._id) {
-      throw new Error("Staged task not found");
-    }
+    await requireOwnedStagedTask(ctx, args.stagedTaskId);
     const trimmed = args.title.trim();
     if (!trimmed) throw new Error("Task title is required");
     if (!/^\d{4}-\d{2}-\d{2}$/.test(args.scheduledDate)) {
@@ -84,11 +81,7 @@ export const schedule = mutation({
 export const unschedule = mutation({
   args: { stagedTaskId: v.id("stagedTasks") },
   handler: async (ctx, { stagedTaskId }) => {
-    const user = await requireUser(ctx);
-    const staged = await ctx.db.get(stagedTaskId);
-    if (!staged || staged.userId !== user._id) {
-      throw new Error("Staged task not found");
-    }
+    await requireOwnedStagedTask(ctx, stagedTaskId);
     await ctx.db.patch(stagedTaskId, {
       scheduledDate: undefined,
       targetType: undefined,

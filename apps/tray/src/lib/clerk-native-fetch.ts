@@ -24,12 +24,18 @@ export function installClerkNativeFetch(publishableKey: string) {
   if (!encodedHost) return;
   const fapiOrigin = `https://${atob(encodedHost).replace(/\$$/, "")}`;
 
-  const tauriFetchPromise = import("@tauri-apps/plugin-http").then((m) => m.fetch);
+  const tauriFetchPromise = import("@tauri-apps/plugin-http").then(
+    (m) => m.fetch,
+  );
   const browserFetch = window.fetch.bind(window);
 
   window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     const rawUrl =
-      typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      typeof input === "string"
+        ? input
+        : input instanceof URL
+          ? input.href
+          : input.url;
     if (!rawUrl.startsWith(fapiOrigin)) return browserFetch(input, init);
 
     const url = new URL(rawUrl);
@@ -44,7 +50,12 @@ export function installClerkNativeFetch(publishableKey: string) {
     const method =
       init?.method ?? (input instanceof Request ? input.method : "GET");
     let body = init?.body ?? null;
-    if (body === null && input instanceof Request && method !== "GET" && method !== "HEAD") {
+    if (
+      body === null &&
+      input instanceof Request &&
+      method !== "GET" &&
+      method !== "HEAD"
+    ) {
       body = await input.clone().arrayBuffer();
     }
 

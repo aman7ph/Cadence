@@ -53,19 +53,16 @@ export function FormDrawer({
   };
 
   return (
-    <Drawer
-      open={open}
-      onOpenChange={onOpenChange}
-      label={title}
-      size={size}
-    >
+    <Drawer open={open} onOpenChange={onOpenChange} label={title} size={size}>
       <form onSubmit={submit} className="flex min-h-full flex-col">
         <div className="px-7 pb-4 pt-6">
           <h2 className="font-display text-[20px] font-semibold leading-tight text-foreground">
             {title}
           </h2>
           {description && (
-            <p className="mt-1 text-[12px] text-[var(--text-secondary)]">{description}</p>
+            <p className="mt-1 text-[12px] text-[var(--text-secondary)]">
+              {description}
+            </p>
           )}
         </div>
 

@@ -34,7 +34,15 @@ interface Props {
  * keeping the transform on RN's 3D path, which is better supported than
  * rotateX/rotateY with no perspective at all.
  */
-export function GyroRing({ size, color, tiltX, tiltY, dir, durationMs, spin }: Props) {
+export function GyroRing({
+  size,
+  color,
+  tiltX,
+  tiltY,
+  dir,
+  durationMs,
+  spin,
+}: Props) {
   const z = useSharedValue(0);
 
   useEffect(() => {

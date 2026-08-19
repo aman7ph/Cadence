@@ -42,7 +42,8 @@ export function MomentumHero({
 
   const score = mean((rows ?? []).map((r) => r.productivityScore));
   const prev = mean((prevRows ?? []).map((r) => r.productivityScore));
-  const delta = score !== null && prev !== null ? Math.round(score - prev) : null;
+  const delta =
+    score !== null && prev !== null ? Math.round(score - prev) : null;
 
   const ranked = [...(dow ?? [])]
     .filter((d) => d.rate !== null)
@@ -64,7 +65,9 @@ export function MomentumHero({
             {delta !== null && delta !== 0 && (
               <span
                 className={`text-[12px] font-semibold ${
-                  delta > 0 ? "text-[var(--status-complete)]" : "text-[var(--status-danger)]"
+                  delta > 0
+                    ? "text-[var(--status-complete)]"
+                    : "text-[var(--status-danger)]"
                 }`}
               >
                 {delta > 0 ? "+" : ""}

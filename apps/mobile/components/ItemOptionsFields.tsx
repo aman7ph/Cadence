@@ -36,7 +36,9 @@ export function ItemOptionsFields({ value, onChange, disabled }: Props) {
         target={value.repeatTarget}
         onTargetChange={(repeatTarget) => set({ repeatTarget })}
         intervalMinutes={value.repeatIntervalMinutes}
-        onIntervalChange={(repeatIntervalMinutes) => set({ repeatIntervalMinutes })}
+        onIntervalChange={(repeatIntervalMinutes) =>
+          set({ repeatIntervalMinutes })
+        }
         disabled={disabled}
       />
     </View>

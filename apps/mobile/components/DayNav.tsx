@@ -13,7 +13,9 @@ interface Props {
 function shortDate(dateStr: string): string {
   const [y, m, d] = dateStr.split("-").map(Number);
   return new Date(y!, m! - 1, d!).toLocaleDateString("en-GB", {
-    weekday: "short", day: "numeric", month: "short",
+    weekday: "short",
+    day: "numeric",
+    month: "short",
   });
 }
 
@@ -22,17 +24,30 @@ export function DayNav({ date, today, onPrev, onNext, onToday }: Props) {
   const isToday = date === today;
 
   const s = StyleSheet.create({
-    row:          { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 10 },
-    arrowBtn:     { width: 28, height: 28, borderRadius: radii.sm, borderWidth: 1,
-                    borderColor: c.bd2, backgroundColor: c.card,
-                    justifyContent: "center", alignItems: "center" },
-    arrowDim:     { borderColor: c.bd1, opacity: 0.35 },
-    arrow:        { fontSize: 16, color: c.t2, includeFontPadding: false },
-    arrowDimTxt:  { color: c.t3 },
-    chip:         { paddingHorizontal: 10, paddingVertical: 4, borderRadius: radii.sm,
-                    backgroundColor: c.card, borderWidth: 1, borderColor: c.bd2 },
-    chipToday:    { backgroundColor: c.accBg, borderColor: c.bdAcc },
-    chipTxt:      { fontSize: 11, fontWeight: "600", color: c.t3 },
+    row: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 10 },
+    arrowBtn: {
+      width: 28,
+      height: 28,
+      borderRadius: radii.sm,
+      borderWidth: 1,
+      borderColor: c.bd2,
+      backgroundColor: c.card,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    arrowDim: { borderColor: c.bd1, opacity: 0.35 },
+    arrow: { fontSize: 16, color: c.t2, includeFontPadding: false },
+    arrowDimTxt: { color: c.t3 },
+    chip: {
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: radii.sm,
+      backgroundColor: c.card,
+      borderWidth: 1,
+      borderColor: c.bd2,
+    },
+    chipToday: { backgroundColor: c.accBg, borderColor: c.bdAcc },
+    chipTxt: { fontSize: 11, fontWeight: "600", color: c.t3 },
     chipTxtToday: { color: c.tacc },
   });
 

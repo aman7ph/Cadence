@@ -76,7 +76,12 @@ export function buttonStyles(
     case "outline": {
       const t = outlineTone(c, tone);
       return {
-        box: { ...base, borderRadius: radii.sm, borderWidth: 1, borderColor: t.border },
+        box: {
+          ...base,
+          borderRadius: radii.sm,
+          borderWidth: 1,
+          borderColor: t.border,
+        },
         label: { ...label, color: t.text },
       };
     }

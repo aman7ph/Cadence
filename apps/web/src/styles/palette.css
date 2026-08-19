@@ -14,31 +14,31 @@
 
 :root {
   /* ---- Sand: warm neutrals. Backgrounds, surfaces, borders, text. ---- */
-  --sand-50: #faf9f6;   /* (prototype) light bg */
-  --sand-100: #f3ecdf;  /* (prototype) dark text — warm paper */
-  --sand-150: #f1efe8;  /* (prototype) light sunken surface */
-  --sand-200: #e4e0d5;  /* (prototype) light border */
+  --sand-50: #faf9f6; /* (prototype) light bg */
+  --sand-100: #f3ecdf; /* (prototype) dark text — warm paper */
+  --sand-150: #f1efe8; /* (prototype) light sunken surface */
+  --sand-200: #e4e0d5; /* (prototype) light border */
   --sand-300: #c9c0ae;
-  --sand-400: #a89a80;  /* (prototype) dark muted text */
-  --sand-500: #7a7264;  /* (prototype) light muted text */
+  --sand-400: #a89a80; /* (prototype) dark muted text */
+  --sand-500: #7a7264; /* (prototype) light muted text */
   --sand-600: #4f4433;
-  --sand-700: #372e20;  /* (prototype) dark border */
-  --sand-800: #282219;  /* (prototype) dark sunken surface */
-  --sand-850: #221f1a;  /* (prototype) light ink — the light theme's text */
-  --sand-900: #211c15;  /* (prototype) dark card surface */
-  --sand-950: #17140f;  /* (prototype) dark bg */
+  --sand-700: #372e20; /* (prototype) dark border */
+  --sand-800: #282219; /* (prototype) dark sunken surface */
+  --sand-850: #221f1a; /* (prototype) light ink — the light theme's text */
+  --sand-900: #211c15; /* (prototype) dark card surface */
+  --sand-950: #17140f; /* (prototype) dark bg */
   --white: #ffffff;
 
   /* ---- Gold: the accent. Also the brand mark's ring colours. ---- */
   --gold-50: #fdf8ec;
-  --gold-100: #faecd0;  /* (prototype) light accent-soft */
-  --gold-200: #f3c877;  /* (mark) ring C */
-  --gold-400: #e8a13d;  /* (prototype) dark accent — and mark ring A */
-  --gold-500: #c9862a;  /* (mark) ring B */
-  --gold-600: #bd7a15;  /* (prototype) light accent */
+  --gold-100: #faecd0; /* (prototype) light accent-soft */
+  --gold-200: #f3c877; /* (mark) ring C */
+  --gold-400: #e8a13d; /* (prototype) dark accent — and mark ring A */
+  --gold-500: #c9862a; /* (mark) ring B */
+  --gold-600: #bd7a15; /* (prototype) light accent */
   --gold-700: #9a6210;
-  --gold-950: #3a2f1c;  /* (prototype) dark accent-soft */
-  --gold-975: #1c1305;  /* (prototype) ink ON gold — dark theme's accent text */
+  --gold-950: #3a2f1c; /* (prototype) dark accent-soft */
+  --gold-975: #1c1305; /* (prototype) ink ON gold — dark theme's accent text */
 
   /* ---- Green: completion and streaks. Warmed to sit on sand. ---- */
 
@@ -55,6 +55,5 @@
   --red-100: #f8dcda;
   --red-500: #dc4f48;
   --red-600: #c9403a;
-  --red-950: #3a1f1e;    /* dark-ground danger tint */
+  --red-950: #3a1f1e; /* dark-ground danger tint */
 }
-

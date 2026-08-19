@@ -3,6 +3,7 @@ import { SectionLabel } from "./section-label";
 import { ListGrid } from "@/components/ui/list-grid";
 import { useListColumns } from "@/lib/use-list-columns";
 import { TaskRow } from "./task-row";
+import { EmptyNote } from "@/components/ui/empty-note";
 
 interface Task {
   taskId: string;
@@ -39,13 +40,19 @@ export function TodayTasksSection({
   const { columns } = useListColumns();
   return (
     <section className="flex flex-col gap-2.5">
-      <SectionLabel count={tasksDone + tasksOpen > 0 ? `${tasksDone}/${tasksDone + tasksOpen}` : undefined}>
+      <SectionLabel
+        count={
+          tasksDone + tasksOpen > 0
+            ? `${tasksDone}/${tasksDone + tasksOpen}`
+            : undefined
+        }
+      >
         Tasks
       </SectionLabel>
       {tasks.length === 0 ? (
-        <p className="text-[13px] text-[var(--text-tertiary)] rounded-md border border-dashed border-[var(--border-subtle)] bg-card px-4 py-8 text-center">
+        <EmptyNote>
           {isPast ? "No tasks on this day." : "No tasks yet. Add one below."}
-        </p>
+        </EmptyNote>
       ) : (
         <ListGrid columns={columns.today} className="gap-1.5">
           {tasks.map((t) => (

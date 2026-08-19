@@ -53,8 +53,18 @@ export const getDay = query({
     );
 
     const scheduledRoutines = allRoutines.filter((r) => isScheduledOn(r, date));
-    const goalIds = [...new Set(scheduledRoutines.map((r) => r.goalId).filter((id): id is Id<"goals"> => !!id))];
-    const goalTitleMap = new Map<Id<"goals">, string>((await Promise.all(goalIds.map((id) => ctx.db.get(id)))).filter(Boolean).map((g) => [g!._id, g!.title]));
+    const goalIds = [
+      ...new Set(
+        scheduledRoutines
+          .map((r) => r.goalId)
+          .filter((id): id is Id<"goals"> => !!id),
+      ),
+    ];
+    const goalTitleMap = new Map<Id<"goals">, string>(
+      (await Promise.all(goalIds.map((id) => ctx.db.get(id))))
+        .filter(Boolean)
+        .map((g) => [g!._id, g!.title]),
+    );
 
     // Same guard as tasks: only read the rep log when the day actually has a
     // repeat routine on it.
@@ -80,7 +90,9 @@ export const getDay = query({
         goalTitle: r.goalId ? goalTitleMap.get(r.goalId) : undefined,
         repeatTarget: r.repeatTarget,
         repeatIntervalMinutes: r.repeatIntervalMinutes,
-        repeatDoneToday: r.repeatTarget ? (repsByRoutine.get(r._id) ?? 0) : undefined,
+        repeatDoneToday: r.repeatTarget
+          ? (repsByRoutine.get(r._id) ?? 0)
+          : undefined,
         nextRepAllowedAt: r.repeatTarget
           ? nextAllowedAt(r.lastRepAt, r.repeatIntervalMinutes)
           : undefined,
@@ -90,8 +102,14 @@ export const getDay = query({
     // Read by presence, not by currentDate: a task that has since rolled over
     // still belongs to the days it actually sat on. See lib/taskDay.ts.
     const tasksToday = await loadDayTasks(ctx, user._id, date);
-    const tkGoalIds = [...new Set(tasksToday.map(t => t.goalId).filter((id): id is Id<"goals"> => !!id))].filter(id => !goalTitleMap.has(id));
-    (await Promise.all(tkGoalIds.map(id => ctx.db.get(id)))).forEach(g => g && goalTitleMap.set(g._id, g.title));
+    const tkGoalIds = [
+      ...new Set(
+        tasksToday.map((t) => t.goalId).filter((id): id is Id<"goals"> => !!id),
+      ),
+    ].filter((id) => !goalTitleMap.has(id));
+    (await Promise.all(tkGoalIds.map((id) => ctx.db.get(id)))).forEach(
+      (g) => g && goalTitleMap.set(g._id, g.title),
+    );
 
     // Read the rep log only when a repeat task is actually on the day, so
     // other days' subscriptions take no dependency on taskCompletions.
@@ -112,7 +130,9 @@ export const getDay = query({
       goalTitle: t.goalId ? goalTitleMap.get(t.goalId) : undefined,
       repeatTarget: t.repeatTarget,
       repeatIntervalMinutes: t.repeatIntervalMinutes,
-      repeatDoneToday: t.repeatTarget ? (repCountByTask.get(t._id) ?? 0) : undefined,
+      repeatDoneToday: t.repeatTarget
+        ? (repCountByTask.get(t._id) ?? 0)
+        : undefined,
       nextRepAllowedAt: t.repeatTarget
         ? nextAllowedAt(t.lastRepAt, t.repeatIntervalMinutes)
         : undefined,

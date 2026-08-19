@@ -36,7 +36,12 @@ export function ComposerSpreadPanel({
 
   const s = StyleSheet.create({
     wrap: { gap: 10, borderTopWidth: 1, borderTopColor: c.bd1, paddingTop: 14 },
-    head: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 },
+    head: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 8,
+    },
     headLeft: { flexDirection: "row", alignItems: "center", gap: 6 },
     headTxt: {
       ...display("regular"),
@@ -45,15 +50,29 @@ export function ComposerSpreadPanel({
       letterSpacing: 0.5,
       color: c.t3,
     },
-    dot: { width: 6, height: 6, borderRadius: radii.full, backgroundColor: c.tacc },
+    dot: {
+      width: 6,
+      height: 6,
+      borderRadius: radii.full,
+      backgroundColor: c.tacc,
+    },
     track: {
-      width: 32, height: 18, borderRadius: radii.pill, borderWidth: 1,
-      borderColor: c.bd1, backgroundColor: c.bgS, justifyContent: "center",
+      width: 32,
+      height: 18,
+      borderRadius: radii.pill,
+      borderWidth: 1,
+      borderColor: c.bd1,
+      backgroundColor: c.bgS,
+      justifyContent: "center",
     },
     trackOn: { borderColor: c.bdAcc, backgroundColor: c.accBg },
     knob: {
-      position: "absolute", left: 2, width: 12, height: 12,
-      borderRadius: radii.full, backgroundColor: c.t3,
+      position: "absolute",
+      left: 2,
+      width: 12,
+      height: 12,
+      borderRadius: radii.full,
+      backgroundColor: c.t3,
     },
     knobOn: { left: 16, backgroundColor: c.prim },
     fields: { gap: 10 },

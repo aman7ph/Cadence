@@ -20,7 +20,9 @@ path = "src/main.rs"
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = ["tray-icon"] }
+# image-png: lets Image::from_bytes decode the generated tray PNG, so the tray
+# icon is the real gyroscope mark instead of shapes rasterised by hand in Rust.
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
 tauri-plugin-autostart = "2"
 tauri-plugin-single-instance = "2"
 tauri-plugin-shell = "2"

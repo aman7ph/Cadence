@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { requireUser } from "./lib/auth";
+import { requireOwnedStagedTask } from "./lib/ownership";
 import { resolveUser } from "./lib/resolveUser";
 
 export const list = query({
@@ -34,35 +35,10 @@ export const create = mutation({
   },
 });
 
-export const update = mutation({
-  args: {
-    stagedTaskId: v.id("stagedTasks"),
-    title: v.string(),
-    description: v.optional(v.string()),
-  },
-  handler: async (ctx, { stagedTaskId, title, description }) => {
-    const user = await requireUser(ctx);
-    const staged = await ctx.db.get(stagedTaskId);
-    if (!staged || staged.userId !== user._id) {
-      throw new Error("Staged task not found");
-    }
-    const trimmed = title.trim();
-    if (!trimmed) throw new Error("Task title is required");
-    await ctx.db.patch(stagedTaskId, {
-      title: trimmed,
-      description: description?.trim() || undefined,
-    });
-  },
-});
-
 export const remove = mutation({
   args: { stagedTaskId: v.id("stagedTasks") },
   handler: async (ctx, { stagedTaskId }) => {
-    const user = await requireUser(ctx);
-    const staged = await ctx.db.get(stagedTaskId);
-    if (!staged || staged.userId !== user._id) {
-      throw new Error("Staged task not found");
-    }
+    await requireOwnedStagedTask(ctx, stagedTaskId);
     await ctx.db.delete(stagedTaskId);
   },
 });

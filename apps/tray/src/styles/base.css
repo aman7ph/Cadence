@@ -1,0 +1,73 @@
+/* Reset, document shell, and the browser dev preview. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Tauri default: transparent window, #root fills the 280×460 shell exactly.
+   html must be rgba(0,0,0,0) — not "transparent" keyword — for WebView2 compositing. */
+html {
+  background: rgba(0, 0, 0, 0);
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  background: transparent;
+  width: 100%;
+  height: 100%;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 13px;
+  color: var(--text);
+}
+
+#dev-shell {
+  width: 100%;
+  height: 100%;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Browser dev preview: simulated desktop + overlay at true size. The tints are
+   the accent at low alpha — they stand in for a desktop wallpaper, so they only
+   need to prove the overlay is translucent. */
+body.browser-preview {
+  background: #17140f;
+  background-image:
+    radial-gradient(
+      ellipse at 70% 20%,
+      rgba(232, 161, 61, 0.07) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse at 30% 80%,
+      rgba(201, 134, 42, 0.05) 0%,
+      transparent 50%
+    );
+}
+
+body.browser-preview #dev-shell {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 32px;
+}
+
+body.browser-preview #root {
+  width: 280px;
+  height: 460px;
+  flex-shrink: 0;
+}

@@ -15,6 +15,13 @@
 // Times are minutes from *local* midnight. Like the YYYY-MM-DD day strings
 // used everywhere else in the app, they are interpreted on the device, so
 // travelling across timezones shifts the reminders with the user.
+//
+// The window arithmetic lives in ./reminderWindow and is re-exported here, so
+// this module stays the one import site for everything reminder-shaped.
+
+import { isValidReminderWindow, reminderSlotCount } from "./reminderWindow";
+
+export * from "./reminderWindow";
 
 export type ReminderAlertMode = "sound" | "vibration" | "both";
 
@@ -22,11 +29,9 @@ export interface ReminderSettings {
   enabled: boolean;
   intervalMinutes: number;
   startMinute: number; // 0..1439, minutes from local midnight
-  endMinute: number;   // ditto; may be < startMinute to cross midnight
+  endMinute: number; // ditto; may be < startMinute to cross midnight
   alertMode: ReminderAlertMode;
 }
-
-export const MINUTES_PER_DAY = 1440;
 
 export const MIN_REMINDER_INTERVAL_MINUTES = 15;
 export const MAX_REMINDER_INTERVAL_MINUTES = 480; // 8h
@@ -44,56 +49,6 @@ export const DEFAULT_REMINDER: ReminderSettings = {
   alertMode: "both",
 };
 
-// Length of the active window in minutes. An end before the start means the
-// window crosses midnight: 22:00 → 06:00 is 8h, not −16h.
-export function reminderWindowLength(startMinute: number, endMinute: number): number {
-  const span = endMinute - startMinute;
-  return span > 0 ? span : span + MINUTES_PER_DAY;
-}
-
-// "09:00", "22:30" — 24h, so a list of interval-driven times never reads
-// ambiguously. Tolerates out-of-range input rather than throwing, since it is
-// only ever used to render.
-export function formatMinuteOfDay(minuteOfDay: number): string {
-  const m = ((minuteOfDay % MINUTES_PER_DAY) + MINUTES_PER_DAY) % MINUTES_PER_DAY;
-  const hh = String(Math.floor(m / 60)).padStart(2, "0");
-  const mm = String(m % 60).padStart(2, "0");
-  return `${hh}:${mm}`;
-}
-
-// Every time of day the reminder should fire, inclusive of both endpoints.
-// Returns [] for a non-positive interval so a bad value can never spin the
-// loop — callers read an empty result as "nothing to schedule".
-export function computeReminderSlots(
-  startMinute: number,
-  endMinute: number,
-  intervalMinutes: number,
-): { hour: number; minute: number }[] {
-  if (!Number.isFinite(intervalMinutes) || intervalMinutes <= 0) return [];
-  const length = reminderWindowLength(startMinute, endMinute);
-  const slots: { hour: number; minute: number }[] = [];
-  for (let offset = 0; offset <= length; offset += intervalMinutes) {
-    const m = (((startMinute + offset) % MINUTES_PER_DAY) + MINUTES_PER_DAY) % MINUTES_PER_DAY;
-    slots.push({ hour: Math.floor(m / 60), minute: m % 60 });
-  }
-  return slots;
-}
-
-// The same count without materializing the array — for the form's live echo
-// and for the cap check. Always equal to computeReminderSlots(...).length.
-export function reminderSlotCount(
-  startMinute: number,
-  endMinute: number,
-  intervalMinutes: number,
-): number {
-  if (!Number.isFinite(intervalMinutes) || intervalMinutes <= 0) return 0;
-  return Math.floor(reminderWindowLength(startMinute, endMinute) / intervalMinutes) + 1;
-}
-
-function isMinuteOfDay(value: number): boolean {
-  return Number.isInteger(value) && value >= 0 && value < MINUTES_PER_DAY;
-}
-
 export function isValidReminderInterval(minutes: number): boolean {
   return (
     Number.isInteger(minutes) &&
@@ -102,16 +57,12 @@ export function isValidReminderInterval(minutes: number): boolean {
   );
 }
 
-// Equal endpoints are rejected rather than guessed at: "zero length" and "all
-// day" are both defensible readings of 09:00 → 09:00, so neither is assumed.
-export function isValidReminderWindow(startMinute: number, endMinute: number): boolean {
-  return isMinuteOfDay(startMinute) && isMinuteOfDay(endMinute) && startMinute !== endMinute;
-}
-
 // Validation shared by the Convex mutation and the settings form, so the two
 // cannot disagree about what is acceptable. Returns the message to show, or
 // null when the settings are good.
-export function reminderValidationError(settings: ReminderSettings): string | null {
+export function reminderValidationError(
+  settings: ReminderSettings,
+): string | null {
   if (!isValidReminderInterval(settings.intervalMinutes)) {
     return `Remind me every ${MIN_REMINDER_INTERVAL_MINUTES} to ${MAX_REMINDER_INTERVAL_MINUTES} minutes — whole minutes only.`;
   }

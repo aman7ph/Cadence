@@ -27,7 +27,10 @@ export function TaskRowMenu({ onDelete }: TaskRowMenuProps) {
       </button>
       {menuOpen && (
         <>
-          <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => setMenuOpen(false)}
+          />
           <div className="absolute right-0 bottom-full mb-1 z-20 min-w-[140px] overflow-hidden rounded-[12px] border border-[var(--border-subtle)] bg-card shadow-[var(--shadow-md)]">
             <button
               type="button"

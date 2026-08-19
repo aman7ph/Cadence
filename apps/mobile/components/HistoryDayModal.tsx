@@ -1,158 +1,112 @@
 import { useQuery } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
-import {
-  ActivityIndicator, Modal, ScrollView, StyleSheet,
-  Text, TouchableOpacity, View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ActivityIndicator, ScrollView, StyleSheet } from "react-native";
 import { useColors } from "../lib/theme";
-import { radii } from "../lib/radii";
-import { SectionLabel } from "./ui/SectionLabel";
-import { fmtLong } from "../lib/dateUtils";
-import { parseMentionSegments } from "./ReflectionEditor";
+import { FullScreenModal } from "./ui/FullScreenModal";
+import { EmptyState } from "./ui/EmptyState";
+import { HistoryDayHeader } from "./HistoryDayHeader";
+import { DaySection } from "./HistoryDaySections";
+import { HistoryDayReflection } from "./HistoryDayReflection";
 
-interface Props { date: string | null; today: string; onClose: () => void }
-
-function MentionText({ text, routineIds, taskIds }: { text: string; routineIds: string[]; taskIds: string[] }) {
-  const c = useColors();
-  const rSet = new Set(routineIds), tSet = new Set(taskIds);
-  return (
-    <Text style={{ fontSize: 13, lineHeight: 20 }}>
-      {parseMentionSegments(text).map((seg, i) =>
-        seg.kind === "text"
-          ? <Text key={i} style={{ color: c.t1 }}>{seg.value}</Text>
-          : <Text key={i} style={{ color: rSet.has(seg.id) ? c.tacc : tSet.has(seg.id) ? c.carry : c.t2, fontWeight: "600" }}>{seg.name}</Text>
-      )}
-    </Text>
-  );
+interface Props {
+  date: string | null;
+  today: string;
+  onClose: () => void;
 }
 
-function DayModalContent({ date, today, onClose }: { date: string; today: string; onClose: () => void }) {
+function DayModalContent({
+  date,
+  today,
+  onClose,
+}: {
+  date: string;
+  today: string;
+  onClose: () => void;
+}) {
   const c = useColors();
   const day = useQuery(api.days.getDay, { date });
   const isPast = date < today;
 
-  const s = StyleSheet.create({
-    screen:    { flex: 1, backgroundColor: c.bg },
-    hdr:       { flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingTop: 6,
-                 paddingBottom: 12, gap: 8, borderBottomWidth: 1, borderBottomColor: c.bd1 },
-    hMeta:     { flex: 1 },
-    hLabel:    { fontSize: 10, fontWeight: "700", textTransform: "uppercase", letterSpacing: 0.9, color: c.t3 },
-    hDate:     { fontSize: 15, fontWeight: "600", color: c.t1, marginTop: 2 },
-    closeBtn:  { width: 34, height: 34, borderRadius: radii.full, backgroundColor: c.card,
-                 borderWidth: 1, borderColor: c.bd2, alignItems: "center", justifyContent: "center" },
-    closeTxt:  { fontSize: 13, fontWeight: "600", color: c.t2 },
-    content:   { paddingBottom: 40 },
-    secHdr:    { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 10 },
-    item:      { marginHorizontal: 16, marginBottom: 10, backgroundColor: c.card, borderWidth: 1,
-                 borderColor: c.bd1, borderRadius: radii.sm, paddingHorizontal: 12, paddingVertical: 10 },
-    iRow:      { flexDirection: "row", alignItems: "center", gap: 8 },
-    dot:       { width: 8, height: 8, borderRadius: radii.full },
-    iName:     { flex: 1, fontSize: 13, color: c.t1 },
-    iStatus:   { fontSize: 11, color: c.t3 },
-    italic:    { fontSize: 13, color: c.t3, fontStyle: "italic", paddingHorizontal: 16, paddingTop: 8 },
-    emptyBox:  { margin: 24, borderWidth: 1, borderStyle: "dashed", borderColor: c.bd1,
-                 borderRadius: radii.md, paddingVertical: 36, alignItems: "center" },
-    emptyTxt:  { fontSize: 13, color: c.t3 },
-    refCard:   { marginHorizontal: 16, backgroundColor: c.card, borderWidth: 1, borderColor: c.bd1,
-                 borderRadius: radii.md, padding: 14 },
-    refEmpty:  { marginHorizontal: 16, borderWidth: 1, borderStyle: "dashed", borderColor: c.bd1,
-                 borderRadius: radii.md, padding: 14 },
-    refEmpty2: { fontSize: 13, color: c.t3, fontStyle: "italic" },
-  });
+  const routines = day?.routines ?? [];
+  const allTasks = day?.randomTasks ?? [];
+  const counted = routines.filter((r) => r.status !== "skipped"); // skips excused
+  const isEmpty =
+    day !== undefined &&
+    day !== null &&
+    routines.length === 0 &&
+    allTasks.length === 0;
 
-  const routines     = day?.routines ?? [];
-  const allTasks     = day?.randomTasks ?? [];
-  const counted      = routines.filter((r) => r.status !== "skipped"); // skips excused
-  const rDone        = counted.filter((r) => r.status === "completed").length;
-  const tDone        = allTasks.filter((t) => t.status === "completed").length;
-  const isEmpty      = day !== undefined && day !== null && routines.length === 0 && allTasks.length === 0;
+  const routineDot = (status: string) =>
+    status === "completed" ? c.cplt : status === "skipped" ? c.carry : c.bd3;
+  const taskDot = (status: string) => (status === "completed" ? c.cplt : c.bd3);
 
-  const ROUTINE_DOT: Record<string, string> = { completed: c.cplt, skipped: c.carry, pending: c.bd3 };
+  const s = StyleSheet.create({ content: { paddingBottom: 40 } });
 
   return (
-    <SafeAreaView style={s.screen} edges={["top", "bottom"]}>
-      <View style={s.hdr}>
-        <View style={s.hMeta}>
-          <Text style={s.hLabel}>{date === today ? "Today" : isPast ? "Past day" : ""}</Text>
-          <Text style={s.hDate} numberOfLines={1}>{fmtLong(date)}</Text>
-        </View>
-        <TouchableOpacity style={s.closeBtn} onPress={onClose} activeOpacity={0.7}>
-          <Text style={s.closeTxt}>✕</Text>
-        </TouchableOpacity>
-      </View>
+    <>
+      <HistoryDayHeader date={date} today={today} onClose={onClose} />
 
       {day === undefined ? (
         <ActivityIndicator color={c.prim} style={{ marginTop: 32 }} />
       ) : (
         <ScrollView contentContainerStyle={s.content}>
           {isEmpty ? (
-            <View style={s.emptyBox}>
-              <Text style={s.emptyTxt}>{isPast ? "Nothing was tracked on this day." : "Nothing yet today."}</Text>
-            </View>
+            <EmptyState>
+              {isPast
+                ? "Nothing was tracked on this day."
+                : "Nothing yet today."}
+            </EmptyState>
           ) : (
             <>
-              {/* Routines */}
-              <View style={s.secHdr}>
-                <SectionLabel count={`${rDone}/${counted.length}`}>Routines</SectionLabel>
-              </View>
-              {routines.length === 0
-                ? <Text style={s.italic}>None scheduled</Text>
-                : routines.map((r) => (
-                    <View key={r.routineId} style={s.item}>
-                      <View style={s.iRow}>
-                        <View style={[s.dot, { backgroundColor: ROUTINE_DOT[r.status] ?? c.bd3 }]} />
-                        <Text style={s.iName}>{r.name}</Text>
-                        <Text style={s.iStatus}>{r.status}</Text>
-                      </View>
-                    </View>
-                  ))}
-
-              {/* Tasks */}
-              <View style={s.secHdr}>
-                <SectionLabel count={`${tDone}/${allTasks.length}`}>Tasks</SectionLabel>
-              </View>
-              {allTasks.length === 0
-                ? <Text style={s.italic}>No tasks</Text>
-                : allTasks.map((t) => (
-                    <View key={t.taskId} style={s.item}>
-                      <View style={s.iRow}>
-                        <View style={[s.dot, { backgroundColor: t.status === "completed" ? c.cplt : c.bd3 }]} />
-                        <Text style={s.iName}>{t.title}</Text>
-                        <Text style={s.iStatus}>{t.status}</Text>
-                      </View>
-                    </View>
-                  ))}
+              <DaySection
+                title="Routines"
+                done={counted.filter((r) => r.status === "completed").length}
+                total={counted.length}
+                items={routines.map((r) => ({
+                  id: r.routineId,
+                  name: r.name,
+                  status: r.status,
+                }))}
+                emptyLabel="None scheduled"
+                dotFor={routineDot}
+              />
+              <DaySection
+                title="Tasks"
+                done={allTasks.filter((t) => t.status === "completed").length}
+                total={allTasks.length}
+                items={allTasks.map((t) => ({
+                  id: t.taskId,
+                  name: t.title,
+                  status: t.status,
+                }))}
+                emptyLabel="No tasks"
+                dotFor={taskDot}
+              />
             </>
           )}
 
-          {/* Reflection */}
-          <View style={s.secHdr}>
-            <SectionLabel>Reflection</SectionLabel>
-          </View>
-          {day?.reflection ? (
-            <View style={s.refCard}>
-              <MentionText
-                text={day.reflection.text}
-                routineIds={day.reflection.taggedRoutineIds as string[]}
-                taskIds={day.reflection.taggedTaskIds as string[]}
-              />
-            </View>
-          ) : (
-            <View style={s.refEmpty}>
-              <Text style={s.refEmpty2}>No reflection written for this day.</Text>
-            </View>
-          )}
+          <HistoryDayReflection
+            reflection={
+              day?.reflection
+                ? {
+                    text: day.reflection.text,
+                    taggedRoutineIds: day.reflection
+                      .taggedRoutineIds as string[],
+                    taggedTaskIds: day.reflection.taggedTaskIds as string[],
+                  }
+                : null
+            }
+          />
         </ScrollView>
       )}
-    </SafeAreaView>
+    </>
   );
 }
 
 export function HistoryDayModal({ date, today, onClose }: Props) {
   return (
-    <Modal visible={!!date} animationType="slide" onRequestClose={onClose}>
+    <FullScreenModal visible={!!date} onClose={onClose}>
       {date && <DayModalContent date={date} today={today} onClose={onClose} />}
-    </Modal>
+    </FullScreenModal>
   );
 }

@@ -3,9 +3,20 @@ import { cn } from "@/lib/utils";
 
 export type ScheduleType = "daily" | "weekdays" | "custom";
 export const WEEKDAY_SHORT = ["S", "M", "T", "W", "T", "F", "S"] as const;
-export const WEEKDAY_FULL = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+export const WEEKDAY_FULL = [
+  "Sun",
+  "Mon",
+  "Tue",
+  "Wed",
+  "Thu",
+  "Fri",
+  "Sat",
+] as const;
 
-export function scheduleLabel(scheduleType: ScheduleType, customDays?: number[]): string {
+export function scheduleLabel(
+  scheduleType: ScheduleType,
+  customDays?: number[],
+): string {
   if (scheduleType === "daily") return "Every day";
   if (scheduleType === "weekdays") return "Weekdays";
   if (!customDays || customDays.length === 0) return "Custom";

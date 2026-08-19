@@ -10,9 +10,7 @@
     // the flag permits the extension, it never requires it.
     "allowImportingTsExtensions": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     }
   },
   "include": [

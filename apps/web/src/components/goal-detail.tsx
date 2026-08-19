@@ -14,16 +14,29 @@ interface GoalDetailProps {
   onRequestDelete: () => void;
 }
 
-export function GoalDetail({ goalId, onBack, onEdit, onRequestComplete, onRequestAbandon, onRequestDelete }: GoalDetailProps) {
+export function GoalDetail({
+  goalId,
+  onBack,
+  onEdit,
+  onRequestComplete,
+  onRequestAbandon,
+  onRequestDelete,
+}: GoalDetailProps) {
   const linked = useQuery(api.goalLinks.getLinkedItems, { goalId });
 
   if (linked === undefined) {
-    return <div className="flex items-center justify-center py-16"><p className="text-[13px] text-[var(--text-tertiary)]">Loading…</p></div>;
+    return (
+      <div className="flex items-center justify-center py-16">
+        <p className="text-[13px] text-[var(--text-tertiary)]">Loading…</p>
+      </div>
+    );
   }
   if (linked === null) {
     return (
       <div className="flex flex-col gap-4">
-        <p className="text-[13px] text-[var(--text-tertiary)]">Goal not found.</p>
+        <p className="text-[13px] text-[var(--text-tertiary)]">
+          Goal not found.
+        </p>
       </div>
     );
   }

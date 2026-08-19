@@ -123,11 +123,16 @@ describe("fillDailyGaps", () => {
   it("preserves the caller's row shape, not just a value field", () => {
     type Row = { date: string; completed: number; open: number };
     const rows: Row[] = [{ date: "2026-06-02", completed: 1, open: 4 }];
-    const filled = fillDailyGaps<Row>(rows, "2026-06-01", "2026-06-03", (date) => ({
-      date,
-      completed: 0,
-      open: 0,
-    }));
+    const filled = fillDailyGaps<Row>(
+      rows,
+      "2026-06-01",
+      "2026-06-03",
+      (date) => ({
+        date,
+        completed: 0,
+        open: 0,
+      }),
+    );
     expect(filled).toEqual([
       { date: "2026-06-01", completed: 0, open: 0 },
       { date: "2026-06-02", completed: 1, open: 4 },

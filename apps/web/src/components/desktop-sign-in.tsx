@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
-import { useSignIn, useAuth, AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  useSignIn,
+  useAuth,
+  AuthenticateWithRedirectCallback,
+} from "@clerk/clerk-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 // Bridge pages that let the Tauri desktop app sign in via this real web domain
@@ -122,14 +132,18 @@ export function DesktopSignInComplete() {
         const { token: ticket } = (await res.json()) as { token: string };
         window.location.href = `${redirectUrl}?ticket=${encodeURIComponent(ticket)}`;
       } catch {
-        setError("Something went wrong completing sign-in. You can close this tab and try again in the app.");
+        setError(
+          "Something went wrong completing sign-in. You can close this tab and try again in the app.",
+        );
       }
     })();
   }, [isLoaded, isSignedIn, redirectUrl, getToken]);
 
   return (
     <div className="min-h-screen w-full grid place-items-center px-4">
-      <p className="text-sm text-muted-foreground">{error || "Finishing sign-in…"}</p>
+      <p className="text-sm text-muted-foreground">
+        {error || "Finishing sign-in…"}
+      </p>
     </div>
   );
 }

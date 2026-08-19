@@ -162,12 +162,16 @@ describe("validation", () => {
 
   it("accepts intervals up to 24h", () => {
     expect(isValidRepeatIntervalMinutes(60)).toBe(true);
-    expect(isValidRepeatIntervalMinutes(MAX_REPEAT_INTERVAL_MINUTES)).toBe(true);
+    expect(isValidRepeatIntervalMinutes(MAX_REPEAT_INTERVAL_MINUTES)).toBe(
+      true,
+    );
   });
 
   it("rejects negative, oversized, and non-integer intervals", () => {
     expect(isValidRepeatIntervalMinutes(-1)).toBe(false);
-    expect(isValidRepeatIntervalMinutes(MAX_REPEAT_INTERVAL_MINUTES + 1)).toBe(false);
+    expect(isValidRepeatIntervalMinutes(MAX_REPEAT_INTERVAL_MINUTES + 1)).toBe(
+      false,
+    );
     expect(isValidRepeatIntervalMinutes(1.5)).toBe(false);
     expect(isValidRepeatIntervalMinutes(NaN)).toBe(false);
   });
@@ -191,8 +195,12 @@ describe("validateRepeatArgs", () => {
   });
 
   it("rejects an out-of-range count", () => {
-    expect(() => validateRepeatArgs(1, 60)).toThrow(/whole number from 2 to 100/);
-    expect(() => validateRepeatArgs(101, 60)).toThrow(/whole number from 2 to 100/);
+    expect(() => validateRepeatArgs(1, 60)).toThrow(
+      /whole number from 2 to 100/,
+    );
+    expect(() => validateRepeatArgs(101, 60)).toThrow(
+      /whole number from 2 to 100/,
+    );
   });
 
   it("rejects an out-of-range interval", () => {

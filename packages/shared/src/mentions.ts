@@ -30,7 +30,8 @@ export function parseMentionSegments(text: string): MentionSegment[] {
   let last = 0;
   let m: RegExpExecArray | null;
   while ((m = re.exec(text)) !== null) {
-    if (m.index > last) out.push({ kind: "text", value: text.slice(last, m.index) });
+    if (m.index > last)
+      out.push({ kind: "text", value: text.slice(last, m.index) });
     out.push({ kind: "mention", name: m[1]!, id: m[2]! });
     last = m.index + m[0].length;
   }
@@ -42,7 +43,10 @@ export function parseMentionSegments(text: string): MentionSegment[] {
  * Stored → what the editor shows. Returns the readable text plus the mentions
  * it contains, which the caller must hold so the text can be re-serialised.
  */
-export function toEditorText(stored: string): { text: string; mentions: Mention[] } {
+export function toEditorText(stored: string): {
+  text: string;
+  mentions: Mention[];
+} {
   const mentions: Mention[] = [];
   const text = parseMentionSegments(stored)
     .map((seg) => {
@@ -94,8 +98,10 @@ export function tagsFromStored(
   const tags: { entityId: string; entityType: "task" | "routine" }[] = [];
   for (const seg of parseMentionSegments(stored)) {
     if (seg.kind !== "mention") continue;
-    if (routineIds.includes(seg.id)) tags.push({ entityId: seg.id, entityType: "routine" });
-    else if (taskIds.includes(seg.id)) tags.push({ entityId: seg.id, entityType: "task" });
+    if (routineIds.includes(seg.id))
+      tags.push({ entityId: seg.id, entityType: "routine" });
+    else if (taskIds.includes(seg.id))
+      tags.push({ entityId: seg.id, entityType: "task" });
   }
   return tags;
 }

@@ -1,5 +1,11 @@
 import { v } from "convex/values";
-import { addDays, consistencyScore, countsTowardRate, daysBetween, resolveDayStatus } from "@cadence/shared";
+import {
+  addDays,
+  consistencyScore,
+  countsTowardRate,
+  daysBetween,
+  resolveDayStatus,
+} from "@cadence/shared";
 import type { ScheduledDayStatus } from "@cadence/shared";
 import { query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
@@ -25,7 +31,10 @@ export type RoutineConsistencyRow = {
 // `today` decides which scheduled days are still pending — see lib/routineDay.ts.
 export const routineConsistency = query({
   args: { from: v.string(), to: v.string(), today: v.string() },
-  handler: async (ctx, { from, to, today }): Promise<RoutineConsistencyRow[]> => {
+  handler: async (
+    ctx,
+    { from, to, today },
+  ): Promise<RoutineConsistencyRow[]> => {
     const user = await resolveUser(ctx);
     if (!user) return [];
 
@@ -64,7 +73,8 @@ export const routineConsistency = query({
         if (hit) completedCount += 1;
       }
       const consistency = consistencyScore(entries, CONSISTENCY_TAU_DAYS);
-      const rate = scheduled > 0 ? Math.round((completedCount / scheduled) * 100) : null;
+      const rate =
+        scheduled > 0 ? Math.round((completedCount / scheduled) * 100) : null;
       return {
         routineId: r._id,
         name: r.name,

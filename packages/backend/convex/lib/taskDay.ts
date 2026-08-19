@@ -56,9 +56,7 @@ export async function recordTaskDaySpan(
   for (const date of spanDates(from, to)) {
     const existing = await ctx.db
       .query("taskDays")
-      .withIndex("by_task_date", (q) =>
-        q.eq("taskId", taskId).eq("date", date),
-      )
+      .withIndex("by_task_date", (q) => q.eq("taskId", taskId).eq("date", date))
       .first();
     if (existing) {
       result.skipped += 1;
@@ -104,7 +102,9 @@ export function statusOn(
   date: string,
 ): Doc<"dailyTasks">["status"] {
   if (task.status !== "completed") return "open";
-  return (task.completedDate ?? task.currentDate) === date ? "completed" : "open";
+  return (task.completedDate ?? task.currentDate) === date
+    ? "completed"
+    : "open";
 }
 
 // How many times the task had been carried by `date`. The stored

@@ -73,6 +73,8 @@ export async function activeGoals(
 ): Promise<Doc<"goals">[]> {
   return ctx.db
     .query("goals")
-    .withIndex("by_user_status", (q) => q.eq("userId", userId).eq("status", "active"))
+    .withIndex("by_user_status", (q) =>
+      q.eq("userId", userId).eq("status", "active"),
+    )
     .collect();
 }

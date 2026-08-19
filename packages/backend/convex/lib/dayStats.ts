@@ -1,6 +1,6 @@
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 import type { Id } from "../_generated/dataModel";
-import { foldDayStats } from "./dayStatsDerive";
+import { foldDayStats } from "./dayStatsFold";
 import { loadDayTasks } from "./taskDay";
 
 export type DayStatsPayload = {
@@ -29,9 +29,7 @@ export async function computeDayStats(
 
   const completionsOnDate = await ctx.db
     .query("routineCompletions")
-    .withIndex("by_user_date", (q) =>
-      q.eq("userId", userId).eq("date", date),
-    )
+    .withIndex("by_user_date", (q) => q.eq("userId", userId).eq("date", date))
     .collect();
   const statusByRoutine = new Map(
     completionsOnDate.map((c) => [c.routineId, c.status] as const),
@@ -73,9 +71,7 @@ export async function upsertDayStats(
   const payload = await computeDayStats(ctx, userId, date);
   const existing = await ctx.db
     .query("dayStats")
-    .withIndex("by_user_date", (q) =>
-      q.eq("userId", userId).eq("date", date),
-    )
+    .withIndex("by_user_date", (q) => q.eq("userId", userId).eq("date", date))
     .unique();
 
   if (existing) {

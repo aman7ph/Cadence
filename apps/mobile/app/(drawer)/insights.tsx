@@ -12,16 +12,12 @@ import type { DateRange } from "@cadence/shared";
 import { AppBar } from "../../components/AppBar";
 import { RangePickerSheet } from "../../components/RangePickerSheet";
 import { MomentumChart, DowHeatmap } from "../../components/ProductivityCharts";
-import {
-  RoutineComparisonChart,
-  RoutineCompletionLines,
-} from "../../components/RoutineInsightCharts";
-import {
-  TasksByDayChart,
-  TaskBreakdownChart,
-  CarryoverCard,
-  OpenTasksTrendChart,
-} from "../../components/TaskInsightCharts";
+import { RoutineComparisonChart } from "../../components/RoutineComparisonChart";
+import { RoutineCompletionLines } from "../../components/RoutineCompletionLines";
+import { TasksByDayChart } from "../../components/TasksByDayChart";
+import { TaskBreakdownChart } from "../../components/TaskBreakdownChart";
+import { CarryoverCard } from "../../components/CarryoverCard";
+import { OpenTasksTrendChart } from "../../components/OpenTasksTrendChart";
 import { ChartCard } from "../../components/InsightShared";
 import { getGranularity } from "../../lib/insightUtils";
 import { granularityLabel, rollingWindowLabel } from "@cadence/shared";

@@ -1,30 +1,60 @@
 import { useQuery } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
-import { MIN_ACTIVE_BAND, NO_ACTIVITY_BAND, scoreToHeatBand } from "@cadence/shared";
+import {
+  MIN_ACTIVE_BAND,
+  NO_ACTIVITY_BAND,
+  scoreToHeatBand,
+} from "@cadence/shared";
 import type { DateRange } from "@cadence/shared";
 import { Text, View } from "react-native";
 import { useColors } from "../lib/theme";
 import { radii } from "../lib/radii";
 import type { Granularity, LineSeries } from "../lib/insightUtils";
-import { computeEMA, bucketByWeek, bucketByMonth, DOW } from "../lib/insightUtils";
+import { DOW } from "../lib/insightUtils";
+import { computeEMA, bucketByWeek, bucketByMonth } from "@cadence/shared";
 import { SimpleLineChart } from "./SimpleLineChart";
 import { Loading, Empty, XLabels } from "./InsightShared";
 
-export function MomentumChart({ range, granularity }: { range: DateRange; granularity: Granularity }) {
+export function MomentumChart({
+  range,
+  granularity,
+}: {
+  range: DateRange;
+  granularity: Granularity;
+}) {
   const c = useColors();
-  const rawRows = useQuery(api.analyticsProductivity.dayStatsRange, { from: range.from, to: range.to });
+  const rawRows = useQuery(api.analyticsProductivity.dayStatsRange, {
+    from: range.from,
+    to: range.to,
+  });
 
   if (!rawRows) return <Loading />;
-  if (rawRows.length === 0) return <Empty msg="Complete some routines or tasks to see momentum." />;
+  if (rawRows.length === 0)
+    return <Empty msg="Complete some routines or tasks to see momentum." />;
 
-  const daily = rawRows.map((r) => ({ date: r.date, value: r.productivityScore }));
-  const bucketed = granularity === "weekly" ? bucketByWeek(daily) : granularity === "monthly" ? bucketByMonth(daily) : daily;
+  const daily = rawRows.map((r) => ({
+    date: r.date,
+    value: r.productivityScore,
+  }));
+  const bucketed =
+    granularity === "weekly"
+      ? bucketByWeek(daily)
+      : granularity === "monthly"
+        ? bucketByMonth(daily)
+        : daily;
   const vals = bucketed.map((r) => r.value);
   const ema = granularity === "daily" ? computeEMA(vals, 7) : null;
 
   const series: LineSeries[] = [
-    { data: vals.map(Math.round), color: c.chart1, strokeWidth: 1.5, opacity: 0.35 },
-    ...(ema ? [{ data: ema.map(Math.round), color: c.chart1, strokeWidth: 2.5 }] : []),
+    {
+      data: vals.map(Math.round),
+      color: c.chart1,
+      strokeWidth: 1.5,
+      opacity: 0.35,
+    },
+    ...(ema
+      ? [{ data: ema.map(Math.round), color: c.chart1, strokeWidth: 2.5 }]
+      : []),
   ];
 
   return (
@@ -34,11 +64,20 @@ export function MomentumChart({ range, granularity }: { range: DateRange; granul
       {ema && (
         <View style={{ flexDirection: "row", gap: 14, marginTop: 8 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-            <View style={{ width: 16, height: 1.5, backgroundColor: c.chart1, opacity: 0.4 }} />
+            <View
+              style={{
+                width: 16,
+                height: 1.5,
+                backgroundColor: c.chart1,
+                opacity: 0.4,
+              }}
+            />
             <Text style={{ fontSize: 11, color: c.t3 }}>Score</Text>
           </View>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-            <View style={{ width: 16, height: 2.5, backgroundColor: c.chart1 }} />
+            <View
+              style={{ width: 16, height: 2.5, backgroundColor: c.chart1 }}
+            />
             <Text style={{ fontSize: 11, color: c.t3 }}>7-day EMA</Text>
           </View>
         </View>
@@ -47,9 +86,19 @@ export function MomentumChart({ range, granularity }: { range: DateRange; granul
   );
 }
 
-export function DowHeatmap({ range, today }: { range: DateRange; today: string }) {
+export function DowHeatmap({
+  range,
+  today,
+}: {
+  range: DateRange;
+  today: string;
+}) {
   const c = useColors();
-  const stats = useQuery(api.analyticsProductivity.dayOfWeekStats, { from: range.from, to: range.to, today });
+  const stats = useQuery(api.analyticsProductivity.dayOfWeekStats, {
+    from: range.from,
+    to: range.to,
+    today,
+  });
 
   if (!stats) return <Loading />;
 
@@ -63,13 +112,29 @@ export function DowHeatmap({ range, today }: { range: DateRange; today: string }
         const rate = s.rate ?? 0;
         // Same band scale as the productivity heatmaps, floored so a 0% weekday
         // stays distinct from a weekday with nothing scheduled.
-        const lvl = s.scheduled === 0
-          ? NO_ACTIVITY_BAND : Math.max(MIN_ACTIVE_BAND, scoreToHeatBand(rate));
+        const lvl =
+          s.scheduled === 0
+            ? NO_ACTIVITY_BAND
+            : Math.max(MIN_ACTIVE_BAND, scoreToHeatBand(rate));
         return (
-          <View key={s.weekday} style={{ flex: 1, alignItems: "center", gap: 5 }}>
-            <View style={{ width: "100%", aspectRatio: 1, borderRadius: radii.sm, backgroundColor: heat[lvl] }} />
-            <Text style={{ fontSize: 10, color: c.t3, fontWeight: "500" }}>{DOW[s.weekday]}</Text>
-            <Text style={{ fontSize: 11, fontWeight: "600", color: c.t1 }}>{s.rate !== null ? `${s.rate}%` : "—"}</Text>
+          <View
+            key={s.weekday}
+            style={{ flex: 1, alignItems: "center", gap: 5 }}
+          >
+            <View
+              style={{
+                width: "100%",
+                aspectRatio: 1,
+                borderRadius: radii.sm,
+                backgroundColor: heat[lvl],
+              }}
+            />
+            <Text style={{ fontSize: 10, color: c.t3, fontWeight: "500" }}>
+              {DOW[s.weekday]}
+            </Text>
+            <Text style={{ fontSize: 11, fontWeight: "600", color: c.t1 }}>
+              {s.rate !== null ? `${s.rate}%` : "—"}
+            </Text>
           </View>
         );
       })}

@@ -50,7 +50,9 @@ export function RoutineFormDrawer({
   const [scheduleType, setScheduleType] = useState<ScheduleType>(
     routine?.scheduleType ?? "daily",
   );
-  const [customDays, setCustomDays] = useState<number[]>(routine?.customDays ?? []);
+  const [customDays, setCustomDays] = useState<number[]>(
+    routine?.customDays ?? [],
+  );
   const [options, setOptions] = useState<ItemOptions>(
     routine ? itemOptionsFrom(routine) : EMPTY_ITEM_OPTIONS,
   );
@@ -61,7 +63,8 @@ export function RoutineFormDrawer({
     );
 
   // A custom schedule with no days selected would never run.
-  const invalid = !name.trim() || (scheduleType === "custom" && customDays.length === 0);
+  const invalid =
+    !name.trim() || (scheduleType === "custom" && customDays.length === 0);
 
   const submit = async () => {
     const shared = {

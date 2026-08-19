@@ -17,15 +17,23 @@ export function ReminderSection() {
   const { draft, ready, update } = reminder;
 
   const s = StyleSheet.create({
-    wrap:     { padding: 14 },
-    row:      { flexDirection: "row", alignItems: "center",
-                justifyContent: "space-between" },
-    lbl:      { fontSize: 14, fontWeight: "500", color: c.t1 },
-    hint:     { fontSize: 12, color: c.t3, marginTop: 2 },
-    toggle:   { paddingHorizontal: 14, paddingVertical: 6, borderRadius: radii.full,
-                borderWidth: 1, borderColor: c.bd2 },
+    wrap: { padding: 14 },
+    row: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    lbl: { fontSize: 14, fontWeight: "500", color: c.t1 },
+    hint: { fontSize: 12, color: c.t3, marginTop: 2 },
+    toggle: {
+      paddingHorizontal: 14,
+      paddingVertical: 6,
+      borderRadius: radii.full,
+      borderWidth: 1,
+      borderColor: c.bd2,
+    },
     toggleOn: { borderColor: c.prim, backgroundColor: c.accBg },
-    toggleTxt:   { fontSize: 12, fontWeight: "600", color: c.t2 },
+    toggleTxt: { fontSize: 12, fontWeight: "600", color: c.t2 },
     toggleTxtOn: { color: c.tacc },
   });
 
@@ -34,7 +42,9 @@ export function ReminderSection() {
       <View style={s.row}>
         <View>
           <Text style={s.lbl}>Check-in reminder</Text>
-          <Text style={s.hint}>A nudge to open Cadence — not tied to any task</Text>
+          <Text style={s.hint}>
+            A nudge to open Cadence — not tied to any task
+          </Text>
         </View>
         <TouchableOpacity
           // Disabled until the saved settings have loaded, so the first tap

@@ -26,7 +26,9 @@ function Stat({
           {value}
         </span>
         {suffix && (
-          <span className="text-[11px] text-[var(--text-tertiary)]">{suffix}</span>
+          <span className="text-[11px] text-[var(--text-tertiary)]">
+            {suffix}
+          </span>
         )}
       </span>
       <span className="text-[11px] text-[var(--text-tertiary)]">{label}</span>
@@ -82,7 +84,10 @@ export function TaskResolutionCard({
               suffix={`(${pct(stats.afterCarryover)})`}
               label="Completed after carryover"
             />
-            <Stat value={carry.avg.toFixed(1)} label="Avg. carryovers before done" />
+            <Stat
+              value={carry.avg.toFixed(1)}
+              label="Avg. carryovers before done"
+            />
           </div>
           {children && (
             <div className="flex flex-col gap-2">

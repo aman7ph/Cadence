@@ -19,7 +19,12 @@ interface MobileNavProps {
  *
  * Before this the web app had NO navigation at all under `md`.
  */
-export function MobileNav({ view, onNavigate, open, onOpenChange }: MobileNavProps) {
+export function MobileNav({
+  view,
+  onNavigate,
+  open,
+  onOpenChange,
+}: MobileNavProps) {
   return (
     <>
       <button

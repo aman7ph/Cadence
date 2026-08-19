@@ -23,27 +23,42 @@ export function TodayTasksSection({ tasks, viewedDate, isPast }: Props) {
   const done = tasks.filter((t) => t.status === "completed").length;
 
   const s = StyleSheet.create({
-    section:   { marginHorizontal: 16, marginBottom: 20, gap: 10 },
-    head:      { paddingVertical: 6 },
-    empty:     { borderWidth: 1, borderColor: c.bd1, borderStyle: "dashed",
-                 borderRadius: radii.md, paddingVertical: 24, alignItems: "center" },
-    emptyTxt:  { fontSize: 13, color: c.t3 },
+    section: { marginHorizontal: 16, marginBottom: 20, gap: 10 },
+    head: { paddingVertical: 6 },
+    empty: {
+      borderWidth: 1,
+      borderColor: c.bd1,
+      borderStyle: "dashed",
+      borderRadius: radii.md,
+      paddingVertical: 24,
+      alignItems: "center",
+    },
+    emptyTxt: { fontSize: 13, color: c.t3 },
   });
 
   return (
     <View style={s.section}>
       <View style={s.head}>
-        <SectionLabel count={tasks.length > 0 ? `${done}/${tasks.length}` : undefined}>
+        <SectionLabel
+          count={tasks.length > 0 ? `${done}/${tasks.length}` : undefined}
+        >
           Tasks
         </SectionLabel>
       </View>
       {tasks.length === 0 ? (
         <View style={s.empty}>
-          <Text style={s.emptyTxt}>{isPast ? "No tasks on this day." : "No tasks yet."}</Text>
+          <Text style={s.emptyTxt}>
+            {isPast ? "No tasks on this day." : "No tasks yet."}
+          </Text>
         </View>
       ) : (
         tasks.map((t) => (
-          <TaskItem key={t.taskId} task={t} viewedDate={viewedDate} readOnly={isPast} />
+          <TaskItem
+            key={t.taskId}
+            task={t}
+            viewedDate={viewedDate}
+            readOnly={isPast}
+          />
         ))
       )}
       {!isPast && (

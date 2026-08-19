@@ -44,7 +44,11 @@ interface ItemOptionsFieldsProps {
   className?: string;
 }
 
-export function ItemOptionsFields({ value, onChange, className }: ItemOptionsFieldsProps) {
+export function ItemOptionsFields({
+  value,
+  onChange,
+  className,
+}: ItemOptionsFieldsProps) {
   const goals = useQuery(api.goals.list, {}) ?? [];
   const set = (patch: Partial<ItemOptions>) => onChange({ ...value, ...patch });
 
@@ -66,7 +70,9 @@ export function ItemOptionsFields({ value, onChange, className }: ItemOptionsFie
           target={value.repeatTarget}
           onTargetChange={(repeatTarget) => set({ repeatTarget })}
           intervalMinutes={value.repeatIntervalMinutes}
-          onIntervalChange={(repeatIntervalMinutes) => set({ repeatIntervalMinutes })}
+          onIntervalChange={(repeatIntervalMinutes) =>
+            set({ repeatIntervalMinutes })
+          }
         />
       </div>
     </div>

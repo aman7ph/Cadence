@@ -1,29 +1,18 @@
 use tauri::{Emitter, Manager, PhysicalPosition};
 
-pub fn build_tray_image() -> Vec<u8> {
-    const SIZE: u32 = 32;
-    let mut px = vec![0u8; (SIZE * SIZE * 4) as usize];
-    let circles: [(f32, f32, f32, [u8; 3]); 2] = [
-        (12.0, 12.0, 9.5, [74, 158, 255]),
-        (20.0, 20.0, 9.5, [61, 214, 140]),
-    ];
-    for y in 0..SIZE {
-        for x in 0..SIZE {
-            let idx = ((y * SIZE + x) * 4) as usize;
-            let fx = x as f32 + 0.5;
-            let fy = y as f32 + 0.5;
-            for (cx, cy, r, rgb) in circles.iter().rev() {
-                if ((fx - cx).powi(2) + (fy - cy).powi(2)).sqrt() <= *r {
-                    px[idx] = rgb[0];
-                    px[idx + 1] = rgb[1];
-                    px[idx + 2] = rgb[2];
-                    px[idx + 3] = 255;
-                    break;
-                }
-            }
-        }
-    }
-    px
+/// The system-tray icon: the gyroscope mark, gold on transparent.
+///
+/// This used to rasterise two solid circles by hand in a nested pixel loop —
+/// the pre-redesign mark, in colours (`#4a9eff`, `#3dd68c`) that no longer
+/// exist in the palette. A loop like that can only draw shapes simple enough to
+/// express as an inequality, which is why it was circles rather than the mark.
+///
+/// The PNG is generated from the web's own styles/mark.css by
+/// .agent/design/harness/icon.mjs, so the tray cannot drift from the app.
+/// Regenerate it there rather than replacing this file.
+pub fn tray_icon() -> tauri::image::Image<'static> {
+    tauri::image::Image::from_bytes(include_bytes!("../icons/tray-32.png"))
+        .expect("tray-32.png is embedded at compile time and must decode")
 }
 
 pub fn toggle_overlay(app: &tauri::AppHandle) {

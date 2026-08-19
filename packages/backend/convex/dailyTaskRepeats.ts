@@ -1,7 +1,12 @@
-import { formatCountdown, isRepAllowed, nextAllowedAt, remainingMs } from "@cadence/shared";
+import {
+  formatCountdown,
+  isRepAllowed,
+  nextAllowedAt,
+  remainingMs,
+} from "@cadence/shared";
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
-import { requireUser } from "./lib/auth";
+import { requireOwnedTask } from "./lib/ownership";
 import { upsertDayStats } from "./lib/dayStats";
 import { applyGoalContribution } from "./lib/goalContribution";
 
@@ -20,9 +25,7 @@ import { applyGoalContribution } from "./lib/goalContribution";
 export const logRep = mutation({
   args: { taskId: v.id("dailyTasks"), today: v.string() },
   handler: async (ctx, { taskId, today }) => {
-    const user = await requireUser(ctx);
-    const task = await ctx.db.get(taskId);
-    if (!task || task.userId !== user._id) throw new Error("Task not found");
+    const task = await requireOwnedTask(ctx, taskId);
     if (!task.repeatTarget) throw new Error("This task does not repeat");
     if (task.status !== "open") throw new Error("Task is not open");
 
@@ -32,20 +35,24 @@ export const logRep = mutation({
         nextAllowedAt(task.lastRepAt, task.repeatIntervalMinutes),
         now,
       );
-      throw new Error(`Too soon — wait ${formatCountdown(wait)} before the next one`);
+      throw new Error(
+        `Too soon — wait ${formatCountdown(wait)} before the next one`,
+      );
     }
 
     // Reps are counted per client-local day, which is what makes a partially
     // done task restart at 0/N tomorrow without any reset logic.
     const repsToday = await ctx.db
       .query("taskCompletions")
-      .withIndex("by_task_date", (q) => q.eq("taskId", taskId).eq("date", today))
+      .withIndex("by_task_date", (q) =>
+        q.eq("taskId", taskId).eq("date", today),
+      )
       .collect();
     const doneToday = repsToday.length + 1;
     const reachedTarget = doneToday >= task.repeatTarget;
 
     await ctx.db.insert("taskCompletions", {
-      userId: user._id,
+      userId: task.userId,
       taskId,
       date: today,
       completedAt: now,
@@ -60,7 +67,7 @@ export const logRep = mutation({
       });
       // Once, at full completion — a rep on its own never moves the goal.
       await applyGoalContribution(ctx, task.goalId, task.goalContribution, 1);
-      await upsertDayStats(ctx, user._id, today);
+      await upsertDayStats(ctx, task.userId, today);
     } else {
       await ctx.db.patch(taskId, { lastRepAt: now });
     }
@@ -76,16 +83,16 @@ export const logRep = mutation({
 export const undoRep = mutation({
   args: { taskId: v.id("dailyTasks"), today: v.string() },
   handler: async (ctx, { taskId, today }) => {
-    const user = await requireUser(ctx);
-    const task = await ctx.db.get(taskId);
-    if (!task || task.userId !== user._id) throw new Error("Task not found");
+    const task = await requireOwnedTask(ctx, taskId);
     if (!task.repeatTarget) throw new Error("This task does not repeat");
 
     // Scoped to today so an undo can never reach back and eat a rep that
     // belongs to an earlier day's count.
     const newest = await ctx.db
       .query("taskCompletions")
-      .withIndex("by_task_date", (q) => q.eq("taskId", taskId).eq("date", today))
+      .withIndex("by_task_date", (q) =>
+        q.eq("taskId", taskId).eq("date", today),
+      )
       .order("desc")
       .first();
     if (!newest) return { doneToday: 0, target: task.repeatTarget };
@@ -105,14 +112,20 @@ export const undoRep = mutation({
         completedDate: undefined,
       });
       await applyGoalContribution(ctx, task.goalId, task.goalContribution, -1);
-      await upsertDayStats(ctx, user._id, task.completedDate ?? task.currentDate);
+      await upsertDayStats(
+        ctx,
+        task.userId,
+        task.completedDate ?? task.currentDate,
+      );
     } else {
       await ctx.db.patch(taskId, { lastRepAt: previous?.completedAt });
     }
 
     const repsToday = await ctx.db
       .query("taskCompletions")
-      .withIndex("by_task_date", (q) => q.eq("taskId", taskId).eq("date", today))
+      .withIndex("by_task_date", (q) =>
+        q.eq("taskId", taskId).eq("date", today),
+      )
       .collect();
     return { doneToday: repsToday.length, target: task.repeatTarget };
   },

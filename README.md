@@ -62,26 +62,26 @@ The one wrinkle: **each platform authenticates differently**, because a browser 
 
 ## The apps
 
-| App | Path | Platform | Purpose |
-| --- | --- | --- | --- |
-| **Web** | `apps/web` | Browser | The primary, full-featured surface — routines, tasks, goals, history calendar, insights charts, settings. Everything else (mobile, tray) is a companion to this. |
-| **Mobile** | `apps/mobile` | iOS / Android (Expo) | A pocket-sized version for checking off tasks and routines on the go. |
-| **Tray** | `apps/tray` | Windows (Tauri) | An always-available desktop overlay that lives in the system tray — click the icon to pop open a small panel for quick task/routine capture without switching windows. Also doubles as the web app's "bridge" host for desktop authentication (see below). |
-| **Backend** | `packages/backend` | Convex | Shared schema, queries, mutations, and HTTP actions. The single source of truth every frontend reads from and writes to. |
-| **Shared** | `packages/shared` | — | Framework-agnostic utilities (date math, streak/scoring logic, schedule calculations) used by both the frontend apps and the Convex backend. |
+| App         | Path               | Platform             | Purpose                                                                                                                                                                                                                                                    |
+| ----------- | ------------------ | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Web**     | `apps/web`         | Browser              | The primary, full-featured surface — routines, tasks, goals, history calendar, insights charts, settings. Everything else (mobile, tray) is a companion to this.                                                                                           |
+| **Mobile**  | `apps/mobile`      | iOS / Android (Expo) | A pocket-sized version for checking off tasks and routines on the go.                                                                                                                                                                                      |
+| **Tray**    | `apps/tray`        | Windows (Tauri)      | An always-available desktop overlay that lives in the system tray — click the icon to pop open a small panel for quick task/routine capture without switching windows. Also doubles as the web app's "bridge" host for desktop authentication (see below). |
+| **Backend** | `packages/backend` | Convex               | Shared schema, queries, mutations, and HTTP actions. The single source of truth every frontend reads from and writes to.                                                                                                                                   |
+| **Shared**  | `packages/shared`  | —                    | Framework-agnostic utilities (date math, streak/scoring logic, schedule calculations) used by both the frontend apps and the Convex backend.                                                                                                               |
 
 ---
 
 ## Tech stack
 
-| Layer | Technology |
-| --- | --- |
-| Web frontend | React 19 + Vite + TypeScript, shadcn/ui + Tailwind CSS |
-| Mobile frontend | Expo (React Native), expo-router |
-| Desktop frontend | Tauri 2 (Rust) + React + Vite |
-| Backend | Convex (serverless database, real-time queries, HTTP actions) |
-| Auth | Clerk (`@clerk/clerk-react`, `@clerk/clerk-expo`) |
-| Monorepo tooling | pnpm workspaces + Turborepo |
+| Layer            | Technology                                                    |
+| ---------------- | ------------------------------------------------------------- |
+| Web frontend     | React 19 + Vite + TypeScript, shadcn/ui + Tailwind CSS        |
+| Mobile frontend  | Expo (React Native), expo-router                              |
+| Desktop frontend | Tauri 2 (Rust) + React + Vite                                 |
+| Backend          | Convex (serverless database, real-time queries, HTTP actions) |
+| Auth             | Clerk (`@clerk/clerk-react`, `@clerk/clerk-expo`)             |
+| Monorepo tooling | pnpm workspaces + Turborepo                                   |
 
 ---
 
@@ -205,27 +205,27 @@ Open the web app at [http://localhost:5173](http://localhost:5173). Mobile runs 
 
 ### `apps/web/.env.local`
 
-| Variable | Description | Where to get it |
-| --- | --- | --- |
-| `VITE_CLERK_PUBLISHABLE_KEY` | Clerk publishable key | Clerk dashboard → API keys |
-| `VITE_CONVEX_URL` | Convex deployment URL | `pnpm convex:dev` output, or Convex dashboard |
+| Variable                     | Description           | Where to get it                               |
+| ---------------------------- | --------------------- | --------------------------------------------- |
+| `VITE_CLERK_PUBLISHABLE_KEY` | Clerk publishable key | Clerk dashboard → API keys                    |
+| `VITE_CONVEX_URL`            | Convex deployment URL | `pnpm convex:dev` output, or Convex dashboard |
 
 ### `apps/mobile/.env.local` (and EAS env vars for cloud builds)
 
-| Variable | Description | Where to get it |
-| --- | --- | --- |
+| Variable                            | Description           | Where to get it            |
+| ----------------------------------- | --------------------- | -------------------------- |
 | `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk publishable key | Clerk dashboard → API keys |
-| `EXPO_PUBLIC_CONVEX_URL` | Convex deployment URL | Convex dashboard |
+| `EXPO_PUBLIC_CONVEX_URL`            | Convex deployment URL | Convex dashboard           |
 
 For EAS cloud builds, these are set per build profile (`development`/`preview`/`production`) with `eas env:create`/`eas env:update`, not read from `.env.local`. See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 ### `apps/tray/.env.local` and `.env.production.local`
 
-| Variable | Description | Where to get it |
-| --- | --- | --- |
-| `VITE_CLERK_PUBLISHABLE_KEY` | Clerk publishable key | Clerk dashboard → API keys |
-| `VITE_CONVEX_URL` | Convex deployment URL | Convex dashboard |
-| `VITE_WEB_APP_URL` | The URL of the deployed **web app** (e.g. `http://localhost:5173` in dev, `https://your-domain.com` in production) | Wherever you deploy `apps/web` |
+| Variable                     | Description                                                                                                        | Where to get it                |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------ |
+| `VITE_CLERK_PUBLISHABLE_KEY` | Clerk publishable key                                                                                              | Clerk dashboard → API keys     |
+| `VITE_CONVEX_URL`            | Convex deployment URL                                                                                              | Convex dashboard               |
+| `VITE_WEB_APP_URL`           | The URL of the deployed **web app** (e.g. `http://localhost:5173` in dev, `https://your-domain.com` in production) | Wherever you deploy `apps/web` |
 
 `VITE_WEB_APP_URL` exists specifically because of how desktop sign-in works — see [Authentication across platforms](#authentication-across-platforms) below. Vite loads `.env.local` in every mode and `.env.production.local` on top of it for production builds only, so you can point dev and production builds at different web app URLs without extra config.
 
@@ -233,10 +233,10 @@ For EAS cloud builds, these are set per build profile (`development`/`preview`/`
 
 Set via `npx convex env set <KEY> <VALUE> [--prod]` or the Convex dashboard → Settings → Environment Variables:
 
-| Variable | Description | Required for | Where to get it |
-| --- | --- | --- | --- |
-| `CLERK_JWT_ISSUER_DOMAIN` | Clerk JWT issuer URL | Dev + prod | Clerk dashboard → JWT Templates → convex → Issuer |
-| `CLERK_SECRET_KEY` | Clerk secret key | **Production only** | Clerk dashboard → API keys (production environment). Used server-side by `convex/http.ts` to mint one-time sign-in tokens for the desktop app's auth handoff — never exposed to any client. |
+| Variable                  | Description          | Required for        | Where to get it                                                                                                                                                                             |
+| ------------------------- | -------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CLERK_JWT_ISSUER_DOMAIN` | Clerk JWT issuer URL | Dev + prod          | Clerk dashboard → JWT Templates → convex → Issuer                                                                                                                                           |
+| `CLERK_SECRET_KEY`        | Clerk secret key     | **Production only** | Clerk dashboard → API keys (production environment). Used server-side by `convex/http.ts` to mint one-time sign-in tokens for the desktop app's auth handoff — never exposed to any client. |
 
 > `packages/backend/.env.local` is generated automatically by `pnpm convex:dev`. Do not create it manually.
 
@@ -250,20 +250,20 @@ All three apps use the same Clerk instance and the same "Continue with Google" f
 - **Mobile** uses Clerk's native SSO flow (`useSSO` from `@clerk/clerk-expo`), which opens an OS-level auth session. In production, this requires explicitly allowlisting the app's custom URL scheme in the Clerk dashboard — it is **not** required in development.
 - **Desktop (tray)** cannot safely do either of those: opening a system browser window from a desktop app breaks Clerk's production session-cookie handling, and embedding the flow in the app's own webview throws away the user's already-logged-in Google session. The tray app instead sends the user to a small "bridge" flow hosted on the **web app** itself, which hands back a one-time Clerk sign-in token over a local loopback server.
 
-This is genuinely one of the more subtle parts of the system, and getting it wrong produces confusing, environment-specific failures (things that work perfectly in development and fail only in production). The full explanation — including *why* each failure mode happens and the exact Clerk dashboard configuration each platform needs — is in **[`docs/AUTHENTICATION.md`](docs/AUTHENTICATION.md)**. Read it before touching sign-in code on any platform.
+This is genuinely one of the more subtle parts of the system, and getting it wrong produces confusing, environment-specific failures (things that work perfectly in development and fail only in production). The full explanation — including _why_ each failure mode happens and the exact Clerk dashboard configuration each platform needs — is in **[`docs/AUTHENTICATION.md`](docs/AUTHENTICATION.md)**. Read it before touching sign-in code on any platform.
 
 ---
 
 ## Development vs. production
 
-| | Development | Production |
-| --- | --- | --- |
-| **Clerk keys** | `pk_test_...` — unrestricted origin, works from any localhost port or app shell | `pk_live_...` — locked to your production domain (and explicitly allowlisted origins/redirect URLs for non-browser apps) |
-| **Clerk session handling** | URL-based session syncing (session state travels in the URL as a query param) — works across any browser/window because nothing depends on cookies | First-party `HttpOnly` cookies scoped to your Clerk domain — requires the whole OAuth flow to happen in one consistent browser/cookie context |
-| **Convex deployment** | A `dev:` deployment, created automatically by `pnpm convex:dev`, one per developer | A single shared production deployment, updated via `convex deploy` (see [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)) |
-| **Mobile native redirect** | No allowlist needed | App's custom URL scheme must be added under Clerk → Developers → Native applications → Allowlist for mobile SSO redirect |
-| **Desktop (tray) sign-in** | Works with the simple redirect-based flow, because dev's URL-based session syncing tolerates the system browser | Requires the web app's `desktop-sign-in` bridge pages + a Convex HTTP action minting one-time sign-in tokens (`CLERK_SECRET_KEY` must be set on the **production** Convex deployment) |
-| **Web app origin** | Any localhost port | Must match your Clerk instance's configured production domain |
+|                            | Development                                                                                                                                        | Production                                                                                                                                                                            |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Clerk keys**             | `pk_test_...` — unrestricted origin, works from any localhost port or app shell                                                                    | `pk_live_...` — locked to your production domain (and explicitly allowlisted origins/redirect URLs for non-browser apps)                                                              |
+| **Clerk session handling** | URL-based session syncing (session state travels in the URL as a query param) — works across any browser/window because nothing depends on cookies | First-party `HttpOnly` cookies scoped to your Clerk domain — requires the whole OAuth flow to happen in one consistent browser/cookie context                                         |
+| **Convex deployment**      | A `dev:` deployment, created automatically by `pnpm convex:dev`, one per developer                                                                 | A single shared production deployment, updated via `convex deploy` (see [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md))                                                                   |
+| **Mobile native redirect** | No allowlist needed                                                                                                                                | App's custom URL scheme must be added under Clerk → Developers → Native applications → Allowlist for mobile SSO redirect                                                              |
+| **Desktop (tray) sign-in** | Works with the simple redirect-based flow, because dev's URL-based session syncing tolerates the system browser                                    | Requires the web app's `desktop-sign-in` bridge pages + a Convex HTTP action minting one-time sign-in tokens (`CLERK_SECRET_KEY` must be set on the **production** Convex deployment) |
+| **Web app origin**         | Any localhost port                                                                                                                                 | Must match your Clerk instance's configured production domain                                                                                                                         |
 
 See [`docs/AUTHENTICATION.md`](docs/AUTHENTICATION.md) for the mechanics behind every row in this table.
 
@@ -284,18 +284,18 @@ Each app deploys independently. Short version below; full step-by-step instructi
 
 From the repo root:
 
-| Command | Description |
-| --- | --- |
-| `pnpm dev` | Start Convex + web via Turborepo |
-| `pnpm build` | Build all apps for production |
-| `pnpm typecheck` | Type-check every package |
-| `pnpm lint` | Lint every package |
-| `pnpm convex:dev` | Start the Convex backend only |
-| `pnpm web:dev` | Start the web app only |
-| `pnpm mobile:dev` | Start the Expo dev server (Android) |
-| `pnpm tray:dev` | Start the Tauri app in dev mode |
+| Command                                 | Description                             |
+| --------------------------------------- | --------------------------------------- |
+| `pnpm dev`                              | Start Convex + web via Turborepo        |
+| `pnpm build`                            | Build all apps for production           |
+| `pnpm typecheck`                        | Type-check every package                |
+| `pnpm lint`                             | Lint every package                      |
+| `pnpm convex:dev`                       | Start the Convex backend only           |
+| `pnpm web:dev`                          | Start the web app only                  |
+| `pnpm mobile:dev`                       | Start the Expo dev server (Android)     |
+| `pnpm tray:dev`                         | Start the Tauri app in dev mode         |
 | `pnpm --filter @cadence/backend deploy` | Deploy the backend to Convex production |
-| `pnpm --filter @cadence/tray build` | Build the Windows tray app installer |
+| `pnpm --filter @cadence/tray build`     | Build the Windows tray app installer    |
 
 ---
 

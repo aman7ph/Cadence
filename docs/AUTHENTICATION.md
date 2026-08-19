@@ -6,7 +6,7 @@ Every Cadence surface — web, mobile, desktop — offers exactly one sign-in me
 
 Clerk instances come in two flavors, and the difference matters enormously here:
 
-- **Development instances** (`pk_test_...` keys) use something Clerk calls **URL-based session syncing**. Since a local dev app usually runs on `localhost` while Clerk's dev Frontend API lives on a completely different domain (`*.accounts.dev`), cookies can't reliably cross that boundary. So Clerk avoids cookies entirely in dev and instead passes session/client identity as a **query string parameter** through every redirect in the OAuth chain. Because the identity travels *in the URL itself*, it doesn't matter which browser, tab, or window completes the flow — anything that follows the URL chain carries the necessary state with it.
+- **Development instances** (`pk_test_...` keys) use something Clerk calls **URL-based session syncing**. Since a local dev app usually runs on `localhost` while Clerk's dev Frontend API lives on a completely different domain (`*.accounts.dev`), cookies can't reliably cross that boundary. So Clerk avoids cookies entirely in dev and instead passes session/client identity as a **query string parameter** through every redirect in the OAuth chain. Because the identity travels _in the URL itself_, it doesn't matter which browser, tab, or window completes the flow — anything that follows the URL chain carries the necessary state with it.
 - **Production instances** (`pk_live_...` keys) use real, first-party `HttpOnly` cookies scoped to your Clerk Frontend API domain, because in production your app and Clerk's Frontend API are same-site (Clerk's Frontend API is a CNAME under your own domain). Clerk's own docs are explicit that the URL-token approach is **not secure enough for production** — a session token sitting in a URL is a real security smell — so production disables it entirely.
 
 The practical consequence: **anything that depends on one browser/window/context handing off to a different one will work in development purely by accident, and will break in production**, because production requires a consistent, cookie-carrying context from the moment a sign-in attempt starts to the moment Google redirects back.
@@ -43,7 +43,7 @@ This is the platform where the dev/production gap actually costs real engineerin
 
 **Approach 1 — open the OAuth URL in the system's default browser** (the standard, RFC 8252–recommended pattern for desktop OAuth, and what Google's own "Desktop app" OAuth client type expects):
 
-- The desktop app calls `signIn.create({ strategy: "oauth_google", redirectUrl })` inside its own embedded webview. This sets Clerk's session cookie *in that webview's cookie store*.
+- The desktop app calls `signIn.create({ strategy: "oauth_google", redirectUrl })` inside its own embedded webview. This sets Clerk's session cookie _in that webview's cookie store_.
 - It then opens the resulting Google auth URL in the OS's default browser — a completely separate process with its own, unrelated cookie store, which has never talked to your Clerk Frontend API domain before.
 - Google authenticates the user fine and redirects back to Clerk's own callback endpoint (`/v1/oauth_callback`) — but that request arrives from the system browser, without the session cookie Clerk needs to correlate it to the sign-in attempt that was created in the embedded webview. Clerk rejects it as unauthorized (`authorization_invalid` / "You are not authorized to perform this request").
 - This works perfectly in development (no cookies involved at all, remember) and fails **only** in production, which makes it a nasty surprise to discover after shipping.
@@ -92,10 +92,10 @@ This requires three pieces of setup that don't exist for web or mobile:
 
 ## Quick-reference: what changes between Clerk dev and prod keys
 
-| | Development (`pk_test_...`) | Production (`pk_live_...`) |
-| --- | --- | --- |
-| Session/client identity | Passed via URL query param (`__clerk_db_jwt`) | First-party `HttpOnly` cookie on your Clerk domain |
-| Cross-window/cross-process continuity | Works automatically (identity travels in the URL) | Requires the whole flow to stay in one cookie context |
-| Origin restrictions | None — works from any origin | Locked to your configured production domain; non-browser origins need explicit `allowed_origins` |
-| Mobile native redirect | No allowlist needed | Custom URL scheme must be added to Native applications → Allowlist for mobile SSO redirect |
-| Desktop sign-in | Simple system-browser redirect works | Requires the web-hosted bridge + sign-in token flow described above |
+|                                       | Development (`pk_test_...`)                       | Production (`pk_live_...`)                                                                       |
+| ------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Session/client identity               | Passed via URL query param (`__clerk_db_jwt`)     | First-party `HttpOnly` cookie on your Clerk domain                                               |
+| Cross-window/cross-process continuity | Works automatically (identity travels in the URL) | Requires the whole flow to stay in one cookie context                                            |
+| Origin restrictions                   | None — works from any origin                      | Locked to your configured production domain; non-browser origins need explicit `allowed_origins` |
+| Mobile native redirect                | No allowlist needed                               | Custom URL scheme must be added to Native applications → Allowlist for mobile SSO redirect       |
+| Desktop sign-in                       | Simple system-browser redirect works              | Requires the web-hosted bridge + sign-in token flow described above                              |

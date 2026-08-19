@@ -81,7 +81,11 @@ export function Sheet({
 
   const body = (
     <>
-      <TouchableOpacity style={s.backdrop} activeOpacity={1} onPress={onClose} />
+      <TouchableOpacity
+        style={s.backdrop}
+        activeOpacity={1}
+        onPress={onClose}
+      />
       <View style={[s.sheet, maxHeight !== undefined && { maxHeight }, style]}>
         {handle && <View style={s.grip} />}
         {children}
@@ -90,7 +94,12 @@ export function Sheet({
   );
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
       {avoidKeyboard ? (
         <KeyboardAvoidingView
           style={s.overlay}

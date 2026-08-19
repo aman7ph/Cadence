@@ -26,9 +26,9 @@ export default defineSchema({
     goalId: v.optional(v.id("goals")),
     goalContribution: v.optional(v.number()),
     // Repeatable routines — absent ⇒ an ordinary once-a-day routine.
-    repeatTarget: v.optional(v.number()),          // reps needed per scheduled day
+    repeatTarget: v.optional(v.number()), // reps needed per scheduled day
     repeatIntervalMinutes: v.optional(v.number()), // min gap between reps; 0 ⇒ none
-    lastRepAt: v.optional(v.number()),             // epoch ms of the newest rep, any day
+    lastRepAt: v.optional(v.number()), // epoch ms of the newest rep, any day
   })
     .index("by_user", ["userId"])
     .index("by_user_active", ["userId", "isActive"])
@@ -73,9 +73,7 @@ export default defineSchema({
     description: v.optional(v.string()),
     createdAt: v.number(),
     scheduledDate: v.optional(v.string()), // YYYY-MM-DD; set ⇔ targetType set
-    targetType: v.optional(
-      v.union(v.literal("task"), v.literal("routine")),
-    ),
+    targetType: v.optional(v.union(v.literal("task"), v.literal("routine"))),
     // Required iff targetType === "routine":
     routineScheduleType: v.optional(
       v.union(v.literal("daily"), v.literal("weekdays"), v.literal("custom")),
@@ -103,8 +101,8 @@ export default defineSchema({
 
   dailyReflections: defineTable({
     userId: v.id("users"),
-    date: v.string(),   // YYYY-MM-DD — same local-date convention as the rest of the schema
-    text: v.string(),   // raw markdown; @[Name](id) mentions are inline
+    date: v.string(), // YYYY-MM-DD — same local-date convention as the rest of the schema
+    text: v.string(), // raw markdown; @[Name](id) mentions are inline
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_user_date", ["userId", "date"]),
@@ -112,7 +110,7 @@ export default defineSchema({
   reflectionTags: defineTable({
     userId: v.id("users"),
     reflectionId: v.id("dailyReflections"),
-    taskId: v.optional(v.id("dailyTasks")),     // exactly one of these two is set per row
+    taskId: v.optional(v.id("dailyTasks")), // exactly one of these two is set per row
     routineId: v.optional(v.id("routines")),
   })
     .index("by_reflection", ["reflectionId"])
@@ -131,11 +129,10 @@ export default defineSchema({
     targetValue: v.optional(v.number()),
     currentValue: v.optional(v.number()),
     unit: v.optional(v.string()),
-    dueDate: v.optional(v.string()),    // YYYY-MM-DD
+    dueDate: v.optional(v.string()), // YYYY-MM-DD
     createdAt: v.number(),
     completedAt: v.optional(v.number()),
   })
     .index("by_user", ["userId"])
     .index("by_user_status", ["userId", "status"]),
-
 });

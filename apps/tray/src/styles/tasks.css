@@ -1,0 +1,147 @@
+/* Task and routine rows, their hover actions, and the labels that group them.
+   Both tabs render the same row, so it is described once. */
+
+.task-list {
+  padding: 6px 0;
+}
+
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 14px;
+  cursor: default;
+  transition: background 80ms ease;
+  position: relative;
+}
+
+.task-row:hover {
+  background: var(--wash-1);
+}
+
+/* The status dot. Named for what it MEANS, not what colour it is — the classes
+   used to be .blue/.green/.amber, which made it impossible to tell from the
+   stylesheet whether two apps agreed about a status. */
+.task-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: opacity 150ms ease;
+}
+
+.task-dot.completed {
+  background: var(--status-complete);
+}
+.task-dot.skipped {
+  background: var(--status-skipped);
+}
+.task-dot.pending {
+  background: var(--status-pending);
+}
+
+.task-title {
+  flex: 1;
+  font-size: 12.5px;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-title.done {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.task-title.dismissed {
+  color: var(--text-dim);
+}
+
+/* actions revealed on hover */
+.task-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 100ms ease;
+  flex-shrink: 0;
+}
+
+.task-row:hover .task-actions {
+  opacity: 1;
+}
+
+.task-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  transition:
+    color 80ms ease,
+    background 80ms ease;
+  line-height: 1;
+}
+
+.task-action-btn:hover {
+  color: var(--text);
+  background: var(--wash-2);
+}
+
+.task-action-btn.danger:hover {
+  color: var(--danger);
+}
+
+.task-action-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.task-action-btn:disabled:hover {
+  color: var(--text-muted);
+  background: none;
+}
+
+/* Repeat progress + interval countdown. These live inside .task-actions,
+   which is hover-revealed, but "3/20" and the wait are status rather than
+   actions — they stay legible without hovering. */
+.task-actions:has(.repeat-count) {
+  opacity: 1;
+}
+
+.repeat-count,
+.repeat-wait {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  padding: 1px 5px;
+  border-radius: 999px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.repeat-count {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.repeat-wait {
+  color: var(--text-muted);
+  background: var(--wash-2);
+}
+
+.section-label {
+  padding: 8px 14px 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.section-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 4px 14px;
+}

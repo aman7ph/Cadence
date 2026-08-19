@@ -10,7 +10,14 @@ export interface NavItemProps {
   onClick?: () => void;
 }
 
-export function NavItem({ icon, label, active, disabled, badge, onClick }: NavItemProps) {
+export function NavItem({
+  icon,
+  label,
+  active,
+  disabled,
+  badge,
+  onClick,
+}: NavItemProps) {
   return (
     <button
       type="button"
@@ -29,7 +36,9 @@ export function NavItem({ icon, label, active, disabled, badge, onClick }: NavIt
       {active && (
         <span className="absolute left-[3px] top-1/2 -translate-y-1/2 h-[18px] w-[3px] rounded-full bg-[var(--text-accent)]" />
       )}
-      <span className="flex w-[18px] shrink-0 justify-center opacity-90">{icon}</span>
+      <span className="flex w-[18px] shrink-0 justify-center opacity-90">
+        {icon}
+      </span>
       <span className="flex-1">{label}</span>
       {badge && (
         <span className="rounded-full bg-[var(--status-complete)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[var(--text-on-accent)]">

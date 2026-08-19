@@ -87,7 +87,6 @@ export const upsert = mutation({
   },
 });
 
-
 export const getRange = query({
   args: { from: v.string(), to: v.string() },
   handler: async (ctx, { from, to }) => {
@@ -103,4 +102,3 @@ export const getRange = query({
     return Promise.all(docs.map((doc) => loadTags(ctx, doc)));
   },
 });
-

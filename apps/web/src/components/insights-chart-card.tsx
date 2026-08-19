@@ -11,15 +11,9 @@ export const CHART_COLORS = [
 
 export const DOW_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-export function computeEMA(values: number[], period: number): number[] {
-  if (values.length === 0) return [];
-  const alpha = 2 / (period + 1);
-  const ema: number[] = [values[0] as number];
-  for (let i = 1; i < values.length; i++) {
-    ema.push((values[i] as number) * alpha + (ema[i - 1] as number) * (1 - alpha));
-  }
-  return ema;
-}
+// `computeEMA` moved to @cadence/shared — mobile had an identical copy.
+// Re-exported so the chart importing it from here keeps working.
+export { computeEMA } from "@cadence/shared";
 
 export function numFmt(v: unknown): number {
   return typeof v === "number" ? v : 0;
@@ -40,7 +34,10 @@ export const tooltipStyle = {
   color: "var(--foreground)",
 };
 
-export const axisStyle = { fill: "var(--text-tertiary)", fontSize: 11 } as const;
+export const axisStyle = {
+  fill: "var(--text-tertiary)",
+  fontSize: 11,
+} as const;
 
 export function ChartCard({
   title,
@@ -56,20 +53,54 @@ export function ChartCard({
   className?: string;
 }) {
   return (
-    <section className={`flex flex-col gap-3 rounded-lg border border-[var(--border-subtle)] bg-card p-5 ${className}`}>
+    <section
+      className={`flex flex-col gap-3 rounded-lg border border-[var(--border-subtle)] bg-card p-5 ${className}`}
+    >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="font-display text-[13.5px] font-semibold tracking-tight text-foreground">{title}</h3>
+          <h3 className="font-display text-[13.5px] font-semibold tracking-tight text-foreground">
+            {title}
+          </h3>
           {subtitle && (
-            <p className="mt-0.5 text-[11px] text-[var(--text-tertiary)]">{subtitle}</p>
+            <p className="mt-0.5 text-[11px] text-[var(--text-tertiary)]">
+              {subtitle}
+            </p>
           )}
         </div>
         {label && (
-          <span className="font-display text-[10px] uppercase tracking-[0.05em] text-[var(--text-tertiary)]">{label}</span>
+          <span className="font-display text-[10px] uppercase tracking-[0.05em] text-[var(--text-tertiary)]">
+            {label}
+          </span>
         )}
       </div>
       {children}
     </section>
+  );
+}
+
+/**
+ * A sunken track with a gold fill — the bar every ranked list on Insights uses.
+ *
+ * Size is the caller's (`h-[5px] w-[70px]`, `h-[9px] flex-1`), because that is
+ * the only thing the instances legitimately disagree about; the two colours and
+ * the pill radius are fixed so a bar cannot drift off the token layer.
+ */
+export function Meter({
+  percent,
+  className = "",
+}: {
+  percent: number;
+  className?: string;
+}) {
+  return (
+    <span
+      className={`overflow-hidden rounded-pill bg-[var(--bg-sunken)] ${className}`}
+    >
+      <span
+        className="block h-full rounded-pill bg-[var(--action-primary)]"
+        style={{ width: `${percent}%` }}
+      />
+    </span>
   );
 }
 

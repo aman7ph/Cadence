@@ -50,7 +50,9 @@ pub fn set_signed_in(app: tauri::AppHandle, signed_in: bool) {
     app.state::<AuthState>().0.store(signed_in, Ordering::Relaxed);
     if let Some(state) = app.try_state::<SignAuthItem>() {
         if let Ok(item) = state.0.lock() {
-            let _ = item.set_text(if signed_in { "Sign Out" } else { "Sign In" });
+            // Sentence case, matching web and mobile. This is the same label
+            // setup.rs builds, so the two must not drift.
+            let _ = item.set_text(if signed_in { "Sign out" } else { "Sign in" });
         }
     }
 }

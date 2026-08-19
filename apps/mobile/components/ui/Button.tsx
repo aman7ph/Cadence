@@ -77,7 +77,7 @@ export function Button({
       {loading ? (
         <ActivityIndicator size="small" color={label.color as string} />
       ) : (
-        children ?? <Text style={[label, labelStyle]}>{title}</Text>
+        (children ?? <Text style={[label, labelStyle]}>{title}</Text>)
       )}
     </TouchableOpacity>
   );

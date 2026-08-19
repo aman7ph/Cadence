@@ -21,9 +21,9 @@ export const dailyTasks = defineTable({
   goalContribution: v.optional(v.number()),
   // Repeatable tasks — all absent ⇒ an ordinary single-completion task, which
   // is why no existing row needs migrating. See packages/shared/src/repeat.ts.
-  repeatTarget: v.optional(v.number()),          // reps needed in a day (2..100)
+  repeatTarget: v.optional(v.number()), // reps needed in a day (2..100)
   repeatIntervalMinutes: v.optional(v.number()), // min gap between reps; 0 ⇒ none
-  lastRepAt: v.optional(v.number()),             // epoch ms of the newest rep, any day
+  lastRepAt: v.optional(v.number()), // epoch ms of the newest rep, any day
 })
   .index("by_user_current", ["userId", "currentDate", "status"])
   .index("by_user_original", ["userId", "originalDate"])

@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useColors } from "../../lib/theme";
 import { radii } from "../../lib/radii";
 
@@ -27,7 +33,15 @@ interface Props {
  * web hit and fixed. Only in-range values are published; the rest settles on
  * blur.
  */
-export function Stepper({ label, value, onChange, min = 0, max = 9999, suffix, disabled }: Props) {
+export function Stepper({
+  label,
+  value,
+  onChange,
+  min = 0,
+  max = 9999,
+  suffix,
+  disabled,
+}: Props) {
   const c = useColors();
   const [draft, setDraft] = useState(String(value));
   const [focused, setFocused] = useState(false);
@@ -52,24 +66,47 @@ export function Stepper({ label, value, onChange, min = 0, max = 9999, suffix, d
   const settle = () => {
     setFocused(false);
     const n = Number(draft);
-    const next = draft.trim() === "" || !Number.isFinite(n) ? value : clamp(Math.round(n));
+    const next =
+      draft.trim() === "" || !Number.isFinite(n) ? value : clamp(Math.round(n));
     onChange(next);
     setDraft(String(next));
   };
 
   const s = StyleSheet.create({
-    row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10 },
+    row: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 10,
+    },
     label: { fontSize: 12, color: c.t2, flexShrink: 1 },
     ctrl: { flexDirection: "row", alignItems: "center", gap: 6 },
     btn: {
-      width: 26, height: 26, borderRadius: radii.sm, borderWidth: 1, borderColor: c.bd2,
-      justifyContent: "center", alignItems: "center",
+      width: 26,
+      height: 26,
+      borderRadius: radii.sm,
+      borderWidth: 1,
+      borderColor: c.bd2,
+      justifyContent: "center",
+      alignItems: "center",
     },
-    btnTxt: { fontSize: 15, color: c.t2, lineHeight: 19, includeFontPadding: false },
+    btnTxt: {
+      fontSize: 15,
+      color: c.t2,
+      lineHeight: 19,
+      includeFontPadding: false,
+    },
     input: {
-      minWidth: 46, borderRadius: radii.sm, borderWidth: 1, borderColor: c.bd2,
-      backgroundColor: c.card, paddingHorizontal: 8, paddingVertical: 4,
-      fontSize: 13, color: c.t1, textAlign: "center",
+      minWidth: 46,
+      borderRadius: radii.sm,
+      borderWidth: 1,
+      borderColor: c.bd2,
+      backgroundColor: c.card,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      fontSize: 13,
+      color: c.t1,
+      textAlign: "center",
     },
     suffix: { fontSize: 11, color: c.t3 },
   });
@@ -79,7 +116,10 @@ export function Stepper({ label, value, onChange, min = 0, max = 9999, suffix, d
       <Text style={s.label}>{label}</Text>
       <View style={s.ctrl}>
         <TouchableOpacity
-          style={s.btn} onPress={() => nudge(-1)} disabled={disabled || value <= min} hitSlop={6}
+          style={s.btn}
+          onPress={() => nudge(-1)}
+          disabled={disabled || value <= min}
+          hitSlop={6}
           accessibilityLabel={`Decrease ${label}`}
         >
           <Text style={s.btnTxt}>−</Text>
@@ -96,7 +136,10 @@ export function Stepper({ label, value, onChange, min = 0, max = 9999, suffix, d
         />
         {suffix ? <Text style={s.suffix}>{suffix}</Text> : null}
         <TouchableOpacity
-          style={s.btn} onPress={() => nudge(1)} disabled={disabled || value >= max} hitSlop={6}
+          style={s.btn}
+          onPress={() => nudge(1)}
+          disabled={disabled || value >= max}
+          hitSlop={6}
           accessibilityLabel={`Increase ${label}`}
         >
           <Text style={s.btnTxt}>+</Text>

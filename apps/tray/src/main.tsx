@@ -16,7 +16,8 @@ if (!isTauri) {
 const clerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string;
 const convexUrl = import.meta.env.VITE_CONVEX_URL as string;
 
-if (!clerkKey) throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY in .env.local");
+if (!clerkKey)
+  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY in .env.local");
 if (!convexUrl) throw new Error("Missing VITE_CONVEX_URL in .env.local");
 
 // Must run before ClerkProvider mounts so clerk-js only ever sees the patched fetch.
@@ -28,7 +29,13 @@ const convex = new ConvexReactClient(convexUrl);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ClerkProvider publishableKey={clerkKey} signInUrl="/" signUpUrl="/" signInFallbackRedirectUrl="/" signUpFallbackRedirectUrl="/">
+    <ClerkProvider
+      publishableKey={clerkKey}
+      signInUrl="/"
+      signUpUrl="/"
+      signInFallbackRedirectUrl="/"
+      signUpFallbackRedirectUrl="/"
+    >
       <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
         <App />
       </ConvexProviderWithClerk>

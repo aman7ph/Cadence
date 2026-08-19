@@ -1,5 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { useColors, useTheme } from "../lib/theme";
+import { radii } from "../lib/radii";
 
 /**
  * The theme control, mirroring web's `ThemeToggle`: a round button in the
@@ -21,7 +22,7 @@ export function ThemeToggle() {
     btn: {
       width: 32,
       height: 32,
-      borderRadius: 16,
+      borderRadius: radii.full,
       backgroundColor: c.active,
       alignItems: "center",
       justifyContent: "center",

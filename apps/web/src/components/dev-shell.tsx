@@ -70,7 +70,11 @@ export function DevShell() {
           <Button variant="outline" onClick={() => setFormOpen(true)}>
             Open form drawer
           </Button>
-          <Button variant="outline" tone="danger" onClick={() => setConfirmOpen(true)}>
+          <Button
+            variant="outline"
+            tone="danger"
+            onClick={() => setConfirmOpen(true)}
+          >
             Open delete confirm
           </Button>
         </div>

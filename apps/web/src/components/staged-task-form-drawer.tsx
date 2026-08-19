@@ -13,11 +13,7 @@ import { Input } from "@/components/ui/input";
  * page subtitle promises ("assign them to a routine or a day later"). See the
  * schedule drawer, and open question 4 on whether the two should merge.
  */
-export function StagedTaskFormDrawer({
-  onClose,
-}: {
-  onClose: () => void;
-}) {
+export function StagedTaskFormDrawer({ onClose }: { onClose: () => void }) {
   const create = useMutation(api.stagedTasks.create);
 
   const [title, setTitle] = useState("");

@@ -34,7 +34,9 @@ export function CheckinTimingPanel() {
       {stamps === undefined ? (
         <Loading />
       ) : stamps.length === 0 ? (
-        <Empty>No check-ins yet. Spread a task across the day to see this.</Empty>
+        <Empty>
+          No check-ins yet. Spread a task across the day to see this.
+        </Empty>
       ) : (
         <div className="flex flex-col gap-1.5">
           <div className="flex h-[56px] items-end gap-[2px]">
@@ -42,7 +44,10 @@ export function CheckinTimingPanel() {
               <span
                 key={hour}
                 className="flex-1 rounded-t-[2px] bg-[var(--action-primary)]"
-                style={{ height: `${Math.max(2, (n / max) * 100)}%`, opacity: n ? 1 : 0.18 }}
+                style={{
+                  height: `${Math.max(2, (n / max) * 100)}%`,
+                  opacity: n ? 1 : 0.18,
+                }}
                 title={`${hour}:00 — ${n} check-in${n === 1 ? "" : "s"}`}
               />
             ))}
@@ -79,8 +84,8 @@ export function ReflectionCadencePanel() {
     else if (i > 0) break;
   }
 
-  const words = (rows ?? []).map(
-    (r) => (r.text.trim() ? r.text.trim().split(/\s+/).length : 0),
+  const words = (rows ?? []).map((r) =>
+    r.text.trim() ? r.text.trim().split(/\s+/).length : 0,
   );
   const avgWords = words.length
     ? Math.round(words.reduce((a, b) => a + b, 0) / words.length)
@@ -100,13 +105,17 @@ export function ReflectionCadencePanel() {
               <span className="font-display text-[22px] font-semibold leading-none text-[var(--text-accent)]">
                 {streak}
               </span>
-              <span className="text-[11px] text-[var(--text-tertiary)]">day streak</span>
+              <span className="text-[11px] text-[var(--text-tertiary)]">
+                day streak
+              </span>
             </span>
             <span className="flex items-baseline gap-1.5">
               <span className="font-display text-[22px] font-semibold leading-none text-foreground">
                 {avgWords}
               </span>
-              <span className="text-[11px] text-[var(--text-tertiary)]">avg words/entry</span>
+              <span className="text-[11px] text-[var(--text-tertiary)]">
+                avg words/entry
+              </span>
             </span>
           </div>
           <div className="flex h-[44px] items-end gap-[3px]">
@@ -114,7 +123,10 @@ export function ReflectionCadencePanel() {
               <span
                 key={i}
                 className="flex-1 rounded-t-[2px] bg-[var(--action-primary)]"
-                style={{ height: `${Math.max(4, (w / maxWords) * 100)}%`, opacity: 0.85 }}
+                style={{
+                  height: `${Math.max(4, (w / maxWords) * 100)}%`,
+                  opacity: 0.85,
+                }}
                 title={`${w} words`}
               />
             ))}

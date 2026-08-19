@@ -7,7 +7,10 @@ import { TasksTab } from "./components/TasksTab";
 import { SignInScreen } from "./components/SignInScreen";
 import { EnsureProvisioned } from "./components/EnsureProvisioned";
 import { Logo, LoadingShell } from "./components/Shell";
-import { SsoCallbackHandler, useOauthCallbackListener } from "./components/SsoCallback";
+import {
+  SsoCallbackHandler,
+  useOauthCallbackListener,
+} from "./components/SsoCallback";
 import { clearClerkClientJwt } from "./lib/clerk-native-fetch";
 
 type Tab = "routines" | "tasks";
@@ -23,7 +26,10 @@ export default function App() {
   });
 
   useEffect(() => {
-    document.documentElement.style.setProperty("--overlay-opacity", String(opacity));
+    document.documentElement.style.setProperty(
+      "--overlay-opacity",
+      String(opacity),
+    );
     localStorage.setItem("overlay-opacity", String(opacity));
   }, [opacity]);
 
@@ -57,9 +63,13 @@ export default function App() {
           clearClerkClientJwt();
           window.history.replaceState({}, "", "/");
         });
-      }).then((fn) => { unlisten = fn; });
+      }).then((fn) => {
+        unlisten = fn;
+      });
     });
-    return () => { unlisten?.(); };
+    return () => {
+      unlisten?.();
+    };
   }, [signOut]);
 
   useOauthCallbackListener();
@@ -70,10 +80,14 @@ export default function App() {
 
   return (
     <>
-      <AuthLoading><LoadingShell /></AuthLoading>
+      <AuthLoading>
+        <LoadingShell />
+      </AuthLoading>
 
       <Unauthenticated>
-        <div className="overlay"><SignInScreen /></div>
+        <div className="overlay">
+          <SignInScreen />
+        </div>
       </Unauthenticated>
 
       <Authenticated>
@@ -85,10 +99,22 @@ export default function App() {
               <span className="brand">Cadence</span>
             </div>
             <div className="opacity-controls">
-              <button className="opacity-btn" onClick={decrease}
-                disabled={opacity <= 0.2} title="Decrease opacity">−</button>
-              <button className="opacity-btn" onClick={increase}
-                disabled={opacity >= 1} title="Increase opacity">+</button>
+              <button
+                className="opacity-btn"
+                onClick={decrease}
+                disabled={opacity <= 0.2}
+                title="Decrease opacity"
+              >
+                −
+              </button>
+              <button
+                className="opacity-btn"
+                onClick={increase}
+                disabled={opacity >= 1}
+                title="Increase opacity"
+              >
+                +
+              </button>
             </div>
           </div>
           <TabBar active={tab} onChange={setTab} />

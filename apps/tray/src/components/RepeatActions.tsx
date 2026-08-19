@@ -28,7 +28,9 @@ export function RepeatActions({
       <span className="repeat-count">
         {doneToday}/{target}
       </span>
-      {gated && <span className="repeat-wait">{formatCountdown(remaining)}</span>}
+      {gated && (
+        <span className="repeat-wait">{formatCountdown(remaining)}</span>
+      )}
       <button
         className="task-action-btn"
         title={gated ? `Wait ${formatCountdown(remaining)}` : "Check in"}
@@ -38,7 +40,11 @@ export function RepeatActions({
         ✓
       </button>
       {doneToday > 0 && (
-        <button className="task-action-btn" title="Undo last check-in" onClick={onUndo}>
+        <button
+          className="task-action-btn"
+          title="Undo the last check-in"
+          onClick={onUndo}
+        >
           ↩
         </button>
       )}

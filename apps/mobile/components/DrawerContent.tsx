@@ -8,11 +8,11 @@ import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 
 const NAV = [
-  { name: "index",    label: "Today",    route: "/(drawer)/"        },
+  { name: "index", label: "Today", route: "/(drawer)/" },
   { name: "routines", label: "Routines", route: "/(drawer)/routines" },
-  { name: "staging",  label: "Staging",  route: "/(drawer)/staging"  },
-  { name: "goals",    label: "Goals",    route: "/(drawer)/goals"    },
-  { name: "history",  label: "History",  route: "/(drawer)/history"  },
+  { name: "staging", label: "Staging", route: "/(drawer)/staging" },
+  { name: "goals", label: "Goals", route: "/(drawer)/goals" },
+  { name: "history", label: "History", route: "/(drawer)/history" },
   { name: "insights", label: "Insights", route: "/(drawer)/insights" },
   { name: "settings", label: "Settings", route: "/(drawer)/settings" },
 ] as const;
@@ -33,23 +33,41 @@ export function DrawerContent(props: DrawerContentComponentProps) {
       : pathname.includes(name);
 
   const s = StyleSheet.create({
-    container:    { flex: 1, backgroundColor: c.bgE },
-    head:         { flexDirection: "row", alignItems: "center",
-                    paddingTop: 56, paddingHorizontal: 20, paddingBottom: 14,
-                    borderBottomWidth: 1, borderBottomColor: c.bd1 },
-    brand:        { flex: 1, flexDirection: "row", alignItems: "center", gap: 10 },
-    brandName:    { ...display("bold"), fontSize: 18, color: c.t1, letterSpacing: -0.4 },
+    container: { flex: 1, backgroundColor: c.bgE },
+    head: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingTop: 56,
+      paddingHorizontal: 20,
+      paddingBottom: 14,
+      borderBottomWidth: 1,
+      borderBottomColor: c.bd1,
+    },
+    brand: { flex: 1, flexDirection: "row", alignItems: "center", gap: 10 },
+    brandName: {
+      ...display("bold"),
+      fontSize: 18,
+      color: c.t1,
+      letterSpacing: -0.4,
+    },
     // Explicit paddingTop, not paddingVertical: DrawerContentScrollView sets
     // `paddingTop: SPACING + insets.top` itself, and the more specific key wins
     // over ours — so the status-bar inset was applied twice, once here and once
     // in the header's own paddingTop: 56.
-    navList:      { paddingTop: 4, paddingBottom: 8 },
-    item:         { paddingHorizontal: 20, paddingVertical: 12, position: "relative" },
-    itemOn:       { backgroundColor: c.accBg },
-    accent:       { position: "absolute", left: 0, top: 6, bottom: 6, width: 3,
-                    borderRadius: 2, backgroundColor: c.prim },
-    label:        { fontSize: 14, fontWeight: "500", color: c.t2, marginLeft: 14 },
-    labelOn:      { color: c.t1, fontWeight: "600" },
+    navList: { paddingTop: 4, paddingBottom: 8 },
+    item: { paddingHorizontal: 20, paddingVertical: 12, position: "relative" },
+    itemOn: { backgroundColor: c.accBg },
+    accent: {
+      position: "absolute",
+      left: 0,
+      top: 6,
+      bottom: 6,
+      width: 3,
+      borderRadius: 2,
+      backgroundColor: c.prim,
+    },
+    label: { fontSize: 14, fontWeight: "500", color: c.t2, marginLeft: 14 },
+    labelOn: { color: c.t1, fontWeight: "600" },
   });
 
   return (
@@ -61,12 +79,19 @@ export function DrawerContent(props: DrawerContentComponentProps) {
         </View>
         <ThemeToggle />
       </View>
-      <DrawerContentScrollView {...props} scrollEnabled={false} contentContainerStyle={s.navList}>
+      <DrawerContentScrollView
+        {...props}
+        scrollEnabled={false}
+        contentContainerStyle={s.navList}
+      >
         {NAV.map((item) => {
           const on = active(item.name);
           return (
-            <TouchableOpacity key={item.name} style={[s.item, on && s.itemOn]}
-              onPress={() => go(item.route)}>
+            <TouchableOpacity
+              key={item.name}
+              style={[s.item, on && s.itemOn]}
+              onPress={() => go(item.route)}
+            >
               {on && <View style={s.accent} />}
               <Text style={[s.label, on && s.labelOn]}>{item.label}</Text>
             </TouchableOpacity>

@@ -81,28 +81,40 @@ export function DateRangePickerPanel({
         </p>
         <div className="flex flex-col gap-2">
           <label className="flex flex-col gap-1">
-            <span className="text-xs font-semibold text-muted-foreground">From</span>
+            <span className="text-xs font-semibold text-muted-foreground">
+              From
+            </span>
             <input
               type="date"
               value={customFrom}
               max={customTo || today}
-              onChange={(e) => { setCustomFrom(e.target.value); setCustomError(null); }}
+              onChange={(e) => {
+                setCustomFrom(e.target.value);
+                setCustomError(null);
+              }}
               className="rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-[var(--text-accent)]"
             />
           </label>
           <label className="flex flex-col gap-1">
-            <span className="text-xs font-semibold text-muted-foreground">To</span>
+            <span className="text-xs font-semibold text-muted-foreground">
+              To
+            </span>
             <input
               type="date"
               value={customTo}
               min={customFrom}
               max={today}
-              onChange={(e) => { setCustomTo(e.target.value); setCustomError(null); }}
+              onChange={(e) => {
+                setCustomTo(e.target.value);
+                setCustomError(null);
+              }}
               className="rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-[var(--text-accent)]"
             />
           </label>
         </div>
-        {customError && <p className="text-xs text-[var(--status-danger)]">{customError}</p>}
+        {customError && (
+          <p className="text-xs text-[var(--status-danger)]">{customError}</p>
+        )}
         <button
           type="button"
           onClick={handleApply}

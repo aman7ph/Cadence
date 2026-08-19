@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { useColors } from "../lib/theme";
+import { radii } from "../lib/radii";
 import { display } from "../lib/fonts";
 import { Logo } from "../components/Logo";
 
@@ -64,7 +65,7 @@ export default function SignIn() {
       backgroundColor: c.card,
       borderWidth: 1,
       borderColor: c.bd2,
-      borderRadius: 14,
+      borderRadius: radii.lg,
       padding: 16,
       marginTop: 8,
     },

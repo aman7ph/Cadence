@@ -19,14 +19,46 @@ import { NavItem } from "./sidebar-nav-item";
  * The navigation, defined once and rendered by both the desktop sidebar and the
  * mobile drawer. Two copies would drift the first time an item is added.
  */
-export const NAV_ITEMS: { view: AppView; label: string; icon: React.ReactNode }[] = [
-  { view: "today", label: "Today", icon: <CheckSquare className="size-[17px]" strokeWidth={2} /> },
-  { view: "routines", label: "Routines", icon: <ListChecks className="size-[17px]" strokeWidth={2} /> },
-  { view: "staging", label: "Staging", icon: <Inbox className="size-[17px]" strokeWidth={2} /> },
-  { view: "goals", label: "Goals", icon: <Target className="size-[17px]" strokeWidth={2} /> },
-  { view: "history", label: "History", icon: <CalendarDays className="size-[17px]" strokeWidth={2} /> },
-  { view: "insights", label: "Insights", icon: <BarChart3 className="size-[17px]" strokeWidth={2} /> },
-  { view: "settings", label: "Settings", icon: <Settings className="size-[17px]" strokeWidth={2} /> },
+export const NAV_ITEMS: {
+  view: AppView;
+  label: string;
+  icon: React.ReactNode;
+}[] = [
+  {
+    view: "today",
+    label: "Today",
+    icon: <CheckSquare className="size-[17px]" strokeWidth={2} />,
+  },
+  {
+    view: "routines",
+    label: "Routines",
+    icon: <ListChecks className="size-[17px]" strokeWidth={2} />,
+  },
+  {
+    view: "staging",
+    label: "Staging",
+    icon: <Inbox className="size-[17px]" strokeWidth={2} />,
+  },
+  {
+    view: "goals",
+    label: "Goals",
+    icon: <Target className="size-[17px]" strokeWidth={2} />,
+  },
+  {
+    view: "history",
+    label: "History",
+    icon: <CalendarDays className="size-[17px]" strokeWidth={2} />,
+  },
+  {
+    view: "insights",
+    label: "Insights",
+    icon: <BarChart3 className="size-[17px]" strokeWidth={2} />,
+  },
+  {
+    view: "settings",
+    label: "Settings",
+    icon: <Settings className="size-[17px]" strokeWidth={2} />,
+  },
 ];
 
 interface SidebarNavProps {
@@ -37,7 +69,11 @@ interface SidebarNavProps {
   showThemeToggle?: boolean;
 }
 
-export function SidebarNav({ view, onNavigate, showThemeToggle }: SidebarNavProps) {
+export function SidebarNav({
+  view,
+  onNavigate,
+  showThemeToggle,
+}: SidebarNavProps) {
   const { user } = useUser();
   const { signOut } = useClerk();
 

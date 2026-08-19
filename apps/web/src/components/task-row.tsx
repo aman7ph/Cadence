@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useMutation } from "convex/react";
+import { useTaskRowActions } from "@/lib/use-task-row-actions";
 import { Target } from "lucide-react";
-import { api } from "@cadence/backend/convex/_generated/api";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 
 import { Badge } from "@/components/ui/badge";
+import { RowBody } from "@/components/ui/row-body";
 import { CompletionToggle } from "@/components/ui/completion-toggle";
 import { RepeatControl } from "@/components/repeat-control";
 import { TaskRowMenu } from "@/components/task-row-menu";
@@ -42,45 +42,26 @@ export function TaskRow({
   originalDate,
   carryoverCount,
   viewedDate,
-  goalTitle, readOnly,
+  goalTitle,
+  readOnly,
   repeatTarget,
   repeatDoneToday = 0,
   nextRepAllowedAt,
 }: TaskRowProps) {
-  const complete = useMutation(api.dailyTasks.complete);
-  const uncomplete = useMutation(api.dailyTasks.uncomplete);
-  const remove = useMutation(api.dailyTasks.remove);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const logRep = useMutation(api.dailyTaskRepeats.logRep);
-  const undoRep = useMutation(api.dailyTaskRepeats.undoRep);
-  const [error, setError] = useState<string | null>(null);
-
   const isRepeat = repeatTarget !== undefined;
   const remaining = useCountdown(nextRepAllowedAt);
   const gated = remaining > 0;
 
-  // dailyTasks.remove enforces what may be deleted; hiding the menu only spares
-  // the common case a guaranteed failure. It cannot be the whole test —
-  // repeatDoneToday is scoped to the viewed date, so a repeat task with reps on
-  // an earlier day still reaches the server and its rejection lands in `error`.
-  const canDelete = status === "open" && repeatDoneToday === 0;
-
-  // The server re-checks the gate regardless; disabling only stops the obvious
-  // case. Its rejection is surfaced, not swallowed — clock skew is when it fires.
-  const fail = (e: unknown) =>
-    setError(e instanceof Error ? e.message.split("\n")[0]! : "Something went wrong");
-
-  const toggle = () => {
-    setError(null);
-    if (isRepeat) {
-      if (status !== "open" || gated) return;
-      void logRep({ taskId, today: viewedDate }).catch(fail);
-    } else if (status === "completed") {
-      void uncomplete({ taskId });
-    } else {
-      void complete({ taskId, today: viewedDate });
-    }
-  };
+  const { error, setError, fail, canDelete, toggle, remove, undoRep } =
+    useTaskRowActions({
+      taskId,
+      viewedDate,
+      status,
+      isRepeat,
+      gated,
+      repeatDoneToday,
+    });
 
   const meta = description?.trim()
     ? description
@@ -101,24 +82,13 @@ export function TaskRow({
             : `Mark ${title} ${status === "completed" ? "incomplete" : "complete"}`
         }
       />
-      <div className="flex-1 min-w-0">
-        <div
-          className={cn(
-            "text-[15px] font-semibold leading-snug text-foreground",
-            status === "completed" &&
-              "line-through decoration-[var(--border-strong)]",
-          )}
-        >
-          {title}
-        </div>
-        <div className="mt-[3px] text-[12px] text-[var(--text-tertiary)] truncate">{meta}</div>
-        {error && <div className="mt-[3px] text-[12px] text-[var(--status-danger)]">{error}</div>}
-        {goalTitle && (
-          <span className="mt-1 inline-flex items-center gap-1 rounded-pill bg-[var(--surface-accent)] px-2 py-[2px] text-[9px] font-semibold uppercase tracking-[0.04em] text-[var(--text-accent)]">
-            <Target className="size-2.5" />{goalTitle}
-          </span>
-        )}
-      </div>
+      <RowBody
+        title={title}
+        meta={meta}
+        error={error}
+        goalTitle={goalTitle}
+        completed={status === "completed"}
+      />
       <div className="flex items-center gap-2 shrink-0">
         {isRepeat && (
           <RepeatControl

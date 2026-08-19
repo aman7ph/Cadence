@@ -6,15 +6,18 @@ import { getGranularity } from "@/lib/chartUtils";
 import { ContributionHeatmap } from "./contribution-heatmap";
 import { ChartCard } from "./insights-chart-card";
 import { MomentumHero } from "./insights-momentum-hero";
-import { RandomTasksByDayChart } from "./insights-task-charts";
+import { RandomTasksByDayChart } from "./insights-tasks-by-day-chart";
 import { TaskResolutionCard } from "./insights-task-resolution";
 import { GoalMixPanel, GoalProgressPanel } from "./insights-patterns-goals";
-import { CheckinTimingPanel, ReflectionCadencePanel } from "./insights-patterns-habits";
+import {
+  CheckinTimingPanel,
+  ReflectionCadencePanel,
+} from "./insights-patterns-habits";
 import {
   RoutineLeaderboardPanel,
   StreakLongevityPanel,
-  WeekRhythmPanel,
 } from "./insights-patterns-routines";
+import { WeekRhythmPanel } from "./insights-week-rhythm";
 import { PageHeader } from "./page-header";
 import { SectionLabel } from "./section-label";
 

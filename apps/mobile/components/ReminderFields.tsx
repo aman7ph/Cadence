@@ -1,4 +1,10 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import {
   MINUTES_PER_DAY,
   formatIntervalMinutes,
@@ -6,6 +12,8 @@ import {
   reminderSlotCount,
 } from "@cadence/shared";
 import { useColors } from "../lib/theme";
+import { ReminderModePicker } from "./ReminderModePicker";
+import { ReminderWindowFields } from "./ReminderWindowFields";
 import { radii } from "../lib/radii";
 import type { useReminderSettings } from "../lib/useReminderSettings";
 
@@ -35,42 +43,44 @@ export function ReminderFields({
   };
 
   const s = StyleSheet.create({
-    panel:   { backgroundColor: c.bgE, borderWidth: 1, borderColor: c.bd1,
-               borderRadius: radii.sm, padding: 10, gap: 10, marginTop: 10 },
-    row:     { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
-    lbl:     { fontSize: 12, color: c.t2 },
-    num:     { width: 70, backgroundColor: c.card, borderWidth: 1, borderColor: c.bd2,
-               borderRadius: radii.sm, paddingHorizontal: 10, paddingVertical: 8,
-               fontSize: 13, color: c.t1 },
-    echo:    { fontSize: 11, color: c.t3, backgroundColor: c.active,
-               borderRadius: radii.full, paddingHorizontal: 8, paddingVertical: 2 },
-    stepper: { flexDirection: "row", alignItems: "center", gap: 6 },
-    adjBtn:  { width: 26, height: 26, borderRadius: radii.sm, borderWidth: 1,
-               borderColor: c.bd2, justifyContent: "center", alignItems: "center" },
-    adjTxt:  { fontSize: 15, color: c.t2, lineHeight: 18, includeFontPadding: false },
-    timeVal: { fontSize: 13, fontWeight: "600", color: c.t1, minWidth: 46,
-               textAlign: "center" },
-    modeRow: { flexDirection: "row", gap: 8 },
-    modeBtn: { flex: 1, paddingVertical: 8, borderRadius: radii.sm, borderWidth: 1,
-               borderColor: c.bd2, alignItems: "center" },
-    modeOn:  { borderColor: c.prim, backgroundColor: c.accBg },
-    modeTxt: { fontSize: 12, fontWeight: "600", color: c.t2 },
-    modeTxtOn: { color: c.tacc },
-    err:     { fontSize: 12, color: c.danger },
-    warn:    { fontSize: 12, color: c.carry },
+    panel: {
+      backgroundColor: c.bgE,
+      borderWidth: 1,
+      borderColor: c.bd1,
+      borderRadius: radii.sm,
+      padding: 10,
+      gap: 10,
+      marginTop: 10,
+    },
+    row: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      flexWrap: "wrap",
+    },
+    lbl: { fontSize: 12, color: c.t2 },
+    num: {
+      width: 70,
+      backgroundColor: c.card,
+      borderWidth: 1,
+      borderColor: c.bd2,
+      borderRadius: radii.sm,
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      fontSize: 13,
+      color: c.t1,
+    },
+    echo: {
+      fontSize: 11,
+      color: c.t3,
+      backgroundColor: c.active,
+      borderRadius: radii.full,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+    },
+    err: { fontSize: 12, color: c.danger },
+    warn: { fontSize: 12, color: c.carry },
   });
-
-  const stepper = (key: "startMinute" | "endMinute") => (
-    <View style={s.stepper}>
-      <TouchableOpacity onPress={() => shift(key, -1)} hitSlop={8} style={s.adjBtn}>
-        <Text style={s.adjTxt}>−</Text>
-      </TouchableOpacity>
-      <Text style={s.timeVal}>{formatMinuteOfDay(draft[key])}</Text>
-      <TouchableOpacity onPress={() => shift(key, 1)} hitSlop={8} style={s.adjBtn}>
-        <Text style={s.adjTxt}>+</Text>
-      </TouchableOpacity>
-    </View>
-  );
 
   return (
     <View style={s.panel}>
@@ -90,36 +100,32 @@ export function ReminderFields({
         {!error && (
           <Text style={s.echo}>
             {formatIntervalMinutes(settings.intervalMinutes)} ·{" "}
-            {reminderSlotCount(draft.startMinute, draft.endMinute, settings.intervalMinutes)} a day
+            {reminderSlotCount(
+              draft.startMinute,
+              draft.endMinute,
+              settings.intervalMinutes,
+            )}{" "}
+            a day
           </Text>
         )}
       </View>
 
-      <View style={s.row}>
-        <Text style={s.lbl}>Between</Text>
-        {stepper("startMinute")}
-        <Text style={s.lbl}>and</Text>
-        {stepper("endMinute")}
-      </View>
+      <ReminderWindowFields
+        startMinute={draft.startMinute}
+        endMinute={draft.endMinute}
+        onShift={shift}
+      />
 
-      <View style={s.modeRow}>
-        {MODES.map((m) => (
-          <TouchableOpacity
-            key={m.value}
-            style={[s.modeBtn, draft.alertMode === m.value && s.modeOn]}
-            onPress={() => update({ alertMode: m.value })}
-          >
-            <Text style={[s.modeTxt, draft.alertMode === m.value && s.modeTxtOn]}>
-              {m.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <ReminderModePicker
+        value={draft.alertMode}
+        onChange={(alertMode) => update({ alertMode })}
+      />
 
       {error && <Text style={s.err}>{error}</Text>}
       {permissionDenied && (
         <Text style={s.warn}>
-          Notifications are off for Cadence in system settings, so nothing will fire.
+          Notifications are off for Cadence in system settings, so nothing will
+          fire.
         </Text>
       )}
     </View>

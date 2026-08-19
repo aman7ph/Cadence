@@ -42,11 +42,11 @@ export function initializeTheme(): ResolvedTheme {
 }
 
 export function useTheme() {
-  const [preference, setPreferenceState] = useState<ThemePreference>(
-    () => readStoredPreference(),
+  const [preference, setPreferenceState] = useState<ThemePreference>(() =>
+    readStoredPreference(),
   );
-  const [theme, setThemeState] = useState<ResolvedTheme>(
-    () => resolveTheme(readStoredPreference()),
+  const [theme, setThemeState] = useState<ResolvedTheme>(() =>
+    resolveTheme(readStoredPreference()),
   );
 
   // When stored preference is "system", follow the OS media query live.

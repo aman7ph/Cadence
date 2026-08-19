@@ -3,6 +3,7 @@ import { RoutineRow } from "./routine-row";
 import { SectionLabel } from "./section-label";
 import { ListGrid } from "@/components/ui/list-grid";
 import { useListColumns } from "@/lib/use-list-columns";
+import { EmptyNote } from "@/components/ui/empty-note";
 
 interface Routine {
   routineId: string;
@@ -37,13 +38,21 @@ export function TodayRoutinesSection({
   const { columns } = useListColumns();
   return (
     <section className="flex flex-col gap-2.5">
-      <SectionLabel count={routinesScheduled > 0 ? `${routinesDone}/${routinesScheduled}` : undefined}>
+      <SectionLabel
+        count={
+          routinesScheduled > 0
+            ? `${routinesDone}/${routinesScheduled}`
+            : undefined
+        }
+      >
         Routines
       </SectionLabel>
       {routines.length === 0 ? (
-        <p className="text-[13px] text-[var(--text-tertiary)] rounded-md border border-dashed border-[var(--border-subtle)] bg-card px-4 py-8 text-center">
-          {isPast ? "Nothing was scheduled this day." : "Nothing scheduled today."}
-        </p>
+        <EmptyNote>
+          {isPast
+            ? "Nothing was scheduled this day."
+            : "Nothing scheduled today."}
+        </EmptyNote>
       ) : (
         <ListGrid columns={columns.today} className="gap-1.5">
           {routines.map((r) => (

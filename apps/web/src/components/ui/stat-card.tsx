@@ -44,7 +44,12 @@ export function StatCard({
           {label}
         </span>
         {icon && (
-          <span className={cn("flex", accent ? "text-white/60" : "text-[var(--text-tertiary)]")}>
+          <span
+            className={cn(
+              "flex",
+              accent ? "text-white/60" : "text-[var(--text-tertiary)]",
+            )}
+          >
             {icon}
           </span>
         )}
@@ -54,8 +59,11 @@ export function StatCard({
         <span
           className={cn(
             "font-display font-bold tracking-tight tabular-nums",
-            accent ? "text-[26px] leading-none text-white" : "text-[24px] leading-none",
-            !accent && (muted ? "text-[var(--text-tertiary)]" : "text-foreground"),
+            accent
+              ? "text-[26px] leading-none text-white"
+              : "text-[24px] leading-none",
+            !accent &&
+              (muted ? "text-[var(--text-tertiary)]" : "text-foreground"),
           )}
         >
           {value}

@@ -15,9 +15,12 @@ import {
 } from "react-native";
 import { AppBar } from "../../components/AppBar";
 import { Button } from "../../components/ui/Button";
+import { TabBar } from "../../components/ui/TabBar";
 import { radii } from "../../lib/radii";
-import { RoutineRow } from "../../components/RoutineRow";
-import { ArchivedRoutineRow } from "../../components/ArchivedRoutineRow";
+import {
+  ActiveRoutinesList,
+  ArchivedRoutinesList,
+} from "../../components/RoutinesTabBodies";
 import { RoutineFormModal } from "../../components/RoutineFormModal";
 import type { RoutineForForm } from "../../components/RoutineFormModal";
 import type { ScheduleType } from "../../components/SchedulePicker";
@@ -74,21 +77,9 @@ export default function RoutinesScreen() {
 
   const s = StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
-    tabs: { flexDirection: "row", gap: 8, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 6 },
     scroll: { flex: 1 },
     content: { paddingBottom: 96 },
     center: { padding: 24, alignItems: "center" },
-    list: { paddingHorizontal: 16, gap: 10 },
-    empty: {
-      marginHorizontal: 16,
-      borderWidth: 1,
-      borderColor: c.bd1,
-      borderStyle: "dashed",
-      borderRadius: radii.md,
-      paddingVertical: 28,
-      alignItems: "center",
-    },
-    emptyTxt: { fontSize: 13, color: c.t3 },
     fab: { position: "absolute", bottom: 28, right: 18 },
   });
 
@@ -102,73 +93,30 @@ export default function RoutinesScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <View style={s.tabs}>
-          {(["Active", "Archived"] as const).map((t) => (
-            <Button
-              key={t}
-              variant="tab"
-              selected={tab === t}
-              title={`${t} ${t === "Active" ? active.length : archived.length}`}
-              onPress={() => setTab(t)}
-            />
-          ))}
-        </View>
+        <TabBar
+          tabs={["Active", "Archived"] as const}
+          active={tab}
+          onChange={setTab}
+          label={(t) =>
+            `${t} ${t === "Active" ? active.length : archived.length}`
+          }
+        />
         {allRoutines === undefined && (
           <View style={s.center}>
             <ActivityIndicator color={c.prim} />
           </View>
         )}
-        {tab === "Active" && allRoutines !== undefined && active.length === 0 && (
-          <View style={s.empty}>
-            <Text style={s.emptyTxt}>
-              No active routines. Tap + to add one.
-            </Text>
-          </View>
-        )}
-        {tab === "Active" && <View style={s.list}>
-          {active.map((r) => (
-            <RoutineRow
-              key={r._id}
-              routine={{
-                _id: r._id,
-                name: r.name,
-                description: r.description,
-                scheduleType: r.scheduleType as ScheduleType,
-                customDays: r.customDays,
-                currentStreak: r.currentStreak,
-                longestStreak: r.longestStreak,
-                goalTitle: r.goalId
-                  ? (goalTitleById.get(r.goalId as Id<"goals">) ?? undefined)
-                  : undefined,
-                goalContribution: r.goalContribution,
-              }}
-              onEdit={() => openEdit(r)}
-              onArchive={() => archive({ routineId: r._id, today })}
+        {allRoutines !== undefined &&
+          (tab === "Active" ? (
+            <ActiveRoutinesList
+              routines={active}
+              goalTitleById={goalTitleById}
+              onEdit={openEdit}
+              onArchive={(routineId) => archive({ routineId, today })}
             />
-          ))}
-        </View>}
-        {tab === "Archived" && allRoutines !== undefined && (
-          archived.length === 0 ? (
-            <View style={s.empty}>
-              <Text style={s.emptyTxt}>Nothing archived yet.</Text>
-            </View>
           ) : (
-            <View style={s.list}>
-              {archived.map((r) => (
-                <ArchivedRoutineRow
-                  key={r._id}
-                  routine={{
-                    _id: r._id,
-                    name: r.name,
-                    scheduleType: r.scheduleType as ScheduleType,
-                    customDays: r.customDays,
-                    archivedDate: r.archivedDate,
-                  }}
-                />
-              ))}
-            </View>
-          )
-        )}
+            <ArchivedRoutinesList routines={archived} />
+          ))}
       </ScrollView>
       <Button
         variant="fab"

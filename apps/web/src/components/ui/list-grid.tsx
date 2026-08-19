@@ -39,7 +39,13 @@ interface ListGridProps {
  */
 export function ListGrid({ columns, className, children }: ListGridProps) {
   return (
-    <div className={cn("grid gap-2", COLUMN_CLASS[columns] ?? COLUMN_CLASS[1], className)}>
+    <div
+      className={cn(
+        "grid gap-2",
+        COLUMN_CLASS[columns] ?? COLUMN_CLASS[1],
+        className,
+      )}
+    >
       {children}
     </div>
   );

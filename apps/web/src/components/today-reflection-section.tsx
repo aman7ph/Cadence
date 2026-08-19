@@ -9,8 +9,15 @@ interface Reflection {
   updatedAt: number;
 }
 
-interface Routine { routineId: string; name: string; }
-interface Task { taskId: string; title: string; status: "open" | "completed"; }
+interface Routine {
+  routineId: string;
+  name: string;
+}
+interface Task {
+  taskId: string;
+  title: string;
+  status: "open" | "completed";
+}
 
 interface TodayReflectionSectionProps {
   date: string;
@@ -20,45 +27,74 @@ interface TodayReflectionSectionProps {
   isPast: boolean;
 }
 
-function MentionText({ text, routineIds }: { text: string; routineIds: Set<string> }) {
+function MentionText({
+  text,
+  routineIds,
+}: {
+  text: string;
+  routineIds: Set<string>;
+}) {
   const regex = /@\[([^\]]+)\]\(([^)]+)\)/g;
   const parts: React.ReactNode[] = [];
   let last = 0;
   let match: RegExpExecArray | null;
   let key = 0;
   while ((match = regex.exec(text)) !== null) {
-    if (match.index > last) parts.push(<span key={key++}>{text.slice(last, match.index)}</span>);
+    if (match.index > last)
+      parts.push(<span key={key++}>{text.slice(last, match.index)}</span>);
     parts.push(
-      <Badge key={key++} tone={routineIds.has(match[2]!) ? "accent" : "carryover"} className="mx-0.5 align-baseline text-[11px]">
+      <Badge
+        key={key++}
+        tone={routineIds.has(match[2]!) ? "accent" : "carryover"}
+        className="mx-0.5 align-baseline text-[11px]"
+      >
         @{match[1]!}
       </Badge>,
     );
     last = match.index + match[0].length;
   }
-  if (last < text.length) parts.push(<span key={key++}>{text.slice(last)}</span>);
+  if (last < text.length)
+    parts.push(<span key={key++}>{text.slice(last)}</span>);
   return <>{parts}</>;
 }
 
-export function TodayReflectionSection({ date, reflection, routines, tasks, isPast }: TodayReflectionSectionProps) {
-  const [mode, setMode] = useState<"view" | "edit">(() => reflection ? "view" : "edit");
+export function TodayReflectionSection({
+  date,
+  reflection,
+  routines,
+  tasks,
+  isPast,
+}: TodayReflectionSectionProps) {
+  const [mode, setMode] = useState<"view" | "edit">(() =>
+    reflection ? "view" : "edit",
+  );
 
   if (isPast && !reflection) return null;
 
   const routineIds = new Set(routines.map((r) => r.routineId));
   const taggedRoutines = reflection
-    ? reflection.taggedRoutineIds.map((id) => routines.find((r) => r.routineId === id)).filter((r): r is Routine => r !== undefined)
+    ? reflection.taggedRoutineIds
+        .map((id) => routines.find((r) => r.routineId === id))
+        .filter((r): r is Routine => r !== undefined)
     : [];
   const taggedTasks = reflection
-    ? reflection.taggedTaskIds.map((id) => tasks.find((t) => t.taskId === id)).filter((t): t is Task => t !== undefined)
+    ? reflection.taggedTaskIds
+        .map((id) => tasks.find((t) => t.taskId === id))
+        .filter((t): t is Task => t !== undefined)
     : [];
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-[11px] font-bold uppercase tracking-[0.10em] text-[var(--text-tertiary)]">Reflection</h2>
+        <h2 className="text-[11px] font-bold uppercase tracking-[0.10em] text-[var(--text-tertiary)]">
+          Reflection
+        </h2>
         {mode === "view" && (
-          <button type="button" onClick={() => setMode("edit")}
-            className="text-[12px] font-semibold text-[var(--text-accent)] hover:underline">
+          <button
+            type="button"
+            onClick={() => setMode("edit")}
+            className="text-[12px] font-semibold text-[var(--text-accent)] hover:underline"
+          >
             Edit
           </button>
         )}
@@ -71,8 +107,16 @@ export function TodayReflectionSection({ date, reflection, routines, tasks, isPa
           </p>
           {(taggedRoutines.length > 0 || taggedTasks.length > 0) && (
             <div className="mt-3 flex flex-wrap gap-1.5 border-t border-[var(--border-subtle)] pt-3">
-              {taggedRoutines.map((r) => <Badge key={r.routineId} tone="accent">{r.name}</Badge>)}
-              {taggedTasks.map((t) => <Badge key={t.taskId} tone="carryover">{t.title}</Badge>)}
+              {taggedRoutines.map((r) => (
+                <Badge key={r.routineId} tone="accent">
+                  {r.name}
+                </Badge>
+              ))}
+              {taggedTasks.map((t) => (
+                <Badge key={t.taskId} tone="carryover">
+                  {t.title}
+                </Badge>
+              ))}
             </div>
           )}
         </div>

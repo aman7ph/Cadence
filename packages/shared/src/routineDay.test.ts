@@ -16,7 +16,9 @@ describe("resolveDayStatus", () => {
   });
 
   it("no record on a finished day is a miss", () => {
-    expect(resolveDayStatus(undefined, addDays(TODAY, -1), TODAY)).toBe("missed");
+    expect(resolveDayStatus(undefined, addDays(TODAY, -1), TODAY)).toBe(
+      "missed",
+    );
   });
 
   it("no record on today is pending, not a miss — the bug this fixes", () => {
@@ -24,7 +26,9 @@ describe("resolveDayStatus", () => {
   });
 
   it("no record on a future day is pending", () => {
-    expect(resolveDayStatus(undefined, addDays(TODAY, 1), TODAY)).toBe("pending");
+    expect(resolveDayStatus(undefined, addDays(TODAY, 1), TODAY)).toBe(
+      "pending",
+    );
   });
 });
 
@@ -61,11 +65,20 @@ function legacyRate(records: Records, to: string, windowDays: number) {
     scheduled += 1;
     if (hit) completed += 1;
   }
-  return { scheduled, completed, consistency: consistencyScore(entries, CONSISTENCY_TAU_DAYS) };
+  return {
+    scheduled,
+    completed,
+    consistency: consistencyScore(entries, CONSISTENCY_TAU_DAYS),
+  };
 }
 
 // What it does now.
-function currentRate(records: Records, to: string, windowDays: number, today: string) {
+function currentRate(
+  records: Records,
+  to: string,
+  windowDays: number,
+  today: string,
+) {
   const entries: Array<{ daysAgo: number; hit: boolean }> = [];
   let scheduled = 0;
   let completed = 0;
@@ -78,7 +91,11 @@ function currentRate(records: Records, to: string, windowDays: number, today: st
     scheduled += 1;
     if (hit) completed += 1;
   }
-  return { scheduled, completed, consistency: consistencyScore(entries, CONSISTENCY_TAU_DAYS) };
+  return {
+    scheduled,
+    completed,
+    consistency: consistencyScore(entries, CONSISTENCY_TAU_DAYS),
+  };
 }
 
 const WINDOW = 30;
@@ -124,7 +141,9 @@ describe("the rule is 'pending', not 'ignore today'", () => {
   it("a routine skipped today stays neutral, exactly as before", () => {
     const records = perfectExceptToday();
     records.set(TODAY, "skipped");
-    expect(currentRate(records, TODAY, WINDOW, TODAY).scheduled).toBe(WINDOW - 1);
+    expect(currentRate(records, TODAY, WINDOW, TODAY).scheduled).toBe(
+      WINDOW - 1,
+    );
   });
 
   it("yesterday missed is still a miss — only today is protected", () => {

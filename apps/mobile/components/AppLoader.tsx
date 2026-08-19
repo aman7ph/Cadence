@@ -42,9 +42,15 @@ export function AppLoader() {
     // `cad-word-fade`: in at 15%, hold to 75%, out by 92%.
     word.value = withRepeat(
       withSequence(
-        withTiming(1, { duration: 0.15 * WORD_MS, easing: Easing.out(Easing.quad) }),
+        withTiming(1, {
+          duration: 0.15 * WORD_MS,
+          easing: Easing.out(Easing.quad),
+        }),
         withTiming(1, { duration: 0.6 * WORD_MS }),
-        withTiming(0, { duration: 0.17 * WORD_MS, easing: Easing.in(Easing.quad) }),
+        withTiming(0, {
+          duration: 0.17 * WORD_MS,
+          easing: Easing.in(Easing.quad),
+        }),
         withTiming(0, { duration: 0.08 * WORD_MS }),
       ),
       -1,
@@ -52,9 +58,15 @@ export function AppLoader() {
     );
     lift.value = withRepeat(
       withSequence(
-        withTiming(0, { duration: 0.15 * WORD_MS, easing: Easing.out(Easing.quad) }),
+        withTiming(0, {
+          duration: 0.15 * WORD_MS,
+          easing: Easing.out(Easing.quad),
+        }),
         withTiming(0, { duration: 0.6 * WORD_MS }),
-        withTiming(-4, { duration: 0.17 * WORD_MS, easing: Easing.in(Easing.quad) }),
+        withTiming(-4, {
+          duration: 0.17 * WORD_MS,
+          easing: Easing.in(Easing.quad),
+        }),
         withTiming(6, { duration: 0.08 * WORD_MS }),
       ),
       -1,
@@ -72,12 +84,29 @@ export function AppLoader() {
   }));
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg, alignItems: "center", justifyContent: "center", paddingHorizontal: 24 }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: c.bg,
+        alignItems: "center",
+        justifyContent: "center",
+        paddingHorizontal: 24,
+      }}
+    >
       <View style={{ alignItems: "center", gap: 28 }}>
         <Logo size={132} animated />
         <Animated.View style={[{ alignItems: "center", gap: 8 }, wordStyle]}>
-          <Text style={{ ...display("semibold"), fontSize: 26, color: c.t1 }}>Cadence</Text>
-          <Text style={{ fontSize: 10, fontWeight: "600", letterSpacing: 1.6, color: c.t3 }}>
+          <Text style={{ ...display("semibold"), fontSize: 26, color: c.t1 }}>
+            Cadence
+          </Text>
+          <Text
+            style={{
+              fontSize: 10,
+              fontWeight: "600",
+              letterSpacing: 1.6,
+              color: c.t3,
+            }}
+          >
             SMALL CORRECTIONS. STEADY COURSE.
           </Text>
         </Animated.View>

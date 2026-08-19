@@ -1,4 +1,10 @@
-import { addDays, daysBetween, startOfWeek, startOfMonth, startOfYear } from "@cadence/shared";
+import {
+  addDays,
+  daysBetween,
+  startOfWeek,
+  startOfMonth,
+  startOfYear,
+} from "@cadence/shared";
 import type { DateRange, Granularity } from "@cadence/shared";
 import type { Colors } from "./colors";
 
@@ -6,7 +12,12 @@ import type { Colors } from "./colors";
 // must leave a hole rather than draw along the floor. SimpleLineChart skips any
 // segment with a null endpoint. Plain number[] still assigns cleanly, so the
 // momentum and open-task charts needed no change.
-export type LineSeries = { data: (number | null)[]; color: string; strokeWidth?: number; opacity?: number };
+export type LineSeries = {
+  data: (number | null)[];
+  color: string;
+  strokeWidth?: number;
+  opacity?: number;
+};
 export type TK = "completed" | "open";
 
 export interface RangePreset {
@@ -21,23 +32,31 @@ export const TASK_KEYS: TK[] = ["completed", "open"];
 // living outside colors.ts, which is exactly what the token layer forbids.
 // They take the active colours instead, so the charts follow the theme.
 // Order and role match web: series run --chart-1..6; completed/open are
-// --chart-2 / --chart-5 (see insights-task-charts.tsx).
-export const seriesColors = (c: Colors): string[] =>
-  [c.chart1, c.chart2, c.chart3, c.chart4, c.chart5, c.chart6];
+// --chart-2 / --chart-5 (see insights-tasks-by-day-chart.tsx).
+export const seriesColors = (c: Colors): string[] => [
+  c.chart1,
+  c.chart2,
+  c.chart3,
+  c.chart4,
+  c.chart5,
+  c.chart6,
+];
 
-export const taskColors = (c: Colors): Record<TK, string> =>
-  ({ completed: c.chart2, open: c.chart5 });
+export const taskColors = (c: Colors): Record<TK, string> => ({
+  completed: c.chart2,
+  open: c.chart5,
+});
 
 export const RANGE_PRESETS: RangePreset[] = [
-  { label: "Last 7 days",   range: (t) => ({ from: addDays(t, -6),   to: t }) },
-  { label: "Last 30 days",  range: (t) => ({ from: addDays(t, -29),  to: t }) },
-  { label: "Last 90 days",  range: (t) => ({ from: addDays(t, -89),  to: t }) },
+  { label: "Last 7 days", range: (t) => ({ from: addDays(t, -6), to: t }) },
+  { label: "Last 30 days", range: (t) => ({ from: addDays(t, -29), to: t }) },
+  { label: "Last 90 days", range: (t) => ({ from: addDays(t, -89), to: t }) },
   { label: "Last 6 months", range: (t) => ({ from: addDays(t, -181), to: t }) },
-  { label: "Last year",     range: (t) => ({ from: addDays(t, -364), to: t }) },
-  { label: "This week",     range: (t) => ({ from: startOfWeek(t),   to: t }) },
-  { label: "This month",    range: (t) => ({ from: startOfMonth(t),  to: t }) },
-  { label: "This year",     range: (t) => ({ from: startOfYear(t),   to: t }) },
-  { label: "All time",      range: (t) => ({ from: "2020-01-01",     to: t }) },
+  { label: "Last year", range: (t) => ({ from: addDays(t, -364), to: t }) },
+  { label: "This week", range: (t) => ({ from: startOfWeek(t), to: t }) },
+  { label: "This month", range: (t) => ({ from: startOfMonth(t), to: t }) },
+  { label: "This year", range: (t) => ({ from: startOfYear(t), to: t }) },
+  { label: "All time", range: (t) => ({ from: "2020-01-01", to: t }) },
 ];
 
 // `getGranularity` and `granLabel` moved to @cadence/shared in Step 11. Mobile
@@ -47,80 +66,19 @@ export const RANGE_PRESETS: RangePreset[] = [
 export type { Granularity } from "@cadence/shared";
 export { getGranularity, granularityLabel } from "@cadence/shared";
 
-export function computeEMA(values: number[], period: number): number[] {
-  if (values.length === 0) return [];
-  const alpha = 2 / (period + 1);
-  const ema = [values[0]!];
-  for (let i = 1; i < values.length; i++) {
-    ema.push(values[i]! * alpha + ema[i - 1]! * (1 - alpha));
-  }
-  return ema;
-}
-
-export function bucketByWeek(rows: { date: string; value: number }[]) {
-  const buckets = new Map<string, { sum: number; count: number }>();
-  for (const r of rows) {
-    const key = startOfWeek(r.date);
-    const b = buckets.get(key) ?? { sum: 0, count: 0 };
-    b.sum += r.value; b.count += 1;
-    buckets.set(key, b);
-  }
-  return Array.from(buckets.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, { sum, count }]) => ({ date, value: Math.round(sum / count) }));
-}
-
-export function bucketByMonth(rows: { date: string; value: number }[]) {
-  const buckets = new Map<string, { sum: number; count: number }>();
-  for (const r of rows) {
-    const key = r.date.slice(0, 7) + "-01";
-    const b = buckets.get(key) ?? { sum: 0, count: 0 };
-    b.sum += r.value; b.count += 1;
-    buckets.set(key, b);
-  }
-  return Array.from(buckets.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, { sum, count }]) => ({ date, value: Math.round(sum / count) }));
-}
-
-export function bucketCountsByWeek<K extends string>(
-  rows: ({ date: string } & Record<K, number>)[],
-  keys: K[],
-): ({ date: string } & Record<K, number>)[] {
-  const buckets = new Map<string, Record<K, number>>();
-  for (const row of rows) {
-    const key = startOfWeek(row.date);
-    const b = buckets.get(key) ?? Object.fromEntries(keys.map((k) => [k, 0])) as Record<K, number>;
-    for (const k of keys) b[k] = ((b[k] ?? 0) as number) + (row[k] ?? 0);
-    buckets.set(key, b);
-  }
-  return Array.from(buckets.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, counts]) => ({ date, ...counts }) as { date: string } & Record<K, number>);
-}
-
-export function bucketCountsByMonth<K extends string>(
-  rows: ({ date: string } & Record<K, number>)[],
-  keys: K[],
-): ({ date: string } & Record<K, number>)[] {
-  const buckets = new Map<string, Record<K, number>>();
-  for (const row of rows) {
-    const key = row.date.slice(0, 7) + "-01";
-    const b = buckets.get(key) ?? Object.fromEntries(keys.map((k) => [k, 0])) as Record<K, number>;
-    for (const k of keys) b[k] = ((b[k] ?? 0) as number) + (row[k] ?? 0);
-    buckets.set(key, b);
-  }
-  return Array.from(buckets.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, counts]) => ({ date, ...counts }) as { date: string } & Record<K, number>);
-}
-
 export function fmtXLabel(date: string, g: Granularity): string {
   const [y, m, d] = date.split("-").map(Number);
   if (g === "monthly") {
-    return new Date(Date.UTC(y!, m! - 1, 1)).toLocaleDateString(undefined, { month: "short", timeZone: "UTC" });
+    return new Date(Date.UTC(y!, m! - 1, 1)).toLocaleDateString(undefined, {
+      month: "short",
+      timeZone: "UTC",
+    });
   }
-  return new Date(Date.UTC(y!, m! - 1, d!)).toLocaleDateString(undefined, { month: "numeric", day: "numeric", timeZone: "UTC" });
+  return new Date(Date.UTC(y!, m! - 1, d!)).toLocaleDateString(undefined, {
+    month: "numeric",
+    day: "numeric",
+    timeZone: "UTC",
+  });
 }
 
 export { fmtShort } from "./dateUtils";

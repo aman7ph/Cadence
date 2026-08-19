@@ -54,14 +54,14 @@ export function ArchivedRoutineRow({ routine }: ArchivedRoutineRowProps) {
           Restore
         </button>
 
-          <button
-            type="button"
-            onClick={() => setConfirm("delete")}
-            aria-label="Delete permanently"
-            className="flex h-8 w-8 items-center justify-center rounded-sm text-[var(--text-tertiary)] transition-colors duration-150 hover:bg-[var(--surface-hover)] hover:text-[var(--status-danger)]"
-          >
-            <Trash2 className="size-3.5" />
-          </button>
+        <button
+          type="button"
+          onClick={() => setConfirm("delete")}
+          aria-label="Delete permanently"
+          className="flex h-8 w-8 items-center justify-center rounded-sm text-[var(--text-tertiary)] transition-colors duration-150 hover:bg-[var(--surface-hover)] hover:text-[var(--status-danger)]"
+        >
+          <Trash2 className="size-3.5" />
+        </button>
       </div>
 
       <ConfirmDrawer

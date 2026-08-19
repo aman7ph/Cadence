@@ -1,7 +1,12 @@
 import { useMemo } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
-import { addDays, scoreToHeatBand, todayLocal, weekdayOf } from "@cadence/shared";
+import {
+  addDays,
+  scoreToHeatBand,
+  todayLocal,
+  weekdayOf,
+} from "@cadence/shared";
 import type { HeatBand } from "@cadence/shared";
 
 const DAYS = 365;
@@ -25,11 +30,15 @@ function prettyDate(date: string): string {
 export function ContributionHeatmap() {
   const today = todayLocal();
   const from = addDays(today, -(DAYS - 1));
-  const rows = useQuery(api.analyticsProductivity.dayStatsRange, { from, to: today });
+  const rows = useQuery(api.analyticsProductivity.dayStatsRange, {
+    from,
+    to: today,
+  });
 
   const cells = useMemo<Cell[]>(() => {
     const scoreByDate = new Map<string, number>();
-    if (rows) for (const r of rows) scoreByDate.set(r.date, r.productivityScore);
+    if (rows)
+      for (const r of rows) scoreByDate.set(r.date, r.productivityScore);
 
     // Leading padding so the first column begins on a Sunday (column-major,
     // grid-rows-7 means each column is one full week).
@@ -45,7 +54,10 @@ export function ContributionHeatmap() {
   }, [from, rows]);
 
   return (
-    <div className="grid grid-flow-col grid-rows-7 gap-[3px]" aria-label="365-day activity heatmap">
+    <div
+      className="grid grid-flow-col grid-rows-7 gap-[3px]"
+      aria-label="365-day activity heatmap"
+    >
       {cells.map((c, i) =>
         c.kind === "pad" ? (
           <span key={`p-${i}`} className="h-3 w-3" aria-hidden />

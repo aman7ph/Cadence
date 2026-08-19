@@ -59,9 +59,15 @@
   transform: rotateX(68deg) rotateY(68deg);
 }
 
-.cad-mark--spin .cad-mark__ring--a { animation: cad-spin-a 4.5s linear infinite; }
-.cad-mark--spin .cad-mark__ring--b { animation: cad-spin-b 3.6s linear infinite; }
-.cad-mark--spin .cad-mark__ring--c { animation: cad-spin-c 5.4s linear infinite; }
+.cad-mark--spin .cad-mark__ring--a {
+  animation: cad-spin-a 4.5s linear infinite;
+}
+.cad-mark--spin .cad-mark__ring--b {
+  animation: cad-spin-b 3.6s linear infinite;
+}
+.cad-mark--spin .cad-mark__ring--c {
+  animation: cad-spin-c 5.4s linear infinite;
+}
 
 /* 15px dot on a 155px mark. */
 .cad-mark__dot {
@@ -80,47 +86,100 @@
 }
 
 @keyframes cad-spin-a {
-  0%   { transform: rotateX(68deg) rotateZ(0deg); }
-  100% { transform: rotateX(68deg) rotateZ(360deg); }
+  0% {
+    transform: rotateX(68deg) rotateZ(0deg);
+  }
+  100% {
+    transform: rotateX(68deg) rotateZ(360deg);
+  }
 }
 @keyframes cad-spin-b {
-  0%   { transform: rotateY(68deg) rotateZ(0deg); }
-  100% { transform: rotateY(68deg) rotateZ(-360deg); }
+  0% {
+    transform: rotateY(68deg) rotateZ(0deg);
+  }
+  100% {
+    transform: rotateY(68deg) rotateZ(-360deg);
+  }
 }
 @keyframes cad-spin-c {
-  0%   { transform: rotateX(68deg) rotateY(68deg) rotateZ(0deg); }
-  100% { transform: rotateX(68deg) rotateY(68deg) rotateZ(360deg); }
+  0% {
+    transform: rotateX(68deg) rotateY(68deg) rotateZ(0deg);
+  }
+  100% {
+    transform: rotateX(68deg) rotateY(68deg) rotateZ(360deg);
+  }
 }
 
 /* The philosophy, literally: it never settles still. */
 @keyframes cad-correct {
-  0%   { transform: rotate(0deg); }
-  18%  { transform: rotate(-3.5deg); }
-  36%  { transform: rotate(2deg); }
-  54%  { transform: rotate(-1.2deg); }
-  72%  { transform: rotate(1.8deg); }
-  86%  { transform: rotate(-0.6deg); }
-  100% { transform: rotate(0deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  18% {
+    transform: rotate(-3.5deg);
+  }
+  36% {
+    transform: rotate(2deg);
+  }
+  54% {
+    transform: rotate(-1.2deg);
+  }
+  72% {
+    transform: rotate(1.8deg);
+  }
+  86% {
+    transform: rotate(-0.6deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
 }
 
 @keyframes cad-pulse {
-  0%, 100% { transform: scale(1);    opacity: 1; }
-  50%      { transform: scale(1.25); opacity: 0.75; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 0.75;
+  }
 }
 
 @keyframes cad-ring-fade {
-  0%   { opacity: 0; }
-  10%  { opacity: 1; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 /* The wordmark breathes in and out beneath the mark. */
 @keyframes cad-word-fade {
-  0%   { opacity: 0; transform: translateY(6px); }
-  15%  { opacity: 1; transform: translateY(0); }
-  75%  { opacity: 1; transform: translateY(0); }
-  92%  { opacity: 0; transform: translateY(-4px); }
-  100% { opacity: 0; }
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  75% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  92% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 .cad-word {

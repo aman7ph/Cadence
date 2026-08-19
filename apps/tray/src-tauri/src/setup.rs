@@ -8,12 +8,13 @@ use tauri_plugin_autostart::ManagerExt;
 use super::{AuthState, AutostartItem, SignAuthItem};
 
 pub fn run(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
-    let icon = tauri::image::Image::new_owned(crate::tray::build_tray_image(), 32, 32);
+    let icon = crate::tray::tray_icon();
     let is_autostart = app.autolaunch().is_enabled().unwrap_or(false);
 
     let autostart_item = CheckMenuItemBuilder::new("Launch on startup")
         .id("autostart").checked(is_autostart).build(app)?;
-    let sign_auth_item = MenuItemBuilder::new("Sign Out").id("sign-auth").build(app)?;
+    // "Sign out", not "Sign Out" — sentence case, matching web and mobile.
+    let sign_auth_item = MenuItemBuilder::new("Sign out").id("sign-auth").build(app)?;
     let menu = MenuBuilder::new(app)
         .item(&MenuItemBuilder::new("Show / Hide").id("toggle").build(app)?)
         .separator()

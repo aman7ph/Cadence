@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import { useColorScheme } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { darkColors, lightColors, type Colors } from "./colors";
@@ -51,13 +57,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const toggle = () => setTheme(scheme === "dark" ? "light" : "dark");
 
   return (
-    <ThemeContext.Provider value={{
-      preference: pref,
-      colorScheme: scheme,
-      colors: scheme === "dark" ? darkColors : lightColors,
-      setTheme,
-      toggle,
-    }}>
+    <ThemeContext.Provider
+      value={{
+        preference: pref,
+        colorScheme: scheme,
+        colors: scheme === "dark" ? darkColors : lightColors,
+        setTheme,
+        toggle,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );
@@ -68,6 +76,7 @@ export function useColors(): Colors {
 }
 
 export function useTheme() {
-  const { preference, colorScheme, setTheme, toggle } = useContext(ThemeContext);
+  const { preference, colorScheme, setTheme, toggle } =
+    useContext(ThemeContext);
   return { preference, colorScheme, setTheme, toggle };
 }

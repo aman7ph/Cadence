@@ -1,202 +1,131 @@
-import { useState } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import { todayLocal } from "@cadence/shared";
-import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ActionSheet } from "./ActionSheet";
-import { GoalFormModal } from "./GoalFormModal";
-import { DatePickerModal } from "./DatePickerModal";
-import { GoalActionButtons } from "./GoalActionButtons";
-import { ConfirmSheet } from "./ui/ConfirmSheet";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { FullScreenModal } from "./ui/FullScreenModal";
+import { IconButton } from "./ui/IconButton";
+import { GoalDetailHeaderCard } from "./GoalDetailHeaderCard";
+import { GoalProgressCard } from "./GoalProgressCard";
 import { GoalDailyTracking } from "./GoalDailyTracking";
-import { useColors } from "../lib/theme";
-import { radii } from "../lib/radii";
-import { fmtTimestamp } from "../lib/dateUtils";
+import { GoalDetailSheets } from "./GoalDetailSheets";
+import { useGoalDetailUi } from "../lib/useGoalDetailUi";
 
 export interface GoalData {
-  _id: Id<"goals">; title: string; status: string; description?: string;
-  targetValue?: number; currentValue?: number; unit?: string; dueDate?: string;
-  createdAt: number; completedAt?: number;
+  _id: Id<"goals">;
+  title: string;
+  status: string;
+  description?: string;
+  targetValue?: number;
+  currentValue?: number;
+  unit?: string;
+  dueDate?: string;
+  createdAt: number;
+  completedAt?: number;
 }
 
-function tsToDateStr(ts: number) { return new Date(ts).toISOString().slice(0, 10); }
-function shiftDate(d: string, n: number) { const dt = new Date(d + "T12:00:00"); dt.setDate(dt.getDate() + n); return dt.toISOString().slice(0, 10); }
-
-function GoalDetailContent({ goal: initGoal, onClose }: { goal: GoalData; onClose: () => void }) {
-  const c = useColors();
+function GoalDetailContent({
+  goal: initGoal,
+  onClose,
+}: {
+  goal: GoalData;
+  onClose: () => void;
+}) {
   const today = todayLocal();
-  const [confirm, setConfirm]       = useState<"complete" | "abandon" | "delete" | null>(null);
-  const [selDate, setSelDate]       = useState(today);
-  const [editKey, setEditKey]       = useState(0);
-  const [editOpen, setEditOpen]     = useState(false);
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const [menuOpen, setMenuOpen]     = useState(false);
+  const linked = useQuery(api.goalLinks.getLinkedItems, {
+    goalId: initGoal._id,
+  });
+  const goal = (linked?.goal ?? initGoal) as GoalData;
+  const ui = useGoalDetailUi(today, goal.createdAt, goal.completedAt);
 
-  const linked   = useQuery(api.goalLinks.getLinkedItems, { goalId: initGoal._id });
-  const day      = useQuery(api.goalLinks.getDayForGoal,  { goalId: initGoal._id, date: selDate });
-  const complete = useMutation(api.goals.complete);
-  const abandon  = useMutation(api.goals.abandon);
-  const remove   = useMutation(api.goals.remove);
+  const day = useQuery(api.goalLinks.getDayForGoal, {
+    goalId: initGoal._id,
+    date: ui.selDate,
+  });
 
-  const goal         = (linked?.goal ?? initGoal) as GoalData;
-  const isActive     = goal.status === "active";
-  const minDate      = tsToDateStr(goal.createdAt);
-  const maxDate      = goal.completedAt ? tsToDateStr(goal.completedAt) : today;
-  const currentValue = (linked?.tasks ?? []).filter((t) => t.status === "completed")
+  // Progress is summed from linked tasks rather than read off the goal: the
+  // stored currentValue is a write-time cache and the linked list is the truth.
+  const currentValue = (linked?.tasks ?? [])
+    .filter((t) => t.status === "completed")
     .reduce((sum, t) => sum + (t.goalContribution ?? 0), 0);
-  const pct       = goal.targetValue ? Math.min(100, Math.round((currentValue / goal.targetValue) * 100)) : null;
-  const badge     = goal.status === "completed"
-    ? { bg: c.successBg, fg: c.tSuccess, label: "Completed" }
-    : goal.status === "abandoned"
-    ? { bg: c.bgS, fg: c.t3, label: "Abandoned" }
-    : { bg: c.accBg, fg: c.tacc, label: "Active" };
-  const routines  = day?.routines ?? [];
-  const tasks     = day?.tasks ?? [];
 
   const s = StyleSheet.create({
-    screen:   { flex: 1, backgroundColor: c.bg },
-    topRow:   { flexDirection: "row", alignItems: "center", paddingHorizontal: 16,
-                paddingTop: 6, paddingBottom: 10, gap: 8 },
-    iconBtn:  { width: 34, height: 34, borderRadius: radii.full, backgroundColor: c.card,
-                borderWidth: 1, borderColor: c.bd2, alignItems: "center", justifyContent: "center" },
-    card:     { marginHorizontal: 16, marginBottom: 10, backgroundColor: c.card,
-                borderWidth: 1, borderColor: c.bd1, borderRadius: radii.lg, padding: 14 },
-    title:    { fontSize: 22, fontWeight: "700", color: c.t1, letterSpacing: -0.5, marginBottom: 10, lineHeight: 28 },
-    metaRow:  { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 8 },
-    badge:    { borderRadius: radii.full, paddingHorizontal: 9, paddingVertical: 3 },
-    startTxt: { fontSize: 12, color: c.t3 },
-    dueBadge: { borderRadius: radii.full, paddingHorizontal: 9, paddingVertical: 3, backgroundColor: c.accBg },
-    dueTxt:   { fontSize: 11, fontWeight: "600", color: c.tacc },
-    desc:     { fontSize: 13, color: c.t2, lineHeight: 20, marginBottom: 8 },
-    divider:  { height: 1, backgroundColor: c.bd1, marginVertical: 10 },
-    pRow:     { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 8 },
-    bigNum:   { fontSize: 44, fontWeight: "700", color: c.t1, letterSpacing: -1.5, lineHeight: 48 },
-    pOfTxt:   { fontSize: 15, color: c.t2, marginBottom: 7, marginLeft: 4 },
-    pPct:     { fontSize: 16, fontWeight: "700", marginBottom: 7 },
-    track:    { height: 5, backgroundColor: c.active, borderRadius: radii.full, overflow: "hidden" },
-    content:  { paddingBottom: 40 },
+    topRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 16,
+      paddingTop: 6,
+      paddingBottom: 10,
+      gap: 8,
+    },
+    spacer: { flex: 1 },
+    content: { paddingBottom: 40 },
   });
 
   return (
-    <SafeAreaView style={s.screen} edges={["top", "bottom"]}>
+    <>
       <View style={s.topRow}>
-        <TouchableOpacity style={s.iconBtn} onPress={onClose} activeOpacity={0.7}>
-          <Text style={{ fontSize: 13, fontWeight: "600", color: c.t2 }}>✕</Text>
-        </TouchableOpacity>
-        <View style={{ flex: 1 }} />
-        <TouchableOpacity style={s.iconBtn} onPress={() => setMenuOpen(true)} activeOpacity={0.7}>
-          <Text style={{ fontSize: 13, fontWeight: "600", color: c.t2 }}>•••</Text>
-        </TouchableOpacity>
+        <IconButton glyph="✕" onPress={onClose} accessibilityLabel="Close" />
+        <View style={s.spacer} />
+        <IconButton
+          glyph="•••"
+          onPress={ui.openMenu}
+          accessibilityLabel="Goal actions"
+        />
       </View>
 
       <ScrollView contentContainerStyle={s.content}>
-        <View style={s.card}>
-          <Text style={s.title}>{goal.title}</Text>
-          <View style={s.metaRow}>
-            <View style={[s.badge, { backgroundColor: badge.bg }]}>
-              <Text style={{ fontSize: 11, fontWeight: "600", color: badge.fg }}>{badge.label}</Text>
-            </View>
-            <Text style={s.startTxt}>Started {fmtTimestamp(goal.createdAt)}</Text>
-            {goal.dueDate && <View style={s.dueBadge}><Text style={s.dueTxt}>Due {goal.dueDate}</Text></View>}
-          </View>
-          {goal.description ? <Text style={s.desc}>{goal.description}</Text> : null}
-          {isActive && (
-            <>
-              <View style={s.divider} />
-              <GoalActionButtons
-                onRequestComplete={() => setConfirm("complete")}
-                onRequestAbandon={() => setConfirm("abandon")}
-              />
-            </>
-          )}
-        </View>
+        <GoalDetailHeaderCard
+          title={goal.title}
+          status={goal.status}
+          description={goal.description}
+          dueDate={goal.dueDate}
+          createdAt={goal.createdAt}
+          onRequestComplete={() => ui.setConfirm("complete")}
+          onRequestAbandon={() => ui.setConfirm("abandon")}
+        />
 
         {goal.targetValue != null && (
-          <View style={s.card}>
-            <View style={s.pRow}>
-              <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-                <Text style={s.bigNum}>{currentValue}</Text>
-                <Text style={s.pOfTxt}>/ {goal.targetValue}{goal.unit ? ` ${goal.unit}` : ""}</Text>
-              </View>
-              <Text style={[s.pPct, { color: c.prim }]}>{pct}%</Text>
-            </View>
-            <View style={s.track}>
-              <View style={{ height: "100%", borderRadius: radii.full, width: `${pct ?? 0}%`, backgroundColor: c.prim }} />
-            </View>
-          </View>
+          <GoalProgressCard
+            currentValue={currentValue}
+            targetValue={goal.targetValue}
+            unit={goal.unit}
+          />
         )}
 
         <GoalDailyTracking
-          selDate={selDate} minDate={minDate} maxDate={maxDate}
-          onPrev={() => setSelDate((d) => shiftDate(d, -1))}
-          onNext={() => setSelDate((d) => shiftDate(d, 1))}
-          onOpenPicker={() => setPickerOpen(true)}
-          routines={routines as { routineId: string; name: string; status: string }[]}
-          tasks={tasks as { taskId: string; title: string; status: string }[]}
+          selDate={ui.selDate}
+          minDate={ui.minDate}
+          maxDate={ui.maxDate}
+          onPrev={() => ui.stepDay(-1)}
+          onNext={() => ui.stepDay(1)}
+          onOpenPicker={ui.openPicker}
+          routines={day?.routines ?? []}
+          tasks={day?.tasks ?? []}
           loading={day === undefined}
         />
       </ScrollView>
 
-      <ActionSheet visible={menuOpen} title={goal.title}
-        actions={[
-          // Edit is offered only on an active goal, as before — a completed or
-          // abandoned goal can still be deleted but not rewritten.
-          ...(isActive
-            ? [{ label: "Edit goal", onPress: () => { setEditKey((k) => k + 1); setEditOpen(true); } }]
-            : []),
-          { label: "Delete goal", style: "destructive" as const,
-            onPress: () => setConfirm("delete") },
-        ]}
-        onCancel={() => setMenuOpen(false)} />
-
-      {/* Copy matches web's goals-page drawers word for word. Complete and
-          abandon are reversible — the goal changes tab rather than vanishing —
-          so they take the accent tone; only delete is danger. */}
-      <ConfirmSheet
-        visible={confirm === "complete"}
-        onCancel={() => setConfirm(null)}
-        title="Mark this goal complete?"
-        description="It moves to Completed and stops accepting contributions."
-        confirmLabel="Mark complete"
-        tone="accent"
-        onConfirm={async () => { await complete({ goalId: initGoal._id }); onClose(); }}
+      <GoalDetailSheets
+        goalId={initGoal._id}
+        goal={goal}
+        ui={ui}
+        onDone={onClose}
       />
-      <ConfirmSheet
-        visible={confirm === "abandon"}
-        onCancel={() => setConfirm(null)}
-        title="Abandon this goal?"
-        description="It moves to Abandoned and stops accepting contributions. Nothing is deleted."
-        confirmLabel="Abandon goal"
-        tone="accent"
-        onConfirm={async () => { await abandon({ goalId: initGoal._id }); onClose(); }}
-      />
-      <ConfirmSheet
-        visible={confirm === "delete"}
-        onCancel={() => setConfirm(null)}
-        title="Delete this goal forever?"
-        description="This cannot be undone. Tasks and routines linked to it are unlinked, not deleted."
-        confirmLabel="Delete forever"
-        tone="danger"
-        onConfirm={async () => { await remove({ goalId: initGoal._id }); onClose(); }}
-      >
-        <Text style={{ fontSize: 13, color: c.t1 }}>{goal.title}</Text>
-      </ConfirmSheet>
-      <GoalFormModal key={editKey} visible={editOpen}
-        goal={{ _id: initGoal._id, title: goal.title, description: goal.description,
-                targetValue: goal.targetValue, unit: goal.unit, dueDate: goal.dueDate }}
-        onDone={() => setEditOpen(false)} />
-      <DatePickerModal visible={pickerOpen} value={selDate} min={minDate} max={maxDate}
-        onChange={setSelDate} onClose={() => setPickerOpen(false)} />
-    </SafeAreaView>
+    </>
   );
 }
 
-export function GoalDetailModal({ goal, onClose }: { goal: GoalData | null; onClose: () => void }) {
+export function GoalDetailModal({
+  goal,
+  onClose,
+}: {
+  goal: GoalData | null;
+  onClose: () => void;
+}) {
   return (
-    <Modal visible={!!goal} animationType="slide" onRequestClose={onClose}>
+    <FullScreenModal visible={!!goal} onClose={onClose}>
       {goal && <GoalDetailContent goal={goal} onClose={onClose} />}
-    </Modal>
+    </FullScreenModal>
   );
 }

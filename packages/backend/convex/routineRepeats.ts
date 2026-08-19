@@ -1,7 +1,12 @@
-import { formatCountdown, isRepAllowed, nextAllowedAt, remainingMs } from "@cadence/shared";
+import {
+  formatCountdown,
+  isRepAllowed,
+  nextAllowedAt,
+  remainingMs,
+} from "@cadence/shared";
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
-import { requireUser } from "./lib/auth";
+import { requireOwnedRoutine } from "./lib/ownership";
 import { clearStatus, setStatus } from "./lib/routineSetStatus";
 
 // Reps for a repeat routine — the routine counterpart of dailyTaskRepeats.
@@ -18,9 +23,7 @@ export const logRep = mutation({
     today: v.string(),
   },
   handler: async (ctx, { routineId, date, today }) => {
-    const user = await requireUser(ctx);
-    const routine = await ctx.db.get(routineId);
-    if (!routine || routine.userId !== user._id) throw new Error("Routine not found");
+    const routine = await requireOwnedRoutine(ctx, routineId);
     if (!routine.repeatTarget) throw new Error("This routine does not repeat");
 
     const completion = await ctx.db
@@ -39,7 +42,9 @@ export const logRep = mutation({
         nextAllowedAt(routine.lastRepAt, routine.repeatIntervalMinutes),
         now,
       );
-      throw new Error(`Too soon — wait ${formatCountdown(wait)} before the next one`);
+      throw new Error(
+        `Too soon — wait ${formatCountdown(wait)} before the next one`,
+      );
     }
 
     const repsOnDate = await ctx.db
@@ -51,13 +56,25 @@ export const logRep = mutation({
     const doneToday = repsOnDate.length + 1;
     const reachedTarget = doneToday >= routine.repeatTarget;
 
-    await ctx.db.insert("routineReps", { userId: user._id, routineId, date, completedAt: now });
+    await ctx.db.insert("routineReps", {
+      // routine.userId, not a separately-fetched user: requireOwnedRoutine has
+      // already proved the two are equal, and reading it off the routine keeps
+      // the rep scoped to whoever owns the routine it belongs to.
+      userId: routine.userId,
+      routineId,
+      date,
+      completedAt: now,
+    });
     await ctx.db.patch(routineId, { lastRepAt: now });
     if (reachedTarget) {
       await setStatus(ctx, { routineId, date, today, status: "completed" });
     }
 
-    return { doneToday, target: routine.repeatTarget, completed: reachedTarget };
+    return {
+      doneToday,
+      target: routine.repeatTarget,
+      completed: reachedTarget,
+    };
   },
 });
 
@@ -69,9 +86,7 @@ export const undoRep = mutation({
     today: v.string(),
   },
   handler: async (ctx, { routineId, date, today }) => {
-    const user = await requireUser(ctx);
-    const routine = await ctx.db.get(routineId);
-    if (!routine || routine.userId !== user._id) throw new Error("Routine not found");
+    const routine = await requireOwnedRoutine(ctx, routineId);
     if (!routine.repeatTarget) throw new Error("This routine does not repeat");
 
     const newest = await ctx.db

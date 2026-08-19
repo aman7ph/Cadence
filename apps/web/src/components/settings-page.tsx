@@ -2,7 +2,10 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
 import { DEFAULT_ROUTINE_WEIGHT } from "@cadence/shared";
 import { Button } from "@/components/ui/button";
-import { AccountSection, AppearanceSection, DataSection, Section } from "./settings-sections";
+import { Section } from "./settings-section";
+import { AccountSection } from "./settings-account-section";
+import { AppearanceSection } from "./settings-appearance-section";
+import { DataSection } from "./settings-data-section";
 import { LayoutSection } from "./settings-layout-section";
 import { PageHeader } from "./page-header";
 
@@ -19,7 +22,9 @@ function ProductivitySection() {
     void setRoutineWeight({ routineWeight: next });
   };
 
-  const isDefault = me?.routineWeight === undefined || me?.routineWeight === DEFAULT_ROUTINE_WEIGHT;
+  const isDefault =
+    me?.routineWeight === undefined ||
+    me?.routineWeight === DEFAULT_ROUTINE_WEIGHT;
 
   return (
     <Section
@@ -28,10 +33,12 @@ function ProductivitySection() {
     >
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <span className="text-[12.5px] font-semibold text-foreground">Routine weight</span>
+          <span className="text-[12.5px] font-semibold text-foreground">
+            Routine weight
+          </span>
           <span className="font-mono text-[12px] text-[var(--text-secondary)]">
             <span className="text-foreground font-bold">{routinePct}%</span>
-            <span className="text-[var(--text-tertiary)]"> routines  ·  </span>
+            <span className="text-[var(--text-tertiary)]"> routines · </span>
             <span className="text-foreground font-bold">{taskPct}%</span>
             <span className="text-[var(--text-tertiary)]"> tasks</span>
           </span>
@@ -70,7 +77,10 @@ function ProductivitySection() {
 export function SettingsPage() {
   return (
     <div className="flex flex-col gap-[22px]">
-      <PageHeader title="Settings" subtitle="Manage your account and preferences." />
+      <PageHeader
+        title="Settings"
+        subtitle="Manage your account and preferences."
+      />
 
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
         <div className="flex flex-col gap-4">

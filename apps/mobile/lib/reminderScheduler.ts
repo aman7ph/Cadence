@@ -5,7 +5,10 @@ import {
   computeReminderSlots,
   reminderValidationError,
 } from "@cadence/shared";
-import { REMINDER_CHANNEL_IDS, ensureReminderChannels } from "./notificationChannels";
+import {
+  REMINDER_CHANNEL_IDS,
+  ensureReminderChannels,
+} from "./notificationChannels";
 
 const CONTENT = {
   title: "Cadence",

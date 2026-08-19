@@ -1,6 +1,6 @@
 import type { MutationCtx } from "../_generated/server";
 import type { Id } from "../_generated/dataModel";
-import { requireUser } from "./auth";
+import { requireOwnedRoutine } from "./ownership";
 import { recomputeStreak } from "./streak";
 import { upsertDayStats } from "./dayStats";
 import { applyGoalContribution } from "./goalContribution";
@@ -14,9 +14,7 @@ export async function setStatus(
     status: "completed" | "skipped";
   },
 ) {
-  const user = await requireUser(ctx);
-  const routine = await ctx.db.get(args.routineId);
-  if (!routine || routine.userId !== user._id) throw new Error("Routine not found");
+  const routine = await requireOwnedRoutine(ctx, args.routineId);
   const existing = await ctx.db
     .query("routineCompletions")
     .withIndex("by_routine_date", (q) =>
@@ -29,11 +27,14 @@ export async function setStatus(
 
   if (existing) {
     if (existing.status !== args.status) {
-      await ctx.db.patch(existing._id, { status: args.status, completedAt: Date.now() });
+      await ctx.db.patch(existing._id, {
+        status: args.status,
+        completedAt: Date.now(),
+      });
     }
   } else {
     await ctx.db.insert("routineCompletions", {
-      userId: user._id,
+      userId: routine.userId,
       routineId: args.routineId,
       date: args.date,
       status: args.status,
@@ -51,7 +52,7 @@ export async function setStatus(
   }
 
   await recomputeStreak(ctx, args.routineId, args.today);
-  await upsertDayStats(ctx, user._id, args.date);
+  await upsertDayStats(ctx, routine.userId, args.date);
 }
 
 // Reverses whatever status a day holds: drops the completion/skip row, gives
@@ -61,9 +62,7 @@ export async function clearStatus(
   ctx: MutationCtx,
   args: { routineId: Id<"routines">; date: string; today: string },
 ): Promise<void> {
-  const user = await requireUser(ctx);
-  const routine = await ctx.db.get(args.routineId);
-  if (!routine || routine.userId !== user._id) throw new Error("Routine not found");
+  const routine = await requireOwnedRoutine(ctx, args.routineId);
   const existing = await ctx.db
     .query("routineCompletions")
     .withIndex("by_routine_date", (q) =>
@@ -75,8 +74,13 @@ export async function clearStatus(
   const wasCompleted = existing.status === "completed";
   await ctx.db.delete(existing._id);
   if (wasCompleted) {
-    await applyGoalContribution(ctx, routine.goalId, routine.goalContribution, -1);
+    await applyGoalContribution(
+      ctx,
+      routine.goalId,
+      routine.goalContribution,
+      -1,
+    );
   }
   await recomputeStreak(ctx, args.routineId, args.today);
-  await upsertDayStats(ctx, user._id, args.date);
+  await upsertDayStats(ctx, routine.userId, args.date);
 }

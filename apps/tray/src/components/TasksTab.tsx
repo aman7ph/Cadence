@@ -19,7 +19,11 @@ export function TasksTab() {
   if (day === undefined) {
     return (
       <div className="tab-empty">
-        <div className="loading-dots"><span /><span /><span /></div>
+        <div className="loading-dots">
+          <span />
+          <span />
+          <span />
+        </div>
       </div>
     );
   }
@@ -32,7 +36,10 @@ export function TasksTab() {
     return (
       <div className="tab-empty">
         <div className="tab-empty-icon">○</div>
-        <p className="tab-empty-text">No tasks for today</p>
+        {/* Web and mobile say "No tasks yet. Add one below." — the second
+            sentence is dropped because the tray has no add affordance, and
+            pointing at one that does not exist is worse than saying less. */}
+        <p className="tab-empty-text">No tasks yet.</p>
       </div>
     );
   }
@@ -41,7 +48,7 @@ export function TasksTab() {
     <div className="task-list">
       {open.map((t) => (
         <div key={t.taskId} className="task-row">
-          <span className="task-dot blue" />
+          <span className="task-dot pending" />
           <span className="task-title">
             {t.isCarriedOver ? "↑ " : ""}
             {t.title}
@@ -73,7 +80,7 @@ export function TasksTab() {
           <div className="section-divider" />
           {done.map((t) => (
             <div key={t.taskId} className="task-row">
-              <span className="task-dot green" />
+              <span className="task-dot completed" />
               <span className="task-title done">{t.title}</span>
               <div className="task-actions">
                 {t.repeatTarget !== undefined && (

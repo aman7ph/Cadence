@@ -10,6 +10,7 @@ import type { Doc } from "@cadence/backend/convex/_generated/dataModel";
 import { PageHeader } from "./page-header";
 import { ListGrid } from "@/components/ui/list-grid";
 import { useListColumns } from "@/lib/use-list-columns";
+import { EmptyNote } from "@/components/ui/empty-note";
 
 type Tab = "unscheduled" | "scheduled";
 
@@ -23,10 +24,16 @@ export function StagingPage() {
   const [scheduling, setScheduling] = useState<Doc<"stagedTasks"> | null>(null);
   const { columns } = useListColumns();
 
-  const goalTitleById = new Map((activeGoals ?? []).map((g) => [g._id, g.title]));
+  const goalTitleById = new Map(
+    (activeGoals ?? []).map((g) => [g._id, g.title]),
+  );
 
-  const unscheduled = (stagedTasks ?? []).filter((t) => t.scheduledDate === undefined);
-  const scheduled = (stagedTasks ?? []).filter((t) => t.scheduledDate !== undefined);
+  const unscheduled = (stagedTasks ?? []).filter(
+    (t) => t.scheduledDate === undefined,
+  );
+  const scheduled = (stagedTasks ?? []).filter(
+    (t) => t.scheduledDate !== undefined,
+  );
   const shown = tab === "unscheduled" ? unscheduled : scheduled;
 
   return (
@@ -35,7 +42,11 @@ export function StagingPage() {
         title="Staging"
         subtitle="Capture tasks now — assign them to a routine or a day later."
         tabs={[
-          { id: "unscheduled", label: "Unscheduled", count: unscheduled.length },
+          {
+            id: "unscheduled",
+            label: "Unscheduled",
+            count: unscheduled.length,
+          },
           { id: "scheduled", label: "Scheduled", count: scheduled.length },
         ]}
         active={tab}
@@ -53,11 +64,11 @@ export function StagingPage() {
         )}
 
         {stagedTasks !== undefined && shown.length === 0 && (
-          <p className="text-[13px] text-[var(--text-tertiary)] rounded-md border border-dashed border-[var(--border-subtle)] bg-card px-4 py-8 text-center">
+          <EmptyNote>
             {tab === "unscheduled"
               ? "Nothing staged yet. Captured tasks wait here until you schedule them."
               : "Nothing scheduled. Schedule a staged task and it will wait here until its day arrives."}
-          </p>
+          </EmptyNote>
         )}
 
         <ListGrid columns={columns.staging}>
@@ -70,14 +81,9 @@ export function StagingPage() {
             />
           ))}
         </ListGrid>
-
       </section>
 
-      {form && (
-        <StagedTaskFormDrawer
-          onClose={() => setForm(false)}
-        />
-      )}
+      {form && <StagedTaskFormDrawer onClose={() => setForm(false)} />}
       {scheduling && (
         <StagedTaskScheduleDrawer
           stagedTask={scheduling}

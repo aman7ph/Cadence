@@ -26,14 +26,25 @@ export function ActionSheet({ visible, title, actions, onCancel }: Props) {
 
   const s = StyleSheet.create({
     title: {
-      textAlign: "center", fontSize: 11, fontWeight: "700", letterSpacing: 0.8,
-      textTransform: "uppercase", paddingVertical: 14, borderBottomWidth: 1,
-      color: c.t2, borderBottomColor: c.bd1,
+      textAlign: "center",
+      fontSize: 11,
+      fontWeight: "700",
+      letterSpacing: 0.8,
+      textTransform: "uppercase",
+      paddingVertical: 14,
+      borderBottomWidth: 1,
+      color: c.t2,
+      borderBottomColor: c.bd1,
     },
     btn: { paddingHorizontal: 20, paddingVertical: 16 },
     btnTxt: { fontSize: 16, fontWeight: "500", textAlign: "center" },
     divider: { borderBottomWidth: 1, borderBottomColor: c.bd1 },
-    cancelBtn: { paddingHorizontal: 20, paddingVertical: 16, borderTopWidth: 1, borderTopColor: c.bd2 },
+    cancelBtn: {
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+      borderTopWidth: 1,
+      borderTopColor: c.bd2,
+    },
     cancelTxt: { fontSize: 16, textAlign: "center", color: c.t3 },
   });
 
@@ -44,15 +55,27 @@ export function ActionSheet({ visible, title, actions, onCancel }: Props) {
         <TouchableOpacity
           key={i}
           style={[s.btn, i < actions.length - 1 && s.divider]}
-          onPress={() => { a.onPress(); onCancel(); }}
+          onPress={() => {
+            a.onPress();
+            onCancel();
+          }}
           activeOpacity={0.7}
         >
-          <Text style={[s.btnTxt, { color: a.style === "destructive" ? c.danger : c.t1 }]}>
+          <Text
+            style={[
+              s.btnTxt,
+              { color: a.style === "destructive" ? c.danger : c.t1 },
+            ]}
+          >
             {a.label}
           </Text>
         </TouchableOpacity>
       ))}
-      <TouchableOpacity style={s.cancelBtn} onPress={onCancel} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={s.cancelBtn}
+        onPress={onCancel}
+        activeOpacity={0.7}
+      >
         <Text style={s.cancelTxt}>Cancel</Text>
       </TouchableOpacity>
     </Sheet>

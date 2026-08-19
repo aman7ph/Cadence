@@ -130,8 +130,12 @@ describe("isValidReminderInterval", () => {
   });
 
   it("rejects anything outside them, and anything not a whole minute", () => {
-    expect(isValidReminderInterval(MIN_REMINDER_INTERVAL_MINUTES - 1)).toBe(false);
-    expect(isValidReminderInterval(MAX_REMINDER_INTERVAL_MINUTES + 1)).toBe(false);
+    expect(isValidReminderInterval(MIN_REMINDER_INTERVAL_MINUTES - 1)).toBe(
+      false,
+    );
+    expect(isValidReminderInterval(MAX_REMINDER_INTERVAL_MINUTES + 1)).toBe(
+      false,
+    );
     expect(isValidReminderInterval(0)).toBe(false);
     expect(isValidReminderInterval(-15)).toBe(false);
     expect(isValidReminderInterval(15.5)).toBe(false);

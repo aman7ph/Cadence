@@ -30,7 +30,13 @@ function FlatMark({ size, className }: { size: number; className?: string }) {
       aria-label="Cadence"
     >
       <g fill="none" strokeWidth="1.7">
-        <ellipse cx="16" cy="16" rx="14" ry="5.2" stroke="var(--action-primary)" />
+        <ellipse
+          cx="16"
+          cy="16"
+          rx="14"
+          ry="5.2"
+          stroke="var(--action-primary)"
+        />
         <ellipse cx="16" cy="16" rx="5.2" ry="14" stroke="var(--gold-500)" />
         <ellipse
           cx="16"

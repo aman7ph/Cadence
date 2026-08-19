@@ -11,3 +11,5 @@ export * from "./routineChart";
 export * from "./listColumns";
 export * from "./mentions";
 export * from "./itemOptions";
+export * from "./goalProgress";
+export * from "./buckets";

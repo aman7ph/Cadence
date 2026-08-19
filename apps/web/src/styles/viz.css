@@ -14,12 +14,12 @@
    * Series 1 is the accent so single-series charts match the UI. Remaining
    * hues are spaced around the wheel to stay separable for the colour-blind
    * and in greyscale, not merely "different colours". ---- */
-  --viz-1: #bd7a15;  /* gold — accent */
-  --viz-2: #9a6210;  /* bronze — was green; the prototype has none */
-  --viz-3: #3d9b8f;  /* teal */
-  --viz-4: #c9504f;  /* rose */
-  --viz-5: #8a6fc4;  /* violet */
-  --viz-6: #4a89c4;  /* blue */
+  --viz-1: #bd7a15; /* gold — accent */
+  --viz-2: #9a6210; /* bronze — was green; the prototype has none */
+  --viz-3: #3d9b8f; /* teal */
+  --viz-4: #c9504f; /* rose */
+  --viz-5: #8a6fc4; /* violet */
+  --viz-6: #4a89c4; /* blue */
 
   /* ---- Chart series, dark ground — same hues, lifted for contrast. ---- */
   --viz-1-lift: #e8a13d;
@@ -40,7 +40,7 @@
   --heat-light-4: #b5761a;
 
   /* ---- Activity heat ramp, dark ground. ---- */
-  --heat-dark-0: #282219;  /* = --sand-800, the sunken surface */
+  --heat-dark-0: #282219; /* = --sand-800, the sunken surface */
   --heat-dark-1: #4a3a1e;
   --heat-dark-2: #7a5c24;
   --heat-dark-3: #b5862c;

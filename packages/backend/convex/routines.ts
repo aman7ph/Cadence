@@ -2,6 +2,7 @@ import { validateRepeatArgs } from "@cadence/shared";
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { requireUser } from "./lib/auth";
+import { requireOwnedRoutine } from "./lib/ownership";
 import { clearStatus, setStatus } from "./lib/routineSetStatus";
 import { assertPlainRoutine } from "./lib/routineRepeat";
 import { deriveStreaks } from "./lib/streak";
@@ -112,9 +113,7 @@ export const skip = mutation({
 export const uncomplete = mutation({
   args: { routineId: v.id("routines"), date: v.string(), today: v.string() },
   handler: async (ctx, { routineId, date, today }) => {
-    const user = await requireUser(ctx);
-    const routine = await ctx.db.get(routineId);
-    if (!routine || routine.userId !== user._id) throw new Error("Routine not found");
+    const routine = await requireOwnedRoutine(ctx, routineId);
     // Un-skipping a repeat routine is fine; only reversing a completion has to
     // go through undoRep, which repairs the rep log alongside the status.
     const existing = await ctx.db

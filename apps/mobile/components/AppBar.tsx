@@ -16,11 +16,30 @@ export function AppBar({ title }: Props) {
   const toggleDrawer = () => navigation.dispatch(DrawerActions.toggleDrawer());
 
   const s = StyleSheet.create({
-    bar:         { height: 52, flexDirection: "row", alignItems: "center", paddingHorizontal: 14,
-                   borderBottomWidth: 1, borderBottomColor: c.bd1, gap: 10 },
-    ham:         { width: 38, height: 38, justifyContent: "center", gap: 5, paddingHorizontal: 10 },
-    line:        { width: 18, height: 1.5, backgroundColor: c.t1, borderRadius: 1 },
-    title:       { ...display("semibold"), fontSize: 19, color: c.t1, letterSpacing: -0.3, flex: 1 },
+    bar: {
+      height: 52,
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 14,
+      borderBottomWidth: 1,
+      borderBottomColor: c.bd1,
+      gap: 10,
+    },
+    ham: {
+      width: 38,
+      height: 38,
+      justifyContent: "center",
+      gap: 5,
+      paddingHorizontal: 10,
+    },
+    line: { width: 18, height: 1.5, backgroundColor: c.t1, borderRadius: 1 },
+    title: {
+      ...display("semibold"),
+      fontSize: 19,
+      color: c.t1,
+      letterSpacing: -0.3,
+      flex: 1,
+    },
   });
 
   return (

@@ -7,7 +7,10 @@ import {
   reminderSlotCount,
   reminderValidationError,
 } from "@cadence/shared";
-import { countScheduledReminders, syncReminderNotifications } from "./reminderScheduler";
+import {
+  countScheduledReminders,
+  syncReminderNotifications,
+} from "./reminderScheduler";
 
 // Keeps the device's scheduled notifications in step with the saved settings.
 //

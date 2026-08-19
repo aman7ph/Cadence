@@ -1,5 +1,11 @@
 import { useQuery } from "convex/react";
-import { Line, LineChart, ReferenceLine, ResponsiveContainer, YAxis } from "recharts";
+import {
+  Line,
+  LineChart,
+  ReferenceLine,
+  ResponsiveContainer,
+  YAxis,
+} from "recharts";
 import { api } from "@cadence/backend/convex/_generated/api";
 import { addDays, todayLocal } from "@cadence/shared";
 import { CHART_COLORS, ChartCard, Empty, Loading } from "./insights-chart-card";
@@ -34,7 +40,9 @@ export function GoalProgressPanel() {
           {series.map((g) => (
             <div key={g.goalId} className="flex flex-col gap-1">
               <div className="flex items-baseline justify-between gap-3">
-                <span className="text-[12.5px] font-semibold text-foreground">{g.title}</span>
+                <span className="text-[12.5px] font-semibold text-foreground">
+                  {g.title}
+                </span>
                 <span className="font-mono text-[11px] tabular-nums text-[var(--text-tertiary)]">
                   {g.points.at(-1)?.value ?? 0}
                   {g.targetValue ? ` / ${g.targetValue}` : ""}
@@ -43,7 +51,10 @@ export function GoalProgressPanel() {
               </div>
               <div className="h-[54px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={g.points} margin={{ top: 4, right: 4, bottom: 0, left: 4 }}>
+                  <LineChart
+                    data={g.points}
+                    margin={{ top: 4, right: 4, bottom: 0, left: 4 }}
+                  >
                     <YAxis hide domain={[0, g.targetValue ?? "dataMax"]} />
                     {g.targetValue ? (
                       <ReferenceLine
@@ -88,7 +99,9 @@ export function GoalMixPanel() {
         <div className="flex flex-col gap-4">
           {mix.map((g) => (
             <div key={g.goalId} className="flex flex-col gap-2">
-              <span className="text-[12.5px] font-semibold text-foreground">{g.title}</span>
+              <span className="text-[12.5px] font-semibold text-foreground">
+                {g.title}
+              </span>
               <div className="flex h-2.5 w-full overflow-hidden rounded-pill">
                 {g.segments.map((s, i) => (
                   <span
@@ -109,7 +122,9 @@ export function GoalMixPanel() {
                   >
                     <span
                       className="size-1.5 rounded-full"
-                      style={{ background: CHART_COLORS[i % CHART_COLORS.length] }}
+                      style={{
+                        background: CHART_COLORS[i % CHART_COLORS.length],
+                      }}
                     />
                     {s.label} · {s.pct}%
                   </span>

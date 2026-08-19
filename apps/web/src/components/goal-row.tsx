@@ -1,4 +1,5 @@
 import type { Id } from "@cadence/backend/convex/_generated/dataModel";
+import { goalProgress } from "@cadence/shared";
 import { Badge } from "@/components/ui/badge";
 
 interface Goal {
@@ -10,6 +11,7 @@ interface Goal {
   targetValue?: number;
   currentValue?: number;
   unit?: string;
+  dueDate?: string;
 }
 
 interface GoalRowProps {
@@ -28,12 +30,15 @@ function since(ts?: number): string | null {
  * Full-width goal row. The prototype lists goals across the whole column and
  * puts the detail in a slide-over — replacing the app's old two-pane split.
  */
-export function GoalRow({ goal, routineCount, taskCount, onOpen }: GoalRowProps) {
+export function GoalRow({
+  goal,
+  routineCount,
+  taskCount,
+  onOpen,
+}: GoalRowProps) {
   const linked = (routineCount ?? 0) + (taskCount ?? 0);
-  const pct =
-    goal.targetValue && goal.targetValue > 0
-      ? Math.min(100, Math.round(((goal.currentValue ?? 0) / goal.targetValue) * 100))
-      : null;
+  const hasTarget = !!goal.targetValue && goal.targetValue > 0;
+  const { pct, reached } = goalProgress(goal.currentValue, goal.targetValue);
 
   return (
     <button
@@ -68,12 +73,15 @@ export function GoalRow({ goal, routineCount, taskCount, onOpen }: GoalRowProps)
       <div className="flex items-center gap-3">
         {linked > 0 && (
           <span className="text-[11px] text-[var(--text-tertiary)]">
-            ● {routineCount ? `${routineCount} routine${routineCount === 1 ? "" : "s"}` : ""}
+            ●{" "}
+            {routineCount
+              ? `${routineCount} routine${routineCount === 1 ? "" : "s"}`
+              : ""}
             {routineCount && taskCount ? " · " : ""}
             {taskCount ? `${taskCount} task${taskCount === 1 ? "" : "s"}` : ""}
           </span>
         )}
-        {pct !== null && (
+        {hasTarget && (
           <span className="flex flex-1 items-center gap-2">
             <span className="h-[3px] flex-1 overflow-hidden rounded-full bg-[var(--bg-sunken)]">
               <span
@@ -82,8 +90,25 @@ export function GoalRow({ goal, routineCount, taskCount, onOpen }: GoalRowProps)
               />
             </span>
             <span className="shrink-0 font-mono text-[10px] tabular-nums text-[var(--text-tertiary)]">
+              {reached && (
+                <span
+                  className="mr-1 text-[var(--action-primary)]"
+                  aria-hidden="true"
+                >
+                  ✓
+                </span>
+              )}
               {goal.currentValue ?? 0}/{goal.targetValue}
             </span>
+          </span>
+        )}
+        {/* Trailing, and `ml-auto` so it still sits right when there is no
+            progress bar to push it there. Plain text rather than the badge the
+            goal DETAIL uses: in a list this is one fact among several, not the
+            header's headline. Mobile's card does the same. */}
+        {goal.dueDate && (
+          <span className="ml-auto shrink-0 text-[11px] text-[var(--text-tertiary)]">
+            Due {goal.dueDate}
           </span>
         )}
       </div>

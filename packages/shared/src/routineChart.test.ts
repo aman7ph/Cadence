@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { ROLLING_WINDOW_DAYS, rollingCompletionRate, rollingWindowLabel } from "./routineChart";
+import {
+  ROLLING_WINDOW_DAYS,
+  rollingCompletionRate,
+  rollingWindowLabel,
+} from "./routineChart";
 import type { RoutineChartDay } from "./routineChart";
 import { addDays } from "./date";
 
 const START = "2026-06-01";
-const days = (n: number) => Array.from({ length: n }, (_, i) => addDays(START, i));
+const days = (n: number) =>
+  Array.from({ length: n }, (_, i) => addDays(START, i));
 
 const isMonday = (date: string) =>
   new Date(date + "T00:00:00Z").getUTCDay() === 1;
@@ -16,7 +21,10 @@ describe("rollingCompletionRate — the window is the routine's own days", () =>
   const axis = days(28);
 
   it("a daily routine reaches the full window", () => {
-    const daily: RoutineChartDay[] = axis.map((date) => ({ date, status: "completed" }));
+    const daily: RoutineChartDay[] = axis.map((date) => ({
+      date,
+      status: "completed",
+    }));
     const values = rollingCompletionRate(daily, axis);
     expect(values.every((v) => v === 100)).toBe(true);
   });
@@ -41,7 +49,9 @@ describe("rollingCompletionRate — the window is the routine's own days", () =>
     }));
     // Evaluated after the last Monday, so the whole history is in the window.
     const [value] = rollingCompletionRate(weekly, [mondays.at(-1)!]);
-    expect(value).toBe(Math.round((Math.ceil(mondays.length / 2) / mondays.length) * 100));
+    expect(value).toBe(
+      Math.round((Math.ceil(mondays.length / 2) / mondays.length) * 100),
+    );
   });
 });
 
@@ -66,7 +76,9 @@ describe("rollingCompletionRate — gaps are null, never zero", () => {
       { date: axis[0]!, status: "skipped" },
       { date: axis[1]!, status: "pending" },
     ];
-    expect(rollingCompletionRate(neutral, axis).every((v) => v === null)).toBe(true);
+    expect(rollingCompletionRate(neutral, axis).every((v) => v === null)).toBe(
+      true,
+    );
   });
 });
 

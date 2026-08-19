@@ -46,10 +46,14 @@ export function StagedTaskScheduleDrawer({
   const [customDays, setCustomDays] = useState<number[]>(
     stagedTask.routineCustomDays ?? [],
   );
-  const [options, setOptions] = useState<ItemOptions>(itemOptionsFrom(stagedTask));
+  const [options, setOptions] = useState<ItemOptions>(
+    itemOptionsFrom(stagedTask),
+  );
 
   const toggleDay = (d: number) =>
-    setCustomDays((p) => (p.includes(d) ? p.filter((x) => x !== d) : [...p, d].sort()));
+    setCustomDays((p) =>
+      p.includes(d) ? p.filter((x) => x !== d) : [...p, d].sort(),
+    );
 
   // A past date would promote into a day that has already rolled over, and a
   // custom routine with no days selected would never run.
@@ -57,7 +61,9 @@ export function StagedTaskScheduleDrawer({
     !title.trim() ||
     !date ||
     date < today ||
-    (destination === "routine" && scheduleType === "custom" && customDays.length === 0);
+    (destination === "routine" &&
+      scheduleType === "custom" &&
+      customDays.length === 0);
 
   const submit = async () => {
     await schedule({
@@ -68,7 +74,9 @@ export function StagedTaskScheduleDrawer({
       scheduledDate: date,
       routineScheduleType: destination === "routine" ? scheduleType : undefined,
       routineCustomDays:
-        destination === "routine" && scheduleType === "custom" ? customDays : undefined,
+        destination === "routine" && scheduleType === "custom"
+          ? customDays
+          : undefined,
       ...itemOptionsToArgs(options),
       today,
     });

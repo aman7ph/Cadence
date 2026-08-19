@@ -24,7 +24,12 @@ export function SectionLabel({ children, count, style }: Props) {
     <Text
       accessibilityRole="header"
       style={[
-        { ...display("regular"), fontSize: 11, letterSpacing: 0.55, color: c.t3 },
+        {
+          ...display("regular"),
+          fontSize: 11,
+          letterSpacing: 0.55,
+          color: c.t3,
+        },
         style,
       ]}
     >

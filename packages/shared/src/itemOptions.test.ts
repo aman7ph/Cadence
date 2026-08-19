@@ -24,12 +24,23 @@ describe("itemOptionsToArgs", () => {
   });
 
   it("keeps the contribution when a goal is linked", () => {
-    const o: ItemOptions = { ...EMPTY_ITEM_OPTIONS, goalId: "g1", goalContribution: 7 };
-    expect(itemOptionsToArgs(o)).toMatchObject({ goalId: "g1", goalContribution: 7 });
+    const o: ItemOptions = {
+      ...EMPTY_ITEM_OPTIONS,
+      goalId: "g1",
+      goalContribution: 7,
+    };
+    expect(itemOptionsToArgs(o)).toMatchObject({
+      goalId: "g1",
+      goalContribution: 7,
+    });
   });
 
   it("drops both repeat values when spread is off", () => {
-    const o: ItemOptions = { ...EMPTY_ITEM_OPTIONS, repeatTarget: 5, repeatIntervalMinutes: 30 };
+    const o: ItemOptions = {
+      ...EMPTY_ITEM_OPTIONS,
+      repeatTarget: 5,
+      repeatIntervalMinutes: 30,
+    };
     expect(itemOptionsToArgs(o)).toMatchObject({
       repeatTarget: undefined,
       repeatIntervalMinutes: undefined,
@@ -65,15 +76,26 @@ describe("itemOptionsToArgs", () => {
 
 describe("itemOptionsFrom", () => {
   it("treats a stored repeatTarget as spread being on", () => {
-    expect(itemOptionsFrom({ repeatTarget: 4 })).toMatchObject({ spread: true, repeatTarget: 4 });
+    expect(itemOptionsFrom({ repeatTarget: 4 })).toMatchObject({
+      spread: true,
+      repeatTarget: 4,
+    });
   });
 
   it("leaves spread off when there is no repeatTarget", () => {
-    expect(itemOptionsFrom({ goalId: "g1" })).toMatchObject({ spread: false, repeatTarget: 2 });
+    expect(itemOptionsFrom({ goalId: "g1" })).toMatchObject({
+      spread: false,
+      repeatTarget: 2,
+    });
   });
 
   it("round-trips a configured item", () => {
-    const doc = { goalId: "g1", goalContribution: 3, repeatTarget: 6, repeatIntervalMinutes: 90 };
+    const doc = {
+      goalId: "g1",
+      goalContribution: 3,
+      repeatTarget: 6,
+      repeatIntervalMinutes: 90,
+    };
     expect(itemOptionsToArgs(itemOptionsFrom(doc))).toMatchObject(doc);
   });
 

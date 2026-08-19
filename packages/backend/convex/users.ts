@@ -27,7 +27,11 @@ export const ensureProvisioned = mutation({
 export const setRoutineWeight = mutation({
   args: { routineWeight: v.number() },
   handler: async (ctx, { routineWeight }) => {
-    if (!Number.isFinite(routineWeight) || routineWeight < 0 || routineWeight > 1) {
+    if (
+      !Number.isFinite(routineWeight) ||
+      routineWeight < 0 ||
+      routineWeight > 1
+    ) {
       throw new Error("routineWeight must be a finite number in [0, 1]");
     }
     const user = await requireUser(ctx);

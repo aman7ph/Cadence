@@ -2,6 +2,7 @@ import { validateRepeatArgs } from "@cadence/shared";
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { requireUser } from "./lib/auth";
+import { requireOwnedTask } from "./lib/ownership";
 import { refreshExistingDayStats, upsertDayStats } from "./lib/dayStats";
 import { applyGoalContribution } from "./lib/goalContribution";
 import { deleteTaskDays, recordTaskDaySpan } from "./lib/taskDay";
@@ -46,11 +47,7 @@ export const create = mutation({
 export const complete = mutation({
   args: { taskId: v.id("dailyTasks"), today: v.string() },
   handler: async (ctx, { taskId, today }) => {
-    const user = await requireUser(ctx);
-    const task = await ctx.db.get(taskId);
-    if (!task || task.userId !== user._id) {
-      throw new Error("Task not found");
-    }
+    const task = await requireOwnedTask(ctx, taskId);
     assertPlainTask(task);
     if (task.status === "completed") return;
     await ctx.db.patch(taskId, {
@@ -59,18 +56,14 @@ export const complete = mutation({
       completedDate: today,
     });
     await applyGoalContribution(ctx, task.goalId, task.goalContribution, 1);
-    await upsertDayStats(ctx, user._id, today);
+    await upsertDayStats(ctx, task.userId, today);
   },
 });
 
 export const uncomplete = mutation({
   args: { taskId: v.id("dailyTasks") },
   handler: async (ctx, { taskId }) => {
-    const user = await requireUser(ctx);
-    const task = await ctx.db.get(taskId);
-    if (!task || task.userId !== user._id) {
-      throw new Error("Task not found");
-    }
+    const task = await requireOwnedTask(ctx, taskId);
     if (task.status === "open") return;
     // Completion is the only thing left to reverse, and a repeat task's must go
     // through undoRep, which repairs the rep log and the interval gate too.
@@ -82,7 +75,7 @@ export const uncomplete = mutation({
       completedDate: undefined,
     });
     await applyGoalContribution(ctx, task.goalId, task.goalContribution, -1);
-    await upsertDayStats(ctx, user._id, affectedDate);
+    await upsertDayStats(ctx, task.userId, affectedDate);
   },
 });
 
@@ -94,13 +87,11 @@ export const uncomplete = mutation({
 export const remove = mutation({
   args: { taskId: v.id("dailyTasks") },
   handler: async (ctx, { taskId }) => {
-    const user = await requireUser(ctx);
-    const task = await ctx.db.get(taskId);
-    if (!task || task.userId !== user._id) {
-      throw new Error("Task not found");
-    }
+    const task = await requireOwnedTask(ctx, taskId);
     if (task.status === "completed") {
-      throw new Error("This task is completed. Mark it incomplete before deleting.");
+      throw new Error(
+        "This task is completed. Mark it incomplete before deleting.",
+      );
     }
     // Any rep at all, on any day — a repeat task sitting at 2/5 has real
     // progress even though its status is still open.
@@ -109,7 +100,9 @@ export const remove = mutation({
       .withIndex("by_task", (q) => q.eq("taskId", taskId))
       .first();
     if (rep) {
-      throw new Error("This task has logged check-ins. Undo them before deleting.");
+      throw new Error(
+        "This task has logged check-ins. Undo them before deleting.",
+      );
     }
     const linked = await ctx.db
       .query("reflectionTags")
@@ -126,6 +119,6 @@ export const remove = mutation({
     // needs no cleanup here.
     const affectedDates = await deleteTaskDays(ctx, taskId);
     await ctx.db.delete(taskId);
-    await refreshExistingDayStats(ctx, user._id, affectedDates);
+    await refreshExistingDayStats(ctx, task.userId, affectedDates);
   },
 });

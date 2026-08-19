@@ -9,13 +9,19 @@ export function StreakPill({ count }: { count: number }) {
   const cold = count === 0;
 
   const s = StyleSheet.create({
-    pill:     { flexDirection: "row", alignItems: "baseline", gap: 1,
-                backgroundColor: c.successBg, borderRadius: radii.full,
-                paddingHorizontal: 8, paddingVertical: 3 },
+    pill: {
+      flexDirection: "row",
+      alignItems: "baseline",
+      gap: 1,
+      backgroundColor: c.successBg,
+      borderRadius: radii.full,
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+    },
     pillCold: { backgroundColor: c.active },
-    num:      { fontSize: 12, fontWeight: "700", color: c.cplt },
-    unit:     { fontSize: 10, fontWeight: "600", color: c.cplt },
-    cold:     { color: c.t3 },
+    num: { fontSize: 12, fontWeight: "700", color: c.cplt },
+    unit: { fontSize: 10, fontWeight: "600", color: c.cplt },
+    cold: { color: c.t3 },
   });
 
   return (

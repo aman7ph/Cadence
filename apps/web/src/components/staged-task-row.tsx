@@ -7,6 +7,7 @@ import type { Doc } from "@cadence/backend/convex/_generated/dataModel";
 import { formatDateShort } from "@cadence/shared";
 
 import { Badge } from "@/components/ui/badge";
+import { GoalTag } from "@/components/ui/goal-tag";
 import { scheduleLabel } from "./routines-schedule-form";
 
 interface StagedTaskRowProps {
@@ -16,10 +17,17 @@ interface StagedTaskRowProps {
 }
 
 function prettyCreatedAt(ts: number): string {
-  return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return new Date(ts).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
 }
 
-export function StagedTaskRow({ stagedTask, goalTitle, onSchedule }: StagedTaskRowProps) {
+export function StagedTaskRow({
+  stagedTask,
+  goalTitle,
+  onSchedule,
+}: StagedTaskRowProps) {
   const unschedule = useMutation(api.stagedTaskScheduling.unschedule);
   const remove = useMutation(api.stagedTasks.remove);
   const [confirm, setConfirm] = useState<"delete" | "unschedule" | null>(null);
@@ -38,12 +46,7 @@ export function StagedTaskRow({ stagedTask, goalTitle, onSchedule }: StagedTaskR
             ? stagedTask.description
             : `Added ${prettyCreatedAt(stagedTask.createdAt)}`}
         </div>
-        {goalTitle && (
-          <span className="mt-1 inline-flex items-center gap-1 rounded-pill bg-[var(--surface-accent)] px-2 py-[2px] text-[9px] font-semibold uppercase tracking-[0.04em] text-[var(--text-accent)]">
-            <Target className="size-2.5" />
-            {goalTitle}
-          </span>
-        )}
+        {goalTitle && <GoalTag>{goalTitle}</GoalTag>}
       </div>
       <div className="flex items-center gap-2 shrink-0">
         {isScheduled && (
@@ -53,7 +56,9 @@ export function StagedTaskRow({ stagedTask, goalTitle, onSchedule }: StagedTaskR
                 ? `Routine · ${scheduleLabel(stagedTask.routineScheduleType ?? "daily", stagedTask.routineCustomDays)}`
                 : "Task"}
             </Badge>
-            <Badge tone="neutral">{formatDateShort(stagedTask.scheduledDate!)}</Badge>
+            <Badge tone="neutral">
+              {formatDateShort(stagedTask.scheduledDate!)}
+            </Badge>
           </>
         )}
         <div className="relative">
@@ -67,11 +72,17 @@ export function StagedTaskRow({ stagedTask, goalTitle, onSchedule }: StagedTaskR
           </button>
           {menuOpen && (
             <>
-              <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
+              <div
+                className="fixed inset-0 z-10"
+                onClick={() => setMenuOpen(false)}
+              />
               <div className="absolute right-0 bottom-full mb-1 z-20 min-w-[150px] overflow-hidden rounded-md border border-[var(--border-subtle)] bg-card shadow-[var(--shadow-md)]">
                 <button
                   type="button"
-                  onClick={() => { onSchedule(); setMenuOpen(false); }}
+                  onClick={() => {
+                    onSchedule();
+                    setMenuOpen(false);
+                  }}
                   className="w-full px-3.5 py-2.5 text-left text-[13px] font-medium text-foreground hover:bg-[var(--surface-hover)] transition-colors"
                 >
                   {isScheduled ? "Edit schedule…" : "Schedule…"}
@@ -81,7 +92,10 @@ export function StagedTaskRow({ stagedTask, goalTitle, onSchedule }: StagedTaskR
                   <>
                     <button
                       type="button"
-                      onClick={() => { setConfirm("unschedule"); setMenuOpen(false); }}
+                      onClick={() => {
+                        setConfirm("unschedule");
+                        setMenuOpen(false);
+                      }}
                       className="w-full px-3.5 py-2.5 text-left text-[13px] font-medium text-foreground hover:bg-[var(--surface-hover)] transition-colors"
                     >
                       Unschedule
@@ -91,7 +105,10 @@ export function StagedTaskRow({ stagedTask, goalTitle, onSchedule }: StagedTaskR
                 )}
                 <button
                   type="button"
-                  onClick={() => { setConfirm("delete"); setMenuOpen(false); }}
+                  onClick={() => {
+                    setConfirm("delete");
+                    setMenuOpen(false);
+                  }}
                   className="w-full px-3.5 py-2.5 text-left text-[13px] font-medium text-[var(--status-danger)] hover:bg-[var(--surface-danger)] transition-colors"
                 >
                   Delete

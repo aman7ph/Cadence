@@ -27,10 +27,8 @@ const buttonVariants = cva(
           "rounded-sm bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
         danger:
           "rounded-sm bg-transparent text-[var(--status-danger)] hover:opacity-80",
-        outline:
-          "rounded-sm border bg-transparent active:scale-[0.97]",
-        segment:
-          "rounded-pill border font-semibold",
+        outline: "rounded-sm border bg-transparent active:scale-[0.97]",
+        segment: "rounded-pill border font-semibold",
         // Page-level tabs (Active/Archived, Unscheduled/Scheduled). Measured
         // r=9 with NO border — distinct from `segment`, which is the bordered
         // 20px pill used inside forms.
@@ -109,15 +107,22 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color">,
+  extends
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color">,
     VariantProps<typeof buttonVariants> {}
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, tone, selected, size, type = "button", ...props }, ref) => (
+  (
+    { className, variant, tone, selected, size, type = "button", ...props },
+    ref,
+  ) => (
     <button
       ref={ref}
       type={type}
-      className={cn(buttonVariants({ variant, tone, selected, size }), className)}
+      className={cn(
+        buttonVariants({ variant, tone, selected, size }),
+        className,
+      )}
       {...props}
     />
   ),

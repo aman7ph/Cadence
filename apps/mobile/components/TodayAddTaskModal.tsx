@@ -20,6 +20,8 @@ import { display } from "../lib/fonts";
 import { radii } from "../lib/radii";
 import { ItemOptionsFields } from "./ItemOptionsFields";
 import { FormFooter } from "./ui/FormFooter";
+import { SheetTitle } from "./ui/SheetTitle";
+import { TextField } from "./ui/TextField";
 import { Sheet } from "./ui/Sheet";
 
 interface Props {
@@ -79,53 +81,44 @@ export function TodayAddTaskModal({ visible, today, onDone }: Props) {
   };
 
   const s = StyleSheet.create({
-    title: {
-      ...display("semibold"),
-      fontSize: 17,
-      color: c.t1,
+    desc: {
+      fontSize: 12,
+      color: c.t3,
       paddingHorizontal: 20,
-      paddingTop: 4,
+      paddingTop: 3,
+      paddingBottom: 14,
     },
-    desc: { fontSize: 12, color: c.t3, paddingHorizontal: 20, paddingTop: 3, paddingBottom: 14 },
     body: { paddingHorizontal: 20 },
-    input: {
-      backgroundColor: c.card,
-      borderWidth: 1,
-      borderColor: c.bd2,
-      borderRadius: radii.sm,
-      paddingHorizontal: 14,
-      paddingVertical: 11,
-      fontSize: 14,
-      color: c.t1,
-    },
   });
 
   return (
     <Sheet visible={visible} onClose={close} avoidKeyboard maxHeight="85%">
-          <Text style={s.title}>New task</Text>
-          <Text style={s.desc}>
-            One-off work for today. Link it to a goal or spread it across the day.
-          </Text>
-          <ScrollView style={s.body} keyboardShouldPersistTaps="handled">
-            <TextInput
-              style={s.input}
-              value={title}
-              onChangeText={setTitle}
-              placeholder="What needs doing today?"
-              placeholderTextColor={c.t3}
-              editable={!pending}
-            />
-            <View style={{ marginTop: 16 }}>
-              <ItemOptionsFields value={options} onChange={setOptions} disabled={pending} />
-            </View>
-          </ScrollView>
-          <FormFooter
-            onCancel={close}
-            onSubmit={submit}
-            submitLabel="Add task"
-            pending={pending}
-            invalid={invalid}
+      <SheetTitle>New task</SheetTitle>
+      <Text style={s.desc}>
+        One-off work for today. Link it to a goal or spread it across the day.
+      </Text>
+      <ScrollView style={s.body} keyboardShouldPersistTaps="handled">
+        <TextField
+          value={title}
+          onChangeText={setTitle}
+          placeholder="What needs doing today?"
+          editable={!pending}
+        />
+        <View style={{ marginTop: 16 }}>
+          <ItemOptionsFields
+            value={options}
+            onChange={setOptions}
+            disabled={pending}
           />
-        </Sheet>
+        </View>
+      </ScrollView>
+      <FormFooter
+        onCancel={close}
+        onSubmit={submit}
+        submitLabel="Add task"
+        pending={pending}
+        invalid={invalid}
+      />
+    </Sheet>
   );
 }

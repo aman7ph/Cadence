@@ -27,20 +27,28 @@ interface ActiveRoutineRowProps {
   onEdit: () => void;
 }
 
-export function ActiveRoutineRow({ routine, today, onEdit }: ActiveRoutineRowProps) {
+export function ActiveRoutineRow({
+  routine,
+  today,
+  onEdit,
+}: ActiveRoutineRowProps) {
   const archiveAction = useRoutineArchive(routine._id, today);
 
   return (
     <div className="group flex items-start gap-3 rounded-md border border-[var(--border-subtle)] bg-card px-3.5 py-3 transition-colors duration-150 hover:border-[var(--border-default)]">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[13.5px] font-semibold leading-snug text-foreground">{routine.name}</span>
+          <span className="text-[13.5px] font-semibold leading-snug text-foreground">
+            {routine.name}
+          </span>
           <span className="rounded-pill bg-[var(--bg-sunken)] px-2 py-[3px] text-[10px] text-[var(--text-tertiary)]">
             {scheduleLabel(routine.scheduleType, routine.customDays)}
           </span>
         </div>
         {routine.description && (
-          <p className="text-[12px] text-[var(--text-secondary)] mt-0.5 truncate">{routine.description}</p>
+          <p className="text-[12px] text-[var(--text-secondary)] mt-0.5 truncate">
+            {routine.description}
+          </p>
         )}
         {routine.currentStreak > 0 && (
           <div className="flex items-center gap-1 mt-1.5">
@@ -49,7 +57,9 @@ export function ActiveRoutineRow({ routine, today, onEdit }: ActiveRoutineRowPro
               {routine.currentStreak} day streak
             </span>
             {routine.longestStreak > routine.currentStreak && (
-              <span className="text-[11px] text-[var(--text-tertiary)]">· best {routine.longestStreak}</span>
+              <span className="text-[11px] text-[var(--text-tertiary)]">
+                · best {routine.longestStreak}
+              </span>
             )}
           </div>
         )}
@@ -59,7 +69,9 @@ export function ActiveRoutineRow({ routine, today, onEdit }: ActiveRoutineRowPro
               <Target className="size-2.5" />
               {routine.goalTitle}
               {routine.goalContribution !== undefined && (
-                <span className="ml-0.5 opacity-70">+{routine.goalContribution}</span>
+                <span className="ml-0.5 opacity-70">
+                  +{routine.goalContribution}
+                </span>
               )}
             </span>
           </div>

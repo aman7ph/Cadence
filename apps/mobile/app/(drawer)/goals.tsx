@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import { AppBar } from "../../components/AppBar";
 import { Button } from "../../components/ui/Button";
+import { EmptyState } from "../../components/ui/EmptyState";
+import { TabBar } from "../../components/ui/TabBar";
 import { GoalCard } from "../../components/GoalCard";
 import { GoalFormModal } from "../../components/GoalFormModal";
 import { GoalDetailModal } from "../../components/GoalDetailModal";
@@ -47,36 +49,20 @@ export default function GoalsScreen() {
 
   const s = StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
-    tabs: {
-      flexDirection: "row",
+    content: {
+      paddingTop: 8,
+      paddingBottom: 100,
       paddingHorizontal: 16,
-      paddingTop: 10,
-      paddingBottom: 6,
-      gap: 8,
+      gap: 10,
     },
-    content: { paddingTop: 8, paddingBottom: 100, paddingHorizontal: 16, gap: 10 },
     center: { flex: 1, alignItems: "center", justifyContent: "center" },
-    empty: {
-      margin: 24,
-      borderWidth: 1,
-      borderStyle: "dashed",
-      borderColor: c.bd1,
-      borderRadius: radii.md,
-      paddingVertical: 40,
-      alignItems: "center",
-    },
-    emptyTxt: { fontSize: 13, color: c.t3 },
     fab: { position: "absolute", bottom: 28, right: 18 },
   });
 
   return (
     <SafeAreaView style={s.screen} edges={["top"]}>
       <AppBar title="Goals" />
-      <View style={s.tabs}>
-        {TABS.map((t) => (
-          <Button key={t} variant="tab" selected={tab === t} title={t} onPress={() => setTab(t)} />
-        ))}
-      </View>
+      <TabBar tabs={TABS} active={tab} onChange={setTab} />
       {allGoals === undefined ? (
         <View style={s.center}>
           <ActivityIndicator color={c.prim} />
@@ -84,9 +70,7 @@ export default function GoalsScreen() {
       ) : (
         <ScrollView contentContainerStyle={s.content}>
           {filtered.length === 0 ? (
-            <View style={s.empty}>
-              <Text style={s.emptyTxt}>No {tab.toLowerCase()} goals</Text>
-            </View>
+            <EmptyState>{`No ${tab.toLowerCase()} goals`}</EmptyState>
           ) : (
             filtered.map((g) => {
               const counts = countMap.get(g._id);
@@ -100,6 +84,7 @@ export default function GoalsScreen() {
                   currentValue={g.currentValue}
                   unit={g.unit}
                   dueDate={g.dueDate}
+                  createdAt={g.createdAt}
                   taskCount={counts?.t ?? 0}
                   routineCount={counts?.r ?? 0}
                   onPress={() => setSelectedGoal(g as GoalData)}

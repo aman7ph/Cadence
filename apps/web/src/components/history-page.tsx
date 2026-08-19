@@ -49,7 +49,10 @@ export function HistoryPage() {
           <button
             type="button"
             onClick={() => setViewMonth(prevMonth(viewMonth))}
-            className={cn(navBtn, "text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-foreground")}
+            className={cn(
+              navBtn,
+              "text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-foreground",
+            )}
             aria-label="Previous month"
           >
             <ChevronLeft className="size-4" />
@@ -72,7 +75,11 @@ export function HistoryPage() {
             <ChevronRight className="size-4" />
           </button>
           {viewMonth !== currentMonth && (
-            <Button variant="ghost" size="sm" onClick={() => setViewMonth(currentMonth)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setViewMonth(currentMonth)}
+            >
               Today
             </Button>
           )}

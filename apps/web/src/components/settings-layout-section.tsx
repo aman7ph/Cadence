@@ -6,7 +6,7 @@ import {
 } from "@cadence/shared";
 import { Button } from "@/components/ui/button";
 import { useListColumns } from "@/lib/use-list-columns";
-import { Section } from "./settings-sections";
+import { Section } from "./settings-section";
 
 const PAGE_LABEL: Record<ListPage, string> = {
   today: "Today",
@@ -39,7 +39,10 @@ export function LayoutSection() {
     >
       <div className="flex flex-col gap-3.5">
         {LIST_PAGES.map((page) => (
-          <div key={page} className="flex flex-wrap items-center justify-between gap-2">
+          <div
+            key={page}
+            className="flex flex-wrap items-center justify-between gap-2"
+          >
             <span className="flex min-w-0 flex-col">
               <span className="text-[12.5px] font-semibold text-foreground">
                 {PAGE_LABEL[page]}

@@ -40,7 +40,9 @@ export function PageHeader<T extends string>({
             {title}
           </h1>
           {subtitle && (
-            <p className="mt-0.5 text-[12.5px] text-[var(--text-secondary)]">{subtitle}</p>
+            <p className="mt-0.5 text-[12.5px] text-[var(--text-secondary)]">
+              {subtitle}
+            </p>
           )}
         </div>
         {action}

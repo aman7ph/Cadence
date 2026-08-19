@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { AuthenticateWithRedirectCallback, SignedOut } from "@clerk/clerk-react";
+import {
+  AuthenticateWithRedirectCallback,
+  SignedOut,
+} from "@clerk/clerk-react";
 import {
   Authenticated,
   AuthLoading,
@@ -8,7 +11,7 @@ import {
   useQuery,
 } from "convex/react";
 import { api } from "@cadence/backend/convex/_generated/api";
-import { todayLocal } from "@cadence/shared";
+import { EnsureProvisioned, RolloverOnForeground } from "./app-mounts";
 
 import { SignInCard } from "@/components/sign-in-card";
 import {
@@ -31,51 +34,14 @@ import { DevShell } from "@/components/dev-shell";
 import { MobileNav } from "@/components/mobile-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-export type AppView = "today" | "routines" | "staging" | "history" | "insights" | "settings" | "goals";
-
-function EnsureProvisioned() {
-  const me = useQuery(api.users.getMe);
-  const ensureProvisioned = useMutation(api.users.ensureProvisioned);
-  useEffect(() => {
-    if (me === null) {
-      void ensureProvisioned({});
-    }
-  }, [me, ensureProvisioned]);
-  return null;
-}
-
-function RolloverOnForeground() {
-  const me = useQuery(api.users.getMe);
-  const rolloverOpenTasks = useMutation(api.taskDays.rolloverOpenTasks);
-  const promoteDueStagedTasks = useMutation(api.stagedTaskScheduling.promoteDue);
-  const lastRolloverDate = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (!me) return;
-
-    const rollIfNeeded = () => {
-      const today = todayLocal();
-      if (lastRolloverDate.current === today) return;
-      lastRolloverDate.current = today;
-      // Promote before rollover: promoted tasks land with currentDate = today,
-      // so they are never subject to same-day carryover.
-      void promoteDueStagedTasks({ today });
-      void rolloverOpenTasks({ today });
-    };
-
-    rollIfNeeded();
-
-    const onVisibilityChange = () => {
-      if (document.visibilityState === "visible") rollIfNeeded();
-    };
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    return () => {
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-    };
-  }, [me, rolloverOpenTasks, promoteDueStagedTasks]);
-
-  return null;
-}
+export type AppView =
+  | "today"
+  | "routines"
+  | "staging"
+  | "history"
+  | "insights"
+  | "settings"
+  | "goals";
 
 function SignedOutLayout() {
   return (

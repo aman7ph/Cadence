@@ -22,7 +22,10 @@ export const REMINDER_CHANNEL_IDS: Record<ReminderAlertMode, string> = {
 // Wait 0ms, buzz 400ms. One short pulse — a nudge, not an alarm.
 const VIBRATION_PATTERN = [0, 400];
 
-const CHANNELS: Record<ReminderAlertMode, Notifications.NotificationChannelInput> = {
+const CHANNELS: Record<
+  ReminderAlertMode,
+  Notifications.NotificationChannelInput
+> = {
   sound: {
     name: "Reminder (sound)",
     importance: Notifications.AndroidImportance.HIGH,
@@ -51,7 +54,10 @@ export async function ensureReminderChannels(): Promise<void> {
   if (Platform.OS !== "android") return;
   await Promise.all(
     (Object.keys(CHANNELS) as ReminderAlertMode[]).map((mode) =>
-      Notifications.setNotificationChannelAsync(REMINDER_CHANNEL_IDS[mode], CHANNELS[mode]),
+      Notifications.setNotificationChannelAsync(
+        REMINDER_CHANNEL_IDS[mode],
+        CHANNELS[mode],
+      ),
     ),
   );
 }

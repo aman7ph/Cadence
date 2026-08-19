@@ -1,4 +1,8 @@
-import { DEFAULT_LOOKBACK_DAYS, addDays, computeCurrentStreak } from "@cadence/shared";
+import {
+  DEFAULT_LOOKBACK_DAYS,
+  addDays,
+  computeCurrentStreak,
+} from "@cadence/shared";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 import type { Doc, Id } from "../_generated/dataModel";
 import { isScheduledOn } from "./schedule";

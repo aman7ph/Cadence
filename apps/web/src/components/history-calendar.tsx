@@ -1,4 +1,8 @@
-import { daysInMonth, firstWeekdayOfMonth, scoreToHeatBand } from "@cadence/shared";
+import {
+  daysInMonth,
+  firstWeekdayOfMonth,
+  scoreToHeatBand,
+} from "@cadence/shared";
 import { cn } from "@/lib/utils";
 
 const DOW_HEADERS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -27,7 +31,13 @@ interface CalendarGridProps {
   onSelect: (date: string) => void;
 }
 
-export function CalendarGrid({ viewMonth, today, scoreByDate, selectedDate, onSelect }: CalendarGridProps) {
+export function CalendarGrid({
+  viewMonth,
+  today,
+  scoreByDate,
+  selectedDate,
+  onSelect,
+}: CalendarGridProps) {
   const count = daysInMonth(viewMonth);
   const offset = (firstWeekdayOfMonth(viewMonth) + 6) % 7;
   const totalCells = offset + count;
@@ -37,7 +47,10 @@ export function CalendarGrid({ viewMonth, today, scoreByDate, selectedDate, onSe
     <div className="flex flex-col gap-1">
       <div className="grid grid-cols-7 gap-1">
         {DOW_HEADERS.map((h) => (
-          <div key={h} className="text-center text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--text-tertiary)] py-1">
+          <div
+            key={h}
+            className="text-center text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--text-tertiary)] py-1"
+          >
             {h}
           </div>
         ))}
@@ -71,12 +84,22 @@ export function CalendarGrid({ viewMonth, today, scoreByDate, selectedDate, onSe
               aria-label={formatFullDate(date)}
               aria-pressed={isSelected}
             >
-              <span className={cn("text-[13px] font-semibold leading-none", isToday || isSelected ? "text-[var(--text-accent)]" : "text-foreground")}>
+              <span
+                className={cn(
+                  "text-[13px] font-semibold leading-none",
+                  isToday || isSelected
+                    ? "text-[var(--text-accent)]"
+                    : "text-foreground",
+                )}
+              >
                 {dayNum}
               </span>
               <span
                 className="h-[7px] w-[7px] rounded-full"
-                style={{ background: `var(--heat-${heat})`, opacity: isFuture ? 0.3 : 1 }}
+                style={{
+                  background: `var(--heat-${heat})`,
+                  opacity: isFuture ? 0.3 : 1,
+                }}
               />
               {isToday && (
                 <span className="absolute bottom-1 left-1/2 -translate-x-1/2 h-0.5 w-3 rounded-full bg-[var(--text-accent)]" />

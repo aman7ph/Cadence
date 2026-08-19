@@ -17,12 +17,16 @@ describe("toEditorText", () => {
   });
 
   it("keeps the surrounding prose intact", () => {
-    const { text } = toEditorText(`Went well. @[Morning run](${ID_A}) felt easy.`);
+    const { text } = toEditorText(
+      `Went well. @[Morning run](${ID_A}) felt easy.`,
+    );
     expect(text).toBe("Went well. @Morning run felt easy.");
   });
 
   it("collects each distinct mention once", () => {
-    const { mentions } = toEditorText(`@[Run](${ID_A}) then @[Run](${ID_A}) and @[Swim](${ID_B})`);
+    const { mentions } = toEditorText(
+      `@[Run](${ID_A}) then @[Run](${ID_A}) and @[Swim](${ID_B})`,
+    );
     expect(mentions).toEqual([
       { id: ID_A, name: "Run" },
       { id: ID_B, name: "Swim" },
@@ -72,9 +76,9 @@ describe("toStoredText", () => {
   });
 
   it("handles several mentions in one sentence", () => {
-    expect(toStoredText("@Test Staged Task and @Test Staged Task Two", mentions)).toBe(
-      `@[Test Staged Task](${ID_A}) and @[Test Staged Task Two](${ID_B})`,
-    );
+    expect(
+      toStoredText("@Test Staged Task and @Test Staged Task Two", mentions),
+    ).toBe(`@[Test Staged Task](${ID_A}) and @[Test Staged Task Two](${ID_B})`);
   });
 });
 

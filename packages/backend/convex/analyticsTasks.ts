@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { resolveUser } from "./lib/resolveUser";
 import { carryoverForTask } from "./lib/carryover";
+import { loadTasksByOriginRange, toSortedRows } from "./lib/taskAnalytics";
 
 export type RandomByDayRow = {
   date: string;
@@ -17,14 +18,12 @@ export const randomTasksByDay = query({
     const user = await resolveUser(ctx);
     if (!user) return [];
 
-    const tasks = await ctx.db
-      .query("dailyTasks")
-      .withIndex("by_user_original", (q) =>
-        q.eq("userId", user._id).gte("originalDate", from).lte("originalDate", to),
-      )
-      .collect();
+    const tasks = await loadTasksByOriginRange(ctx, user._id, from, to);
 
-    const byDay = new Map<string, { added: number; completed: number; open: number }>();
+    const byDay = new Map<
+      string,
+      { added: number; completed: number; open: number }
+    >();
     for (const t of tasks) {
       const day = t.originalDate;
       const entry = byDay.get(day) ?? { added: 0, completed: 0, open: 0 };
@@ -34,9 +33,7 @@ export const randomTasksByDay = query({
       byDay.set(day, entry);
     }
 
-    return Array.from(byDay.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, counts]) => ({ date, ...counts }));
+    return toSortedRows(byDay);
   },
 });
 
@@ -54,14 +51,13 @@ export const avgCarryover = query({
     const user = await resolveUser(ctx);
     if (!user) return { avg: 0, distribution: [] };
 
-    const tasks = await ctx.db
-      .query("dailyTasks")
-      .withIndex("by_user_original", (q) =>
-        q.eq("userId", user._id).gte("originalDate", from).lte("originalDate", to),
-      )
-      .filter((q) => q.eq(q.field("status"), "completed"))
-      .collect();
-
+    const tasks = await loadTasksByOriginRange(
+      ctx,
+      user._id,
+      from,
+      to,
+      "completed",
+    );
     if (tasks.length === 0) return { avg: 0, distribution: [] };
 
     const counts = [0, 0, 0, 0];
@@ -89,22 +85,16 @@ export const openTasksByOriginDate = query({
     const user = await resolveUser(ctx);
     if (!user) return [];
 
-    const tasks = await ctx.db
-      .query("dailyTasks")
-      .withIndex("by_user_original", (q) =>
-        q.eq("userId", user._id).gte("originalDate", from).lte("originalDate", to),
-      )
-      .filter((q) => q.eq(q.field("status"), "open"))
-      .collect();
+    const tasks = await loadTasksByOriginRange(ctx, user._id, from, to, "open");
 
-    const byDate = new Map<string, number>();
+    const byDate = new Map<string, { count: number }>();
     for (const t of tasks) {
-      byDate.set(t.originalDate, (byDate.get(t.originalDate) ?? 0) + 1);
+      const entry = byDate.get(t.originalDate);
+      if (entry) entry.count += 1;
+      else byDate.set(t.originalDate, { count: 1 });
     }
 
-    return Array.from(byDate.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, count]) => ({ date, count }));
+    return toSortedRows(byDate);
   },
 });
 
@@ -124,13 +114,13 @@ export const randomStats = query({
     const user = await resolveUser(ctx);
     if (!user) return { onTime: 0, afterCarryover: 0, total: 0 };
 
-    const tasks = await ctx.db
-      .query("dailyTasks")
-      .withIndex("by_user_original", (q) =>
-        q.eq("userId", user._id).gte("originalDate", from).lte("originalDate", to),
-      )
-      .filter((q) => q.eq(q.field("status"), "completed"))
-      .collect();
+    const tasks = await loadTasksByOriginRange(
+      ctx,
+      user._id,
+      from,
+      to,
+      "completed",
+    );
 
     let onTime = 0;
     let afterCarryover = 0;

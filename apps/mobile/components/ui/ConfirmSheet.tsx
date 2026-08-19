@@ -5,6 +5,7 @@ import { useColors } from "../../lib/theme";
 import { display } from "../../lib/fonts";
 import { FormFooter } from "./FormFooter";
 import { Sheet } from "./Sheet";
+import { SheetTitle } from "./SheetTitle";
 
 interface Props {
   visible: boolean;
@@ -57,14 +58,19 @@ export function ConfirmSheet({
   };
 
   const s = StyleSheet.create({
-    title: { ...display("semibold"), fontSize: 17, color: c.t1, paddingHorizontal: 20, paddingTop: 4 },
-    desc: { fontSize: 12.5, color: c.t2, lineHeight: 18, paddingHorizontal: 20, paddingTop: 4 },
+    desc: {
+      fontSize: 12.5,
+      color: c.t2,
+      lineHeight: 18,
+      paddingHorizontal: 20,
+      paddingTop: 4,
+    },
     body: { paddingHorizontal: 20, paddingTop: 12 },
   });
 
   return (
     <Sheet visible={visible} onClose={onCancel}>
-      <Text style={s.title}>{title}</Text>
+      <SheetTitle>{title}</SheetTitle>
       <Text style={s.desc}>{description}</Text>
       {children ? <View style={s.body}>{children}</View> : null}
       <FormFooter

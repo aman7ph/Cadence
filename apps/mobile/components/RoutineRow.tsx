@@ -4,6 +4,7 @@ import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import { scheduleLabel } from "./SchedulePicker";
 import type { ScheduleType } from "./SchedulePicker";
 import { useColors } from "../lib/theme";
+import { GoalTag } from "./ui/GoalTag";
 import { radii } from "../lib/radii";
 import { ActionSheet } from "./ActionSheet";
 
@@ -19,7 +20,11 @@ export interface RoutineForRow {
   goalContribution?: number;
 }
 
-interface Props { routine: RoutineForRow; onEdit: () => void; onArchive: () => void }
+interface Props {
+  routine: RoutineForRow;
+  onEdit: () => void;
+  onArchive: () => void;
+}
 
 export function RoutineRow({ routine, onEdit, onArchive }: Props) {
   const c = useColors();
@@ -27,22 +32,44 @@ export function RoutineRow({ routine, onEdit, onArchive }: Props) {
   const sched = scheduleLabel(routine.scheduleType, routine.customDays);
 
   const s = StyleSheet.create({
-    card:     { flexDirection: "row", alignItems: "flex-start", gap: 12,
-                backgroundColor: c.card, borderWidth: 1, borderColor: c.bd1,
-                borderRadius: radii.sm, paddingHorizontal: 12, paddingVertical: 10 },
-    dot:      { width: 4, height: 4, borderRadius: radii.full, backgroundColor: c.bd3, marginTop: 6, flexShrink: 0 },
-    body:     { flex: 1, gap: 3 },
-    nameRow:  { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
-    name:     { fontSize: 14, fontWeight: "500", color: c.t1, flexShrink: 1 },
-    chip:     { backgroundColor: c.bgS, borderRadius: radii.pill, paddingHorizontal: 8, paddingVertical: 3 },
-    chipTxt:  { fontSize: 10, fontWeight: "400", color: c.t2 },
-    desc:     { fontSize: 12, color: c.t2 },
-    streak:   { fontSize: 10.5, fontWeight: "600", color: c.tacc },
-    goalPill: { alignSelf: "flex-start", backgroundColor: c.accBg, borderRadius: radii.pill,
-                paddingHorizontal: 8, paddingVertical: 2 },
-    goalTxt:  { fontSize: 9, fontWeight: "600", color: c.tacc, letterSpacing: 0.27 },
-    more:     { paddingLeft: 4, paddingTop: 2 },
-    moreTxt:  { fontSize: 16, color: c.t3, letterSpacing: 1 },
+    card: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: 12,
+      backgroundColor: c.card,
+      borderWidth: 1,
+      borderColor: c.bd1,
+      borderRadius: radii.sm,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+    },
+    dot: {
+      width: 4,
+      height: 4,
+      borderRadius: radii.full,
+      backgroundColor: c.bd3,
+      marginTop: 6,
+      flexShrink: 0,
+    },
+    body: { flex: 1, gap: 3 },
+    nameRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      flexWrap: "wrap",
+    },
+    name: { fontSize: 14, fontWeight: "500", color: c.t1, flexShrink: 1 },
+    chip: {
+      backgroundColor: c.bgS,
+      borderRadius: radii.pill,
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+    },
+    chipTxt: { fontSize: 10, fontWeight: "400", color: c.t2 },
+    desc: { fontSize: 12, color: c.t2 },
+    streak: { fontSize: 10.5, fontWeight: "600", color: c.tacc },
+    more: { paddingLeft: 4, paddingTop: 2 },
+    moreTxt: { fontSize: 16, color: c.t3, letterSpacing: 1 },
   });
 
   return (
@@ -50,26 +77,41 @@ export function RoutineRow({ routine, onEdit, onArchive }: Props) {
       <View style={s.dot} />
       <View style={s.body}>
         <View style={s.nameRow}>
-          <Text style={s.name} numberOfLines={1}>{routine.name}</Text>
-          <View style={s.chip}><Text style={s.chipTxt}>{sched}</Text></View>
+          <Text style={s.name} numberOfLines={1}>
+            {routine.name}
+          </Text>
+          <View style={s.chip}>
+            <Text style={s.chipTxt}>{sched}</Text>
+          </View>
         </View>
-        {!!routine.description && <Text style={s.desc} numberOfLines={1}>{routine.description}</Text>}
+        {!!routine.description && (
+          <Text style={s.desc} numberOfLines={1}>
+            {routine.description}
+          </Text>
+        )}
         {routine.currentStreak > 0 && (
           <Text style={s.streak}>
             🔥 {routine.currentStreak} day streak
-            {routine.longestStreak > routine.currentStreak ? ` · best ${routine.longestStreak}` : ""}
+            {routine.longestStreak > routine.currentStreak
+              ? ` · best ${routine.longestStreak}`
+              : ""}
           </Text>
         )}
         {!!routine.goalTitle && (
-          <View style={s.goalPill}>
-            <Text style={s.goalTxt} numberOfLines={1}>
-              ◎ {routine.goalTitle}
-              {routine.goalContribution != null ? ` +${routine.goalContribution}` : ""}
-            </Text>
-          </View>
+          <GoalTag spaced={false}>
+            {`◎ ${routine.goalTitle}${
+              routine.goalContribution != null
+                ? ` +${routine.goalContribution}`
+                : ""
+            }`}
+          </GoalTag>
         )}
       </View>
-      <TouchableOpacity onPress={() => setMenuOpen(true)} hitSlop={10} style={s.more}>
+      <TouchableOpacity
+        onPress={() => setMenuOpen(true)}
+        hitSlop={10}
+        style={s.more}
+      >
         <Text style={s.moreTxt}>···</Text>
       </TouchableOpacity>
       <ActionSheet

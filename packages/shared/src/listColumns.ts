@@ -70,7 +70,9 @@ export function listColumnsValidationError(value: unknown): string | null {
   return null;
 }
 
-export function validateListColumns(value: unknown): asserts value is ListColumns {
+export function validateListColumns(
+  value: unknown,
+): asserts value is ListColumns {
   const error = listColumnsValidationError(value);
   if (error) throw new Error(error);
 }
@@ -80,7 +82,9 @@ export function validateListColumns(value: unknown): asserts value is ListColumn
  * optional and older rows predate it — so callers get a complete object rather
  * than having to guard every read.
  */
-export function withColumnDefaults(stored: Partial<ListColumns> | undefined): ListColumns {
+export function withColumnDefaults(
+  stored: Partial<ListColumns> | undefined,
+): ListColumns {
   const out = { ...DEFAULT_LIST_COLUMNS };
   if (!stored) return out;
   for (const page of LIST_PAGES) {

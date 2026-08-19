@@ -3,7 +3,8 @@ import { useColors } from "../../lib/theme";
 import type { Colors } from "../../lib/colors";
 import { radii } from "../../lib/radii";
 
-export type BadgeTone = "neutral" | "accent" | "success" | "carryover" | "danger";
+export type BadgeTone =
+  "neutral" | "accent" | "success" | "carryover" | "danger";
 
 /**
  * Tones match apps/web/src/components/ui/badge.tsx one for one.
@@ -53,7 +54,9 @@ export function Badge({ children, tone = "neutral", style }: Props) {
         style,
       ]}
     >
-      <Text style={{ fontSize: 12, fontWeight: "500", color: t.text }}>{children}</Text>
+      <Text style={{ fontSize: 12, fontWeight: "500", color: t.text }}>
+        {children}
+      </Text>
     </View>
   );
 }

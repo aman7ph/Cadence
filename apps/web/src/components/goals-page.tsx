@@ -5,13 +5,14 @@ import type { Id } from "@cadence/backend/convex/_generated/dataModel";
 import { api } from "@cadence/backend/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Drawer } from "@/components/ui/drawer";
-import { ConfirmDrawer } from "@/components/ui/confirm-drawer";
+import { GoalConfirmDrawers, type GoalConfirm } from "./goal-confirm-drawers";
 import { GoalDetail } from "./goal-detail";
 import { GoalFormDrawer, type GoalFormValues } from "./goal-form-drawer";
 import { GoalRow } from "./goal-row";
 import { PageHeader } from "./page-header";
 import { ListGrid } from "@/components/ui/list-grid";
 import { useListColumns } from "@/lib/use-list-columns";
+import { EmptyNote } from "@/components/ui/empty-note";
 
 type Tab = "active" | "completed" | "abandoned";
 
@@ -26,10 +27,7 @@ export function GoalsPage() {
   // a dialog inside a dialog, which would stack two focus traps.
   const [form, setForm] = useState<{ goal?: GoalFormValues } | null>(null);
   const { columns } = useListColumns();
-  const completeGoal = useMutation(api.goals.complete);
-  const abandonGoal = useMutation(api.goals.abandon);
-  const removeGoal = useMutation(api.goals.remove);
-  const [confirm, setConfirm] = useState<"complete" | "abandon" | "delete" | null>(null);
+  const [confirm, setConfirm] = useState<GoalConfirm>(null);
 
   const active = goalsWithCounts ?? [];
   const completed = (allGoals ?? []).filter((g) => g.status === "completed");
@@ -77,11 +75,11 @@ export function GoalsPage() {
       )}
 
       {allGoals !== undefined && rows.length === 0 && (
-        <p className="rounded-md border border-dashed border-[var(--border-subtle)] bg-card px-4 py-8 text-center text-[13px] text-[var(--text-tertiary)]">
+        <EmptyNote>
           {tab === "active"
             ? "No active goals yet. Create one to start tracking the long game."
             : `Nothing ${tab} yet.`}
-        </p>
+        </EmptyNote>
       )}
 
       <ListGrid columns={columns.goals}>
@@ -119,41 +117,11 @@ export function GoalsPage() {
         )}
       </Drawer>
 
-      {/* Both are reversible — the goal moves tab rather than disappearing —
-          so they use the accent tone, not danger. */}
-      <ConfirmDrawer
-        open={confirm === "complete" || confirm === "abandon"}
-        onOpenChange={(o) => !o && setConfirm(null)}
-        title={confirm === "complete" ? "Mark this goal complete?" : "Abandon this goal?"}
-        description={
-          confirm === "complete"
-            ? "It moves to Completed and stops accepting contributions."
-            : "It moves to Abandoned and stops accepting contributions. Nothing is deleted."
-        }
-        confirmLabel={confirm === "complete" ? "Mark complete" : "Abandon goal"}
-        tone="accent"
-        onConfirm={async () => {
-          if (!openGoalId) return;
-          if (confirm === "complete") await completeGoal({ goalId: openGoalId });
-          else await abandonGoal({ goalId: openGoalId });
-          setConfirm(null);
-          setOpenGoalId(null);
-        }}
-      />
-
-      {/* Delete is the one irreversible action here, so it is the one that gets
-          the danger tone — and it stays available for completed and abandoned
-          goals, not just active ones. */}
-      <ConfirmDrawer
-        open={confirm === "delete"}
-        onOpenChange={(o) => !o && setConfirm(null)}
-        title="Delete this goal forever?"
-        description="This cannot be undone. Tasks and routines linked to it are unlinked, not deleted."
-        confirmLabel="Delete forever"
-        tone="danger"
-        onConfirm={async () => {
-          if (!openGoalId) return;
-          await removeGoal({ goalId: openGoalId });
+      <GoalConfirmDrawers
+        goalId={openGoalId}
+        open={confirm}
+        onClose={() => setConfirm(null)}
+        onDone={() => {
           setConfirm(null);
           setOpenGoalId(null);
         }}

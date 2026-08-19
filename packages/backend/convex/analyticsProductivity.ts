@@ -1,5 +1,10 @@
 import { v } from "convex/values";
-import { addDays, countsTowardRate, daysBetween, resolveDayStatus } from "@cadence/shared";
+import {
+  addDays,
+  countsTowardRate,
+  daysBetween,
+  resolveDayStatus,
+} from "@cadence/shared";
 import { query } from "./_generated/server";
 import { isScheduledOn } from "./lib/schedule";
 import { resolveUser } from "./lib/resolveUser";
@@ -30,7 +35,13 @@ export const dayStatsRange = query({
   handler: async (ctx, { from, to }): Promise<DayStatsRow[]> => {
     const user = await resolveUser(ctx);
     if (!user) return [];
-    return await deriveDayStatsRange(ctx, user._id, from, to, user.routineWeight);
+    return await deriveDayStatsRange(
+      ctx,
+      user._id,
+      from,
+      to,
+      user.routineWeight,
+    );
   },
 });
 
@@ -60,7 +71,9 @@ export const dayOfWeekStats = query({
     const byRoutine = await loadCompletionsByRoutine(ctx, user._id, from, to);
 
     const stats = Array.from({ length: 7 }, (_, i) => ({
-      weekday: i, scheduled: 0, completed: 0,
+      weekday: i,
+      scheduled: 0,
+      completed: 0,
     }));
 
     const windowDays = daysBetween(from, to);
@@ -87,7 +100,8 @@ export const dayOfWeekStats = query({
       weekday: s.weekday,
       scheduled: s.scheduled,
       completed: s.completed,
-      rate: s.scheduled > 0 ? Math.round((s.completed / s.scheduled) * 100) : null,
+      rate:
+        s.scheduled > 0 ? Math.round((s.completed / s.scheduled) * 100) : null,
     }));
   },
 });

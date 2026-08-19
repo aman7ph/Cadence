@@ -24,7 +24,9 @@ export function useListColumns(): {
   const me = useQuery(api.users.getMe);
   const save = useMutation(api.users.setListColumns);
 
-  const columns = me ? withColumnDefaults(me.listColumns) : DEFAULT_LIST_COLUMNS;
+  const columns = me
+    ? withColumnDefaults(me.listColumns)
+    : DEFAULT_LIST_COLUMNS;
 
   const setColumns = (page: ListPage, count: number) => {
     // The whole object is sent, since the mutation stores it whole. Building it

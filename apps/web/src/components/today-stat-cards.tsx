@@ -32,7 +32,11 @@ export function TodayStatCards({
         label="Day's progress"
         value={dayPct ?? "—"}
         unit={dayPct !== null ? "%" : undefined}
-        delta={totalScheduled > 0 ? `${totalDone} of ${totalScheduled} done` : "Nothing scheduled"}
+        delta={
+          totalScheduled > 0
+            ? `${totalDone} of ${totalScheduled} done`
+            : "Nothing scheduled"
+        }
         deltaDir={dayPct === null ? "flat" : dayPct >= 50 ? "up" : "flat"}
       />
       <StatCard

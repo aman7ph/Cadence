@@ -82,7 +82,9 @@ describe("validateListColumns", () => {
   });
 
   it("does not throw on a valid object", () => {
-    expect(() => validateListColumns({ today: 3, routines: 5, staging: 1, goals: 2 })).not.toThrow();
+    expect(() =>
+      validateListColumns({ today: 3, routines: 5, staging: 1, goals: 2 }),
+    ).not.toThrow();
   });
 });
 

@@ -72,7 +72,9 @@ export const backfillTaskDays = internalMutation({
     let rowsSkipped = 0;
     for (const t of tasks) {
       const endDate =
-        t.status === "completed" ? (t.completedDate ?? t.currentDate) : t.currentDate;
+        t.status === "completed"
+          ? (t.completedDate ?? t.currentDate)
+          : t.currentDate;
       const { inserted, skipped } = await recordTaskDaySpan(
         ctx,
         userId,
@@ -85,7 +87,12 @@ export const backfillTaskDays = internalMutation({
       rowsSkipped += skipped;
     }
 
-    return { tasksScanned: tasks.length, rowsInserted, rowsSkipped, dryRun: !!dryRun };
+    return {
+      tasksScanned: tasks.length,
+      rowsInserted,
+      rowsSkipped,
+      dryRun: !!dryRun,
+    };
   },
 });
 
@@ -122,6 +129,11 @@ export const recomputeDayStats = internalMutation({
       if (!dryRun) await ctx.db.patch(row._id, next);
     }
 
-    return { rowsScanned: rows.length, changed: changes.length, dryRun: !!dryRun, changes };
+    return {
+      rowsScanned: rows.length,
+      changed: changes.length,
+      dryRun: !!dryRun,
+      changes,
+    };
   },
 });

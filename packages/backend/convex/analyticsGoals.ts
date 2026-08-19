@@ -20,7 +20,9 @@ export const contributionMix = query({
   args: {},
   handler: async (
     ctx,
-  ): Promise<Array<{ goalId: string; title: string; segments: MixSegment[] }>> => {
+  ): Promise<
+    Array<{ goalId: string; title: string; segments: MixSegment[] }>
+  > => {
     const user = await resolveUser(ctx);
     if (!user) return [];
 

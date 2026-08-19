@@ -14,7 +14,13 @@ import { useTheme } from "@/lib/theme";
  * primitive is otherwise unverifiable without signing in. Rendering the actual
  * components — not a copy of their markup — means this cannot drift from them.
  */
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
+function Row({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex flex-col gap-2">
       <Label>{label}</Label>
@@ -46,26 +52,46 @@ export function DevPrimitives() {
 
         <Row label="ghost / danger — plain text">
           <Button variant="ghost">Cancel</Button>
-          <Button variant="ghost" size="sm">Close</Button>
+          <Button variant="ghost" size="sm">
+            Close
+          </Button>
           <Button variant="danger">Sign out</Button>
-          <Button variant="danger" size="sm">Delete</Button>
+          <Button variant="danger" size="sm">
+            Delete
+          </Button>
         </Row>
 
         <Row label="outline — tones">
-          <Button variant="outline" size="sm">Edit</Button>
-          <Button variant="outline" tone="success">✓ Mark complete</Button>
-          <Button variant="outline" tone="neutral">○ Abandon</Button>
-          <Button variant="outline" tone="danger">Archive</Button>
+          <Button variant="outline" size="sm">
+            Edit
+          </Button>
+          <Button variant="outline" tone="success">
+            ✓ Mark complete
+          </Button>
+          <Button variant="outline" tone="neutral">
+            ○ Abandon
+          </Button>
+          <Button variant="outline" tone="danger">
+            Archive
+          </Button>
         </Row>
 
         <Row label="segment — selected vs not">
-          <Button variant="segment" size="sm" selected>Daily</Button>
-          <Button variant="segment" size="sm">Weekdays</Button>
-          <Button variant="segment" size="sm">Custom</Button>
+          <Button variant="segment" size="sm" selected>
+            Daily
+          </Button>
+          <Button variant="segment" size="sm">
+            Weekdays
+          </Button>
+          <Button variant="segment" size="sm">
+            Custom
+          </Button>
         </Row>
 
         <Row label="block — full-width add row">
-          <Button variant="block" size="lg">+ New routine</Button>
+          <Button variant="block" size="lg">
+            + New routine
+          </Button>
         </Row>
 
         <Row label="badge tones">
@@ -102,12 +128,23 @@ export function DevPrimitives() {
           <ReflectionEditor
             date="2026-08-15"
             initialText=""
-            routines={["Morning run", "Read 10 pages a day", "30 push-ups", "No breakfast", "One GitHub push"].map(
-              (name, i) => ({ routineId: `r${i}`, name }),
-            )}
-            tasks={["Check email for the reply", "Stretch break", "Plan the week", "Call the bank"].map(
-              (title, i) => ({ taskId: `t${i}`, title, status: "open" as const }),
-            )}
+            routines={[
+              "Morning run",
+              "Read 10 pages a day",
+              "30 push-ups",
+              "No breakfast",
+              "One GitHub push",
+            ].map((name, i) => ({ routineId: `r${i}`, name }))}
+            tasks={[
+              "Check email for the reply",
+              "Stretch break",
+              "Plan the week",
+              "Call the bank",
+            ].map((title, i) => ({
+              taskId: `t${i}`,
+              title,
+              status: "open" as const,
+            }))}
             hasExisting={false}
             onSaved={() => {}}
             onCancel={() => {}}

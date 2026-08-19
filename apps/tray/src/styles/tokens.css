@@ -1,0 +1,55 @@
+/* ============================================================================
+ * Cadence tray — tokens
+ *
+ * The tray's slice of the shared design language. It mirrors the roles in
+ * apps/web/src/styles/semantic.css (dark theme) and apps/mobile/lib/colors.ts,
+ * so the three apps agree on what a colour MEANS. Only the dark theme exists
+ * here: the overlay is always dark, whatever the desktop behind it.
+ *
+ * Two things are deliberately NOT copied from web:
+ *
+ *   1. Surfaces are translucent washes, not solid fills. This window sits over
+ *      the user's desktop and is meant to, so a surface lightens the ground
+ *      instead of replacing it. That is a platform difference, not drift.
+ *
+ *   2. The wash is sand-100 (#f3ecdf), NOT pure white. That single change is
+ *      most of the difference between this reading as Cadence and reading as a
+ *      generic dark widget — a white wash over a warm ground turns it grey.
+ *
+ * Values are literal because there is no palette layer here; each one is
+ * labelled with the palette name it comes from so a re-point stays traceable.
+ * ========================================================================== */
+
+:root {
+  /* Ground. sand-950 (#17140f). The alpha is LOAD-BEARING — it is what makes
+     the overlay an overlay. Change the hue, never the transparency. */
+  --bg: rgba(23, 20, 15, 0.93);
+
+  /* Warm washes, lightest to strongest: row hover, control hover, raised. */
+  --wash-1: rgba(243, 236, 223, 0.05);
+  --wash-2: rgba(243, 236, 223, 0.07);
+  --wash-3: rgba(243, 236, 223, 0.11);
+
+  --border: rgba(243, 236, 223, 0.08);
+  --border-subtle: rgba(243, 236, 223, 0.05);
+  --border-strong: rgba(243, 236, 223, 0.16);
+
+  --text: #f3ecdf; /* sand-100  — text-primary */
+  --text-muted: #a89a80; /* sand-400  — text-secondary */
+  --text-dim: #7a7264; /* sand-500  — text-tertiary */
+  --brand: #f3ecdf; /* sand-100  — the wordmark */
+
+  --accent: #e8a13d; /* gold-400  — action-primary */
+  --accent-soft: rgba(232, 161, 61, 0.16); /* gold-400 @ 16% */
+
+  /* Status. Gold for complete, and neutrals for the rest — the same call web
+     and mobile make. There is no green anywhere in this design, and carryover
+     /skipped is deliberately NEUTRAL rather than amber so that "stale" reads
+     quiet instead of competing with the gold accent. */
+  --status-complete: #e8a13d; /* gold-400 */
+  --status-skipped: #a89a80; /* sand-400 */
+  --status-pending: #7a7264; /* sand-500 */
+  --danger: #dc4f48; /* red-500 */
+
+  --scrollbar: rgba(243, 236, 223, 0.1);
+}

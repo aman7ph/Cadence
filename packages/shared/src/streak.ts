@@ -83,7 +83,10 @@ export function bestStreakOf(
   const days = active.reduce((max, r) => Math.max(max, r.longestStreak), 0);
   return {
     days,
-    name: days > 0 ? (active.find((r) => r.longestStreak === days)?.name ?? "—") : "—",
+    name:
+      days > 0
+        ? (active.find((r) => r.longestStreak === days)?.name ?? "—")
+        : "—",
   };
 }
 

@@ -97,9 +97,7 @@ describe("scoreToHeatBand — the scale that was adopted", () => {
     // 25-39, 50-59, 75-79 — the ranges measured during the audit.
     expect(diverging[0]).toBe(25);
     expect(diverging.at(-1)).toBe(79);
-    expect(diverging).toEqual(
-      expect.arrayContaining([25, 39, 50, 59, 75, 79]),
-    );
+    expect(diverging).toEqual(expect.arrayContaining([25, 39, 50, 59, 75, 79]));
     expect(diverging).not.toContain(24);
     expect(diverging).not.toContain(40);
   });

@@ -61,7 +61,8 @@ export function Stepper({
 
   const settle = () => {
     const n = Number(draft);
-    const next = draft.trim() === "" || !Number.isFinite(n) ? value : clamp(Math.round(n));
+    const next =
+      draft.trim() === "" || !Number.isFinite(n) ? value : clamp(Math.round(n));
     onChange(next);
     setDraft(String(next));
   };
@@ -71,7 +72,9 @@ export function Stepper({
 
   return (
     <div className={cn("flex items-center justify-between gap-3", className)}>
-      <label className="text-[11.5px] text-[var(--text-secondary)]">{label}</label>
+      <label className="text-[11.5px] text-[var(--text-secondary)]">
+        {label}
+      </label>
       <div className="flex items-center gap-1.5">
         <button
           type="button"

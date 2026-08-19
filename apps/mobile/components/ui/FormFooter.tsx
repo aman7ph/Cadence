@@ -49,7 +49,13 @@ export function FormFooter({
         style,
       ]}
     >
-      <Button variant="ghost" size="lg" title={cancelLabel} onPress={onCancel} disabled={pending} />
+      <Button
+        variant="ghost"
+        size="lg"
+        title={cancelLabel}
+        onPress={onCancel}
+        disabled={pending}
+      />
       <Button
         variant={tone === "danger" ? "outline" : "solid"}
         tone={tone === "danger" ? "danger" : "neutral"}

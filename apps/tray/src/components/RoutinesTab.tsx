@@ -20,7 +20,11 @@ export function RoutinesTab() {
   if (day === undefined) {
     return (
       <div className="tab-empty">
-        <div className="loading-dots"><span /><span /><span /></div>
+        <div className="loading-dots">
+          <span />
+          <span />
+          <span />
+        </div>
       </div>
     );
   }
@@ -31,7 +35,9 @@ export function RoutinesTab() {
     return (
       <div className="tab-empty">
         <div className="tab-empty-icon">○</div>
-        <p className="tab-empty-text">No routines scheduled for today</p>
+        {/* Web and mobile both say exactly this. The tray only ever shows
+            today, so their past-day variants have no equivalent here. */}
+        <p className="tab-empty-text">Nothing scheduled today.</p>
       </div>
     );
   }
@@ -42,12 +48,20 @@ export function RoutinesTab() {
         <div key={r.routineId} className="task-row">
           <span
             className={`task-dot ${
-              r.status === "completed" ? "green" : r.status === "skipped" ? "amber" : "blue"
+              r.status === "completed"
+                ? "completed"
+                : r.status === "skipped"
+                  ? "skipped"
+                  : "pending"
             }`}
           />
           <span
             className={`task-title${
-              r.status === "completed" ? " done" : r.status === "skipped" ? " dismissed" : ""
+              r.status === "completed"
+                ? " done"
+                : r.status === "skipped"
+                  ? " dismissed"
+                  : ""
             }`}
           >
             {r.name}
@@ -60,22 +74,38 @@ export function RoutinesTab() {
                     doneToday={r.repeatDoneToday ?? 0}
                     target={r.repeatTarget}
                     nextRepAllowedAt={r.nextRepAllowedAt}
-                    onRep={() => void logRep({ routineId: r.routineId, date: today, today })}
-                    onUndo={() => void undoRep({ routineId: r.routineId, date: today, today })}
+                    onRep={() =>
+                      void logRep({
+                        routineId: r.routineId,
+                        date: today,
+                        today,
+                      })
+                    }
+                    onUndo={() =>
+                      void undoRep({
+                        routineId: r.routineId,
+                        date: today,
+                        today,
+                      })
+                    }
                   />
                 ) : (
                   <button
                     className="task-action-btn"
                     title="Complete"
-                    onClick={() => complete({ routineId: r.routineId, date: today, today })}
+                    onClick={() =>
+                      complete({ routineId: r.routineId, date: today, today })
+                    }
                   >
                     ✓
                   </button>
                 )}
                 <button
                   className="task-action-btn danger"
-                  title="Skip"
-                  onClick={() => skip({ routineId: r.routineId, date: today, today })}
+                  title="Skip today"
+                  onClick={() =>
+                    skip({ routineId: r.routineId, date: today, today })
+                  }
                 >
                   ✕
                 </button>
@@ -95,8 +125,16 @@ export function RoutinesTab() {
                     // A skipped day is un-skipped by the plain mutation; only a
                     // completion has to go back through undoRep.
                     r.repeatTarget !== undefined && r.status === "completed"
-                      ? void undoRep({ routineId: r.routineId, date: today, today })
-                      : void uncomplete({ routineId: r.routineId, date: today, today })
+                      ? void undoRep({
+                          routineId: r.routineId,
+                          date: today,
+                          today,
+                        })
+                      : void uncomplete({
+                          routineId: r.routineId,
+                          date: today,
+                          today,
+                        })
                   }
                 >
                   ↩

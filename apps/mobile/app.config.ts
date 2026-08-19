@@ -54,6 +54,18 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-secure-store",
     "expo-web-browser",
     [
+      // Without this, Android draws its own fallback for every reminder — the
+      // app icon squashed into a grey circle. Android renders a notification
+      // icon as a MASK: it keeps the alpha and discards the colour, so the
+      // asset is white-on-transparent (generated that way by icon.mjs) rather
+      // than gold. `color` is what tints the resulting silhouette.
+      "expo-notifications",
+      {
+        icon: "./assets/images/notification-icon.png",
+        color: darkColors.prim,
+      },
+    ],
+    [
       // The mark on the app's own ground, so launch reads as the gyroscope
       // rather than a plated tile. Uses the TRANSPARENT foreground PNG — the
       // same file the adaptive icon uses — composited over backgroundColor.

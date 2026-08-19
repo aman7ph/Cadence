@@ -13,6 +13,8 @@ import {
 } from "react-native";
 import { AppBar } from "../../components/AppBar";
 import { Button } from "../../components/ui/Button";
+import { EmptyState } from "../../components/ui/EmptyState";
+import { TabBar } from "../../components/ui/TabBar";
 import { StagedTaskItem } from "../../components/StagedTaskItem";
 import type { StagedTaskData } from "../../components/StagedTaskItem";
 import { StagedTaskFormModal } from "../../components/StagedTaskFormModal";
@@ -66,43 +68,27 @@ export default function StagingScreen() {
 
   const s = StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
-    tabs: {
-      flexDirection: "row",
+    content: {
+      paddingTop: 8,
+      paddingBottom: 100,
       paddingHorizontal: 16,
-      paddingTop: 10,
-      paddingBottom: 6,
-      gap: 8,
+      gap: 10,
     },
-    content: { paddingTop: 8, paddingBottom: 100, paddingHorizontal: 16, gap: 10 },
     center: { flex: 1, alignItems: "center", justifyContent: "center" },
-    empty: {
-      margin: 24,
-      borderWidth: 1,
-      borderStyle: "dashed",
-      borderColor: c.bd1,
-      borderRadius: radii.md,
-      paddingVertical: 40,
-      paddingHorizontal: 20,
-      alignItems: "center",
-    },
-    emptyTxt: { fontSize: 13, color: c.t3, textAlign: "center" },
     fab: { position: "absolute", bottom: 28, right: 18 },
   });
 
   return (
     <SafeAreaView style={s.screen} edges={["top"]}>
       <AppBar title="Staging" />
-      <View style={s.tabs}>
-        {TABS.map((t) => (
-          <Button
-            key={t}
-            variant="tab"
-            selected={tab === t}
-            title={`${t}${count(t === "Unscheduled" ? unscheduled : scheduled)}`}
-            onPress={() => setTab(t)}
-          />
-        ))}
-      </View>
+      <TabBar
+        tabs={TABS}
+        active={tab}
+        onChange={setTab}
+        label={(t) =>
+          `${t}${count(t === "Unscheduled" ? unscheduled : scheduled)}`
+        }
+      />
       {stagedTasks === undefined ? (
         <View style={s.center}>
           <ActivityIndicator color={c.prim} />
@@ -119,13 +105,11 @@ export default function StagingScreen() {
           }
         >
           {shown.length === 0 ? (
-            <View style={s.empty}>
-              <Text style={s.emptyTxt}>
-                {tab === "Unscheduled"
-                  ? "Nothing staged yet. Captured tasks wait here until you schedule them."
-                  : "Nothing scheduled. Schedule a staged task and it will wait here until its day arrives."}
-              </Text>
-            </View>
+            <EmptyState>
+              {tab === "Unscheduled"
+                ? "Nothing staged yet. Captured tasks wait here until you schedule them."
+                : "Nothing scheduled. Schedule a staged task and it will wait here until its day arrives."}
+            </EmptyState>
           ) : (
             shown.map((t) => (
               <StagedTaskItem

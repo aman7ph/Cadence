@@ -21,7 +21,10 @@ http.route({
   handler: httpAction(async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      return new Response("Unauthorized", { status: 401, headers: corsHeaders });
+      return new Response("Unauthorized", {
+        status: 401,
+        headers: corsHeaders,
+      });
     }
 
     const secretKey = process.env.CLERK_SECRET_KEY;
@@ -38,12 +41,18 @@ http.route({
         Authorization: `Bearer ${secretKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ user_id: identity.subject, expires_in_seconds: 300 }),
+      body: JSON.stringify({
+        user_id: identity.subject,
+        expires_in_seconds: 300,
+      }),
     });
 
     if (!clerkRes.ok) {
       const text = await clerkRes.text();
-      return new Response(text, { status: clerkRes.status, headers: corsHeaders });
+      return new Response(text, {
+        status: clerkRes.status,
+        headers: corsHeaders,
+      });
     }
 
     const data = (await clerkRes.json()) as { token: string };
@@ -57,7 +66,9 @@ http.route({
 http.route({
   path: "/mint-sign-in-token",
   method: "OPTIONS",
-  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders })),
+  handler: httpAction(
+    async () => new Response(null, { status: 204, headers: corsHeaders }),
+  ),
 });
 
 export default http;

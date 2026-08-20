@@ -7,8 +7,13 @@
 // Values are the web's, so the two apps match. Where a name differs the mapping
 // is in .agent/mobile-redesign-implementation-plan.md (M2).
 
+// These two live in a plain-JS file because app.config.ts also needs them and
+// cannot import TypeScript — see the note in nativeColors.js. Re-read here so
+// the token layer and the native splash/icon config stay one definition.
+import { NATIVE_BG, NATIVE_ACCENT } from "./nativeColors";
+
 export const darkColors = {
-  bg: "#17140f", // web --bg-app
+  bg: NATIVE_BG, // web --bg-app
   bgE: "#211c15", // --bg-elevated
   bgS: "#282219", // --bg-sunken
   card: "#211c15", // --surface-card
@@ -31,7 +36,7 @@ export const darkColors = {
   bd3: "#7a7264", // --border-strong
   bdAcc: "#e8a13d", // --border-accent — focused inputs, selected chips
 
-  prim: "#e8a13d", // --action-primary
+  prim: NATIVE_ACCENT, // --action-primary
   primH: "#f3c877", // --action-primary-hover
 
   // The gyroscope's second and third rings. Fixed in BOTH themes, exactly as

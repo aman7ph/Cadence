@@ -1,7 +1,12 @@
 import type { ExpoConfig, ConfigContext } from "expo/config";
 // Read from the token layer so the native splash/launcher ground cannot drift
 // from the app's own background — it silently did until the Step 1 re-theme.
-import { darkColors } from "./lib/colors.ts";
+//
+// This MUST point at a plain-JS file, not at colors.ts. EAS reads this config
+// with a transform that does not strip TypeScript types, and importing the .ts
+// token layer here failed the build with "Unexpected token '{'". See the note
+// in lib/nativeColors.js.
+import { NATIVE_BG, NATIVE_ACCENT } from "./lib/nativeColors";
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
@@ -23,13 +28,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: "./assets/images/icon.png",
   android: {
     package: "com.cadence.app",
-    backgroundColor: darkColors.bg,
+    backgroundColor: NATIVE_BG,
     // Without this, Android 8+ plates the square icon instead of masking a
     // proper foreground. The foreground PNG is deliberately transparent so the
     // launcher composites it over backgroundColor and applies its own mask.
     adaptiveIcon: {
       foregroundImage: "./assets/images/icon-foreground.png",
-      backgroundColor: darkColors.bg,
+      backgroundColor: NATIVE_BG,
     },
     softwareKeyboardLayoutMode: "pan",
   },
@@ -62,7 +67,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       "expo-notifications",
       {
         icon: "./assets/images/notification-icon.png",
-        color: darkColors.prim,
+        color: NATIVE_ACCENT,
       },
     ],
     [
@@ -77,7 +82,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       "expo-splash-screen",
       {
         image: "./assets/images/icon-foreground.png",
-        backgroundColor: darkColors.bg,
+        backgroundColor: NATIVE_BG,
         imageWidth: 213,
       },
     ],
